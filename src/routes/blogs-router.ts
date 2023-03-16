@@ -32,15 +32,15 @@ blogsRouter.delete('/:id',
 
         if (isDeleted) {
             res.sendStatus(204)
-        } else res.sendStatus(400)
+        }
     })
 
 blogsRouter.post('/',
+    basicAuthMiddleware,
     nameBlogMiddleware,
     descriptionBlogMiddleware,
     websiteUrlBlogMiddleware,
     errorsBlogMiddleware,
-    basicAuthMiddleware,
     (req: Request, res: Response) => {
 
         const newBlog = blogRepository.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
@@ -50,11 +50,11 @@ blogsRouter.post('/',
     })
 
 blogsRouter.put('/:id',
+    basicAuthMiddleware,
     nameBlogMiddleware,
     descriptionBlogMiddleware,
     websiteUrlBlogMiddleware,
     errorsBlogMiddleware,
-    basicAuthMiddleware,
     (req: Request, res: Response) => {
 
         let foundBlog = blogRepository.updateBlog(+req.params.id, req.body.name, req.body.description, req.body.websiteUrl);

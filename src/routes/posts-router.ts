@@ -36,12 +36,12 @@ postsRouter.delete('/:id',
     })
 
 postsRouter.post('/',
+    basicAuthMiddleware,
     titlePostMiddleware,
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
     blogIdMiddleware,
     errorsPostMiddleware,
-    basicAuthMiddleware,
     (req: Request, res: Response) => {
         const newPost = postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName);
 
@@ -50,12 +50,12 @@ postsRouter.post('/',
     })
 
 postsRouter.put('/:id',
+    basicAuthMiddleware,
     titlePostMiddleware,
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
     blogIdMiddleware,
     errorsPostMiddleware,
-    basicAuthMiddleware,
     (req: Request, res: Response) => {
         let uodatedPost = postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
         if (uodatedPost) {
