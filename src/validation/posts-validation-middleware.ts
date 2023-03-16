@@ -10,7 +10,7 @@ export const blogIdMiddleware = body('blogId').isString();
 export const errorsPostMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.status(400).json({
+        res.status(400).send({
             errorsMessages: errors.array().map((e) => {
                     return {
                         message: e.msg,
