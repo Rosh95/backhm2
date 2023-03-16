@@ -32,15 +32,14 @@ blogsRouter.delete('/:id',
 
         if (isDeleted) {
             res.sendStatus(204)
-        }
-        else res.sendStatus(404)
+        } else res.sendStatus(404)
     })
 
 blogsRouter.post('/',
     basicAuthMiddleware,
+    websiteUrlBlogMiddleware,
     nameBlogMiddleware,
     descriptionBlogMiddleware,
-    websiteUrlBlogMiddleware,
     errorsBlogMiddleware,
     (req: Request, res: Response) => {
 
@@ -52,9 +51,9 @@ blogsRouter.post('/',
 
 blogsRouter.put('/:id',
     basicAuthMiddleware,
+    websiteUrlBlogMiddleware,
     nameBlogMiddleware,
     descriptionBlogMiddleware,
-    websiteUrlBlogMiddleware,
     errorsBlogMiddleware,
     (req: Request, res: Response) => {
 
