@@ -9,7 +9,7 @@ exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString();
 const errorsPostMiddleware = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        res.status(400).json({
+        res.status(400).send({
             errorsMessages: errors.array().map((e) => {
                 return {
                     message: e.msg,
