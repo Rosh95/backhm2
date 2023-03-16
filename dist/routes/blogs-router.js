@@ -23,12 +23,14 @@ exports.blogsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     if (isDeleted) {
         res.sendStatus(204);
     }
+    else
+        res.sendStatus(404);
 });
-exports.blogsRouter.post('/', blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.errorsBlogMiddleware, authorization_1.basicAuthMiddleware, (req, res) => {
+exports.blogsRouter.post('/', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.errorsBlogMiddleware, (req, res) => {
     const newBlog = blog_repository_1.blogRepository.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
     res.status(201).send(newBlog);
 });
-exports.blogsRouter.put('/:id', blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.errorsBlogMiddleware, authorization_1.basicAuthMiddleware, (req, res) => {
+exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.errorsBlogMiddleware, (req, res) => {
     let foundBlog = blog_repository_1.blogRepository.updateBlog(+req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
     if (foundBlog) {
         res.sendStatus(204);

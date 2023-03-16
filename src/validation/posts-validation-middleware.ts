@@ -1,11 +1,14 @@
 import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
+import {db} from '../db/db';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({max: 30}).withMessage('title should be less than 30 symbols string');
 export const shortDescriptionPostMiddleware = body('shortDescription').isString().isLength({max: 100}).withMessage('shortDescription should be less than 500 sympols string');
 
 export const contentPostMiddleware = body('content').isString().isLength({max: 1000}).withMessage('content should be less than 1000 sympols string');
-export const blogIdMiddleware = body('blogId').isString();
+
+const blogsIdArray = db.blogs.map(b => b.id);
+export const blogIdMiddleware = body('blogId').isString().isIn(blogsIdArray);
 
 export const errorsPostMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
