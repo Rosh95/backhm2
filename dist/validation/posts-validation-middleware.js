@@ -7,7 +7,14 @@ exports.titlePostMiddleware = (0, express_validator_1.body)('title').isString().
 exports.shortDescriptionPostMiddleware = (0, express_validator_1.body)('shortDescription').isString().isLength({ max: 100 }).withMessage('shortDescription should be less than 500 sympols string');
 exports.contentPostMiddleware = (0, express_validator_1.body)('content').isString().isLength({ max: 1000 }).withMessage('content should be less than 1000 sympols string');
 const blogsIdArray = db_1.db.blogs.map(b => b.id);
-exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().isIn([...blogsIdArray]);
+console.log(blogsIdArray);
+exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().custom((value) => {
+    const isIncluded = blogsIdArray.includes(value);
+    if (!isIncluded) {
+        throw new Error('This blodId doesn`t exist');
+    }
+    return true;
+}).withMessage('Please, write exist blogId');
 const errorsPostMiddleware = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {

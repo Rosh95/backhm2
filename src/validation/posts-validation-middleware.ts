@@ -8,7 +8,15 @@ export const shortDescriptionPostMiddleware = body('shortDescription').isString(
 export const contentPostMiddleware = body('content').isString().isLength({max: 1000}).withMessage('content should be less than 1000 sympols string');
 
 const blogsIdArray = db.blogs.map(b => b.id);
-export const blogIdMiddleware = body('blogId').isString().isIn([...blogsIdArray]);
+console.log(blogsIdArray)
+export const blogIdMiddleware = body('blogId').isString().custom((value) => {
+    const isIncluded = blogsIdArray.includes(value);
+    if (!isIncluded) {
+        throw new Error('This blodId doesn`t exist')
+    }
+    return true;
+
+}).withMessage('Please, write exist blogId');
 
 export const errorsPostMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

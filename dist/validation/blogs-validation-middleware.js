@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorsBlogMiddleware = exports.websiteUrlBlogMiddleware = exports.descriptionBlogMiddleware = exports.nameBlogMiddleware = void 0;
 const express_validator_1 = require("express-validator");
 exports.nameBlogMiddleware = (0, express_validator_1.body)('name').isString().trim().isLength({
-    min: 1,
     max: 15
 }).withMessage('name should be less than 15 sympols string');
 exports.descriptionBlogMiddleware = (0, express_validator_1.body)('description').isString().trim().isLength({
