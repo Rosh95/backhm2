@@ -12,7 +12,12 @@ export const basicAuthMiddleware = async (req: Request, res: Response, next: Nex
     // }
 
     const loginAndPassword = Buffer.from('admin:qwerty').toString('base64');
+    let authorizationMethod = req.headers.authorization ? req.headers.authorization.split(' ')[0] : undefined;
     let authorizationPart = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
+    if (authorizationMethod?.toLowerCase() !== 'Basic'.toLowerCase()) {
+        authorizationPart = undefined;
+    }
+
     if (authorizationPart === loginAndPassword) {
         next()
     } else {

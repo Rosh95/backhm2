@@ -21,7 +21,11 @@ const basicAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
     //     res.status(401).end('Please, authorize.')
     // }
     const loginAndPassword = Buffer.from('admin:qwerty').toString('base64');
+    let authorizationMethod = req.headers.authorization ? req.headers.authorization.split(' ')[0] : undefined;
     let authorizationPart = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
+    if ((authorizationMethod === null || authorizationMethod === void 0 ? void 0 : authorizationMethod.toLowerCase()) !== 'Basic'.toLowerCase()) {
+        authorizationPart = undefined;
+    }
     if (authorizationPart === loginAndPassword) {
         next();
     }
