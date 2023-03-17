@@ -1,8 +1,7 @@
 import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 
-export const nameBlogMiddleware = body('name').isString().trim().isLength({
-    min: 1,
+export const nameBlogMiddleware = body('name').isString().trim().custom(value => value !== '').isLength({
     max: 15
 }).withMessage('name should be less than 15 sympols string');
 export const descriptionBlogMiddleware = body('description').isString().trim().isLength({
