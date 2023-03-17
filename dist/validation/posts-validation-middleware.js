@@ -3,8 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorsPostMiddleware = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
 const express_validator_1 = require("express-validator");
 const db_1 = require("../db/db");
-exports.titlePostMiddleware = (0, express_validator_1.body)('title').isString().trim().isLength({
-    min: 1,
+exports.titlePostMiddleware = (0, express_validator_1.body)('title').isString().trim().custom(value => value !== '').isLength({
     max: 30
 }).withMessage('title should be less than 30 symbols string');
 exports.shortDescriptionPostMiddleware = (0, express_validator_1.body)('shortDescription').isString().isLength({ max: 100 }).withMessage('shortDescription should be less than 500 sympols string');
