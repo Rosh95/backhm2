@@ -2,7 +2,10 @@ import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 import {db} from '../db/db';
 
-export const titlePostMiddleware = body('title').isString().trim().isLength({max: 30}).withMessage('title should be less than 30 symbols string');
+export const titlePostMiddleware = body('title').isString().trim().isLength({
+    min: 1,
+    max: 30
+}).withMessage('title should be less than 30 symbols string');
 export const shortDescriptionPostMiddleware = body('shortDescription').isString().isLength({max: 100}).withMessage('shortDescription should be less than 500 sympols string');
 
 export const contentPostMiddleware = body('content').isString().isLength({max: 1000}).withMessage('content should be less than 1000 sympols string');
