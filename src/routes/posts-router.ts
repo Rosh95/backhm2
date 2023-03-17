@@ -32,7 +32,7 @@ postsRouter.delete('/:id',
 
         if (isDeleted) {
             res.sendStatus(204)
-        } else res.sendStatus(400)
+        } else res.sendStatus(404)
     })
 
 postsRouter.post('/',

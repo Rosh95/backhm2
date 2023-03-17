@@ -24,7 +24,7 @@ exports.postsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
         res.sendStatus(204);
     }
     else
-        res.sendStatus(400);
+        res.sendStatus(404);
 });
 exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, posts_validation_middleware_1.blogIdMiddleware, posts_validation_middleware_1.errorsPostMiddleware, (req, res) => {
     const newPost = post_repository_1.postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName);

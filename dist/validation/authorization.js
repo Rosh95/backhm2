@@ -12,10 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.basicAuthMiddleware = void 0;
 const auth = require('basic-auth');
 const basicAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield auth(req);
-    const username = 'admin';
-    const password = 'qwerty';
-    if (user && user.name.toLowerCase() === username && user.pass.toLowerCase() === password) {
+    // const user = await auth(req);
+    // const username: string = 'admin';
+    // const password: string = 'qwerty';
+    // if (user && user.name.toLowerCase() === username && user.pass.toLowerCase() === password) {
+    //     next()
+    // } else {
+    //     res.status(401).end('Please, authorize.')
+    // }
+    const loginAndPassword = Buffer.from('admin:qwerty').toString('base64');
+    let authorizationPart = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
+    if (authorizationPart === loginAndPassword) {
         next();
     }
     else {
