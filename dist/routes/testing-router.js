@@ -8,11 +8,10 @@ exports.testRouter.delete('/', (req, res) => {
     if (db_1.db.blogs.length > 0) {
         db_1.db.blogs.splice(0);
         res.sendStatus(204);
-        return;
     }
     if (db_1.db.posts.length > 0) {
         db_1.db.posts.splice(0);
         res.sendStatus(204);
-        return;
     }
+    return;
 });

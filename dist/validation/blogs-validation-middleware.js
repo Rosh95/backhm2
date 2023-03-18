@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorsBlogMiddleware = exports.websiteUrlBlogMiddleware = exports.descriptionBlogMiddleware = exports.nameBlogMiddleware = void 0;
 const express_validator_1 = require("express-validator");
-exports.nameBlogMiddleware = (0, express_validator_1.body)('name').trim().isLength({
+exports.nameBlogMiddleware = (0, express_validator_1.body)('name').isString().trim().isLength({
     min: 1,
     max: 15
 }).withMessage('name should be less than 15 symbols string');
@@ -15,7 +15,7 @@ const errorsBlogMiddleware = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(400).send({
-            errorsMessages: errors.array().map((e) => {
+            errorsMessages: errors.array({ onlyFirstError: true }).map((e) => {
                 return {
                     message: e.msg,
                     field: e.param

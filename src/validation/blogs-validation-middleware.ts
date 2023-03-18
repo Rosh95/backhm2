@@ -1,7 +1,7 @@
 import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 
-export const nameBlogMiddleware = body('name').trim().isLength({
+export const nameBlogMiddleware = body('name').isString().trim().isLength({
     min: 1,
     max: 15
 }).withMessage('name should be less than 15 symbols string');
@@ -17,7 +17,7 @@ export const errorsBlogMiddleware = (req: Request, res: Response, next: NextFunc
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.status(400).send({
-            errorsMessages: errors.array().map((e) => {
+            errorsMessages: errors.array({onlyFirstError: true}).map((e) => {
                     return {
                         message: e.msg,
                         field: e.param

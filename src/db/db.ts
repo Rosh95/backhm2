@@ -49,6 +49,12 @@ export type blogType = {
     websiteUrl: string
 
 }
+export type blogInputType = {
+    name: string,
+    description: string,
+    websiteUrl: string
+
+}
 export type postType = {
     id: string,
     title: string,
@@ -57,4 +63,10 @@ export type postType = {
     blogId: string,
     blogName: string
 }
-
+export type postInputType = {
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string,
+    blogName: string
+}

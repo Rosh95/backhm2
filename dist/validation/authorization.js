@@ -10,27 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.basicAuthMiddleware = void 0;
-const auth = require('basic-auth');
 const basicAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // const user = await auth(req);
-    // const username: string = 'admin';
-    // const password: string = 'qwerty';
-    // if (user && user.name.toLowerCase() === username && user.pass.toLowerCase() === password) {
-    //     next()
-    // } else {
-    //     res.status(401).end('Please, authorize.')
-    // }
     const loginAndPassword = Buffer.from('admin:qwerty').toString('base64');
     let authorizationMethod = req.headers.authorization ? req.headers.authorization.split(' ')[0] : undefined;
     let authorizationPart = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
-    if ((authorizationMethod === null || authorizationMethod === void 0 ? void 0 : authorizationMethod.toLowerCase()) !== 'Basic'.toLowerCase()) {
-        authorizationPart = undefined;
-    }
-    if (authorizationPart === loginAndPassword) {
-        next();
+    let isBasicauthorizationMethod = (authorizationMethod === null || authorizationMethod === void 0 ? void 0 : authorizationMethod.toLowerCase()) !== 'Basic'.toLowerCase();
+    let isTrueLoginAndPassword = authorizationPart !== loginAndPassword;
+    if (isBasicauthorizationMethod || isTrueLoginAndPassword) {
+        res.sendStatus(401);
     }
     else {
-        res.status(401).end('Please, authorize.');
+        next();
     }
 });
 exports.basicAuthMiddleware = basicAuthMiddleware;
