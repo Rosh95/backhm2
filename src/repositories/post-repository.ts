@@ -32,13 +32,14 @@ export const postRepository = {
         return newPost;
     },
 
-    updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string) {
+    updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string, blogName: string) {
         let foundPost = postRepository.findPostById(id);
         if (foundPost) {
             foundPost.title = title;
             foundPost.shortDescription = shortDescription;
             foundPost.content = content;
             foundPost.blogId = blogId;
+            foundPost.blogName = blogName;
             return true;
         } else {
             return false;

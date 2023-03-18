@@ -57,7 +57,7 @@ postsRouter.put('/:id',
     blogIdMiddleware,
     errorsPostMiddleware,
     (req: Request, res: Response) => {
-        let uodatedPost = postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+        let uodatedPost = postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName );
         if (uodatedPost) {
             res.sendStatus(204)
         } else {

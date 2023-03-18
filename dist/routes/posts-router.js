@@ -31,7 +31,7 @@ exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validat
     res.status(201).send(newPost);
 });
 exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, posts_validation_middleware_1.blogIdMiddleware, posts_validation_middleware_1.errorsPostMiddleware, (req, res) => {
-    let uodatedPost = post_repository_1.postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+    let uodatedPost = post_repository_1.postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName);
     if (uodatedPost) {
         res.sendStatus(204);
     }

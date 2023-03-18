@@ -31,13 +31,14 @@ exports.postRepository = {
         db_1.db.posts.push(newPost);
         return newPost;
     },
-    updatePost(id, title, shortDescription, content, blogId) {
+    updatePost(id, title, shortDescription, content, blogId, blogName) {
         let foundPost = exports.postRepository.findPostById(id);
         if (foundPost) {
             foundPost.title = title;
             foundPost.shortDescription = shortDescription;
             foundPost.content = content;
             foundPost.blogId = blogId;
+            foundPost.blogName = blogName;
             return true;
         }
         else {
