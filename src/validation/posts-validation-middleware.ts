@@ -23,7 +23,8 @@ export const blogIdMiddleware = body('blogId').isString().custom((value) => {
     console.log(`${blogsIdArray} exists blogID`)
     const isIncluded = db.blogs.map(b => b.id).includes(value);
     if (!isIncluded) {
-        throw new Error('This blodId doesn`t exist')
+        return false;
+        // throw new Error('This blogId doesn`t exist')
     }
     return true;
 

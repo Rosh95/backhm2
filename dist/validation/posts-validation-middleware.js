@@ -22,7 +22,8 @@ exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().cu
     console.log(`${blogsIdArray} exists blogID`);
     const isIncluded = db_1.db.blogs.map(b => b.id).includes(value);
     if (!isIncluded) {
-        throw new Error('This blodId doesn`t exist');
+        return false;
+        // throw new Error('This blogId doesn`t exist')
     }
     return true;
 }).withMessage('Please, write exist blogId');
