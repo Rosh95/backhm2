@@ -12,9 +12,9 @@ const port = process.env.port || 3001;
 exports.app = (0, express_1.default)();
 const parserMiddleWare = express_1.default.json();
 exports.app.use(parserMiddleWare);
+exports.app.use('/testing/all-data', testing_router_1.testRouter);
 exports.app.use('/blogs', blogs_router_1.blogsRouter);
 exports.app.use('/posts', posts_router_1.postsRouter);
-exports.app.use('/testing/all-data', testing_router_1.testRouter);
 exports.app.use('/', (req, res) => {
     res.send('Siiiiii');
 });
