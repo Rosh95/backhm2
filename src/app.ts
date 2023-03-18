@@ -12,6 +12,8 @@ app.use(parserMiddleWare)
 
 app.use('/blogs', blogsRouter);
 app.use('/posts', postsRouter);
+app.use('/testing/all-data', testRouter);
+
 app.use('/', (req: Request, res: Response) => {
     res.send('Siiiiii')
 })

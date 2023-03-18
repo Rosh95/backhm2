@@ -85,11 +85,11 @@ describe('Posts router', () => {
             const postFromAPi = getPostResponse.body
             expect(postFromAPi).toEqual(post)
         })
-        // it('should get non-existent blog and return 404', async () => {
-        //     let randomNumber = 1222555;
-        //     const getBlogResponse = await request(app).get(`/blogs/${randomNumber}`)
-        //     expect(getBlogResponse.status).toBe(404)
-        // })
+        it('should get non-existent post and return 404', async () => {
+            let randomNumber = 1222555;
+            const getPostResponse = await request(app).get(`/posts/${randomNumber}`)
+            expect(getPostResponse.status).toBe(404)
+        })
 
     })
 
