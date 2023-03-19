@@ -1,6 +1,7 @@
 import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 import {db} from '../db/db';
+import {blogsCollection} from '../db/dbMongo';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({
     min: 1,
@@ -18,13 +19,14 @@ export const contentPostMiddleware = body('content').isString().trim().isLength(
 
 let blogsIdArray = db.blogs.map(b => b.id);
 console.log(blogsIdArray)
-export const blogIdMiddleware = body('blogId').isString().custom((value) => {
+export const blogIdMiddleware = body('blogId').isString().custom(async (value) => {
     console.log(value);
     console.log(`${blogsIdArray} exists blogID`)
-    const isIncluded = db.blogs.map(b => b.id).includes(value);
-    if (!isIncluded) {
-        return false;
-        // throw new Error('This blogId doesn`t exist')
+    //   const isIncluded = db.blogs.map(b => b.id).includes(value);
+    const isIncluded = await blogsCollection.find({id:value}).toArray();
+    if (isIncluded.length === 0) {
+        // return false;
+        throw new Error('This blogId doesn`t exist')
     }
     return true;
 

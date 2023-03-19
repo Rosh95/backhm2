@@ -7,16 +7,17 @@ import {
     websiteUrlBlogMiddleware
 } from '../validation/blogs-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
+import {Collection} from 'mongodb';
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', (req: Request, res: Response) => {
-    const blogs: Array<blogType> = blogRepository.findBlogs();
+blogsRouter.get('/', async (req: Request, res: Response) => {
+    const blogs = await blogRepository.findBlogs();
     res.send(blogs)
 })
 
-blogsRouter.get('/:id', (req: Request, res: Response) => {
-    let foundBlog: blogType | undefined = blogRepository.findBlogById(+req.params.id)
+blogsRouter.get('/:id', async (req: Request, res: Response) => {
+    let foundBlog = await blogRepository.findBlogById(+req.params.id)
     if (foundBlog) {
         res.send(foundBlog)
         return;
@@ -26,9 +27,9 @@ blogsRouter.get('/:id', (req: Request, res: Response) => {
 
 blogsRouter.delete('/:id',
     basicAuthMiddleware,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
 
-        const isDeleted = blogRepository.deleteBlog(+req.params.id)
+        const isDeleted = await blogRepository.deleteBlog(+req.params.id)
 
         if (isDeleted) {
             res.sendStatus(204)
@@ -41,9 +42,9 @@ blogsRouter.post('/',
     nameBlogMiddleware,
     descriptionBlogMiddleware,
     errorsBlogMiddleware,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
 
-        const newBlog = blogRepository.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
+        const newBlog = await blogRepository.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
 
         res.status(201).send(newBlog)
 
@@ -55,9 +56,9 @@ blogsRouter.put('/:id',
     nameBlogMiddleware,
     descriptionBlogMiddleware,
     errorsBlogMiddleware,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
 
-        let foundBlog = blogRepository.updateBlog(+req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
+        let foundBlog = await blogRepository.updateBlog(+req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
         if (foundBlog) {
             res.sendStatus(204)
         } else {

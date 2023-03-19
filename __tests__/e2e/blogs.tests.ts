@@ -32,6 +32,7 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
+                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -84,6 +85,7 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
+                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -94,7 +96,6 @@ describe('Blogs router', () => {
             expect.setState({blog: newBlog})
         })
         it('should delete blog by id', async () => {
-            let currentIdBlog = db.blogs[0].id;
             const {blog} = expect.getState()
 
             await request(app)
@@ -133,6 +134,7 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
+                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -173,6 +175,7 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
+                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
