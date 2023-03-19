@@ -1,5 +1,5 @@
 import request from 'supertest'
-import {blogInputType, postInputType} from '../../src/db/db';
+import {blogInputType, db, postInputType} from '../../src/db/db';
 import {app} from '../../src/app';
 
 
@@ -58,7 +58,6 @@ describe('Posts router', () => {
                 shortDescription: 'How to make money?',
                 content: 'Just born in Billionare family',
                 blogId: blog.id,
-                blogName: 'finance'
             }
 
             let response = await addNewPost(postsInputData);
@@ -70,7 +69,7 @@ describe('Posts router', () => {
                 shortDescription: postsInputData.shortDescription,
                 content: postsInputData.content,
                 blogId: postsInputData.blogId,
-                blogName: postsInputData.blogName
+                blogName: expect.any(String)
                 // createdAt: expect.any(String),
                 // isMembership: false
             })
@@ -93,214 +92,311 @@ describe('Posts router', () => {
 
     })
 
-    // describe('Blogs router DELETE method', () => {
-    //     beforeAll(async () => {
-    //         await request(app).delete('/testing/all-data')
-    //     })
-    //     it('should delete unexciting blog by id and return 404', async () => {
-    //         let randomNumber = 55555;
-    //         await request(app)
-    //             .delete(`/blogs/${randomNumber}`)
-    //             .auth('admin', 'qwerty')
-    //             .expect(404)
-    //     })
-    //     it('should delete  blog by id unauthorized and return 401 ', async () => {
-    //         let randomNumber = 55555;
-    //         await request(app)
-    //             .delete(`/blogs/${randomNumber}`)
-    //             .expect(401)
-    //     })
-    //     it('should return 201 status and add new blog', async () => {
-    //         const blogInputData = {
-    //             name: "Vasya Pupkin",
-    //             websiteUrl: "https://vk.com/55",
-    //             description: "homeless"
-    //         }
-    //         let response = await addNewBlog(blogInputData);
-    //         expect(response.status).toBe(201)
-    //         const newBlog = response.body
-    //         expect(newBlog).toEqual({
-    //             id: expect.any(String),
-    //             name: blogInputData.name,
-    //             description: blogInputData.description,
-    //             websiteUrl: blogInputData.websiteUrl,
-    //             // createdAt: expect.any(String),
-    //             // isMembership: false
-    //         })
-    //         expect.setState({blog: newBlog})
-    //     })
-    //     it('should delete blog by id', async () => {
-    //         let currentIdBlog = db.blogs[0].id;
-    //         const {blog} = expect.getState()
-    //
-    //         await request(app)
-    //             .delete('/blogs/' + blog.id)
-    //             .auth('admin', 'qwerty')
-    //             .expect(204)
-    //
-    //         await request(app)
-    //             .get('/blogs')
-    //             .expect(200, [])
-    //     })
-    // })
+    describe('Posts router DELETE method', () => {
+        beforeAll(async () => {
+            await request(app).delete('/testing/all-data')
+        })
+        it('should delete unexciting posts by id and return 404', async () => {
+            let randomNumber = 55555;
+            await request(app)
+                .delete(`/posts/${randomNumber}`)
+                .auth('admin', 'qwerty')
+                .expect(404)
+        })
+        it('should delete  blog by id unauthorized and return 401 ', async () => {
+            let randomNumber = 55555;
+            await request(app)
+                .delete(`/posts/${randomNumber}`)
+                .expect(401)
+        })
+        it('should return 201 status and add new blog', async () => {
+            const blogInputData = {
+                name: "Pavel Durov",
+                websiteUrl: "https://vk.com",
+                description: "it businessman"
+            }
 
-    // describe('Blogs router POST method', () => {
-    //     // beforeAll(async () => {
-    //     //     await request(app).delete('/testing/all-data')
-    //     // })
-    //     it('try add post by unauthorized user and return 401', async () => {
-    //         const blogInputData = {
-    //             name: "Vasyliy Pupkin",
-    //             websiteUrl: "https://vk.com/55",
-    //             description: "teacher"
-    //         }
-    //         let response = await request(app)
-    //             .post('/blogs')
-    //             .send(blogInputData);
-    //         expect(response.status).toBe(401)
-    //     })
-    //     it('should return 201 status and add new blog', async () => {
-    //         const blogInputData = {
-    //             name: "Vasyliy Pupkin",
-    //             websiteUrl: "https://vk.com/55",
-    //             description: "teacher"
-    //         }
-    //         let response = await addNewBlog(blogInputData);
-    //         expect(response.status).toBe(201)
-    //         const newBlog = response.body
-    //         expect(newBlog).toEqual({
-    //             id: expect.any(String),
-    //             name: blogInputData.name,
-    //             description: blogInputData.description,
-    //             websiteUrl: blogInputData.websiteUrl,
-    //             // createdAt: expect.any(String),
-    //             // isMembership: false
-    //         })
-    //         expect.setState({blog: newBlog})
-    //     })
-    //     it('try add new blog with wrong data and get 400', async () => {
-    //         const blogInputData = {
-    //             name: "Vasyliy Pupkin",
-    //             websiteUrl: "httppppps://vk.com/55",
-    //             description: "teacher"
-    //         }
-    //         let response = await addNewBlog(blogInputData);
-    //         expect(response.status).toBe(400)
-    //     })
-    //
-    //
-    // })
+            let response = await addNewBlog(blogInputData);
+            expect(response.status).toBe(201)
+            const newBlog = response.body
+            expect(newBlog).toEqual({
+                id: expect.any(String),
+                name: blogInputData.name,
+                description: blogInputData.description,
+                websiteUrl: blogInputData.websiteUrl,
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({blog: newBlog})
+        })
+        it('should return 201 status and add new post', async () => {
+            const {blog} = expect.getState()
 
-    // describe('Blogs router PUT method', () => {
-    //     it('should delete all blogs', async () => {
-    //         await request(app).delete('/testing/all-data');
-    //         await request(app)
-    //             .get('/blogs')
-    //             .expect(200, [])
-    //     })
-    //     it('should return 201 status and add new blog', async () => {
-    //         const blogInputData = {
-    //             name: "Pavel Durov",
-    //             websiteUrl: "https://vk.com",
-    //             description: "it businessman"
-    //         }
-    //
-    //         let response = await addNewBlog(blogInputData);
-    //         expect(response.status).toBe(201)
-    //         const newBlog = response.body
-    //         expect(newBlog).toEqual({
-    //             id: expect.any(String),
-    //             name: blogInputData.name,
-    //             description: blogInputData.description,
-    //             websiteUrl: blogInputData.websiteUrl,
-    //             // createdAt: expect.any(String),
-    //             // isMembership: false
-    //         })
-    //         expect.setState({blog: newBlog})
-    //     })
-    //     it('should return 204 status and  change blog', async () => {
-    //         const {blog} = expect.getState()
-    //         const resp = await request(app)
-    //             .put('/blogs/' + blog.id)
-    //             .send(
-    //                 {
-    //                     name: "Nikolay Durov",
-    //                     websiteUrl: "https://vk.com",
-    //                     description: "it programming man"
-    //                 })
-    //             .auth('admin', 'qwerty')
-    //
-    //         expect(resp.status).toBe(204)
-    //         const updateBlogInputData = {
-    //             id: blog.id,
-    //             name: "Nikolay Durov",
-    //             websiteUrl: "https://vk.com",
-    //             description: "it programming man"
-    //         }
-    //
-    //         await request(app)
-    //             .get('/blogs')
-    //             .expect(200, [updateBlogInputData])
-    //
-    //         expect.setState({blog: updateBlogInputData})
-    //
-    //     })
-    //     it('try change blog unauthorized and return 401', async () => {
-    //         const {blog} = expect.getState()
-    //         const resp = await request(app)
-    //             .put('/blogs/' + blog.id)
-    //             .send(
-    //                 {
-    //                     name: "Nikolay Durov",
-    //                     websiteUrl: "https://vk.com",
-    //                     description: "it programming man"
-    //                 })
-    //         expect(resp.status).toBe(401)
-    //
-    //     })
-    //     it('should return 400 status and try change blog by wrong data', async () => {
-    //         const {blog} = expect.getState()
-    //         const resp = await request(app)
-    //             .put('/blogs/' + blog.id)
-    //             .send(
-    //                 {
-    //                     name: "Nikolay Durov",
-    //                     websiteUrl: "httjkdfngaps://vk.com",
-    //                     description: "it programming man"
-    //                 })
-    //             .auth('admin', 'qwerty')
-    //
-    //         expect(resp.status).toBe(400)
-    //         // const updateBlogInputData = {
-    //         //     id: blog.id,
-    //         //     name: "Nikolay Durov",
-    //         //     websiteUrl: "https://vk.com",
-    //         //     description: "it programming man"
-    //         // }
-    //         //
-    //         // await request(app)
-    //         //     .get('/blogs')
-    //         //     .expect(200, [updateBlogInputData])
-    //         //
-    //         // expect.setState({blog: updateBlogInputData})
-    //
-    //     })
-    //     it('try change  non-exist blog and return 404', async () => {
-    //         const {blog} = expect.getState()
-    //         let randomNumber = 561649849;
-    //         const resp = await request(app)
-    //             .put('/blogs/' + randomNumber)
-    //             .send(
-    //                 {
-    //                     name: "Nikolay Durov",
-    //                     websiteUrl: "https://vk.com",
-    //                     description: "it programming man"
-    //                 })
-    //             .auth('admin', 'qwerty')
-    //         expect(resp.status).toBe(404)
-    //
-    //     })
-    //
-    // })
+            const postsInputData = {
+                title: 'Money',
+                shortDescription: 'How to make money?',
+                content: 'Just born in Billionare family',
+                blogId: blog.id,
+                blogName: blog.name
+            }
+
+            let response = await addNewPost(postsInputData);
+            expect(response.status).toBe(201)
+            const newPost = response.body
+            expect(newPost).toEqual({
+                id: expect.any(String),
+                title: postsInputData.title,
+                shortDescription: postsInputData.shortDescription,
+                content: postsInputData.content,
+                blogId: postsInputData.blogId,
+                blogName: postsInputData.blogName
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({post: newPost})
+        })
+        it('should delete post by id', async () => {
+            let currentIdBlog = db.blogs[0].id;
+            const {post} = expect.getState()
+
+            await request(app)
+                .delete('/posts/' + post.id)
+                .auth('admin', 'qwerty')
+                .expect(204)
+
+            await request(app)
+                .get('/posts')
+                .expect(200, [])
+        })
+    })
+
+    describe('Posts router POST method', () => {
+        // beforeAll(async () => {
+        //     await request(app).delete('/testing/all-data')
+        // })
+        it('should return 201 status and add new blog', async () => {
+            const blogInputData = {
+                name: "Pavel Durov",
+                websiteUrl: "https://vk.com",
+                description: "it businessman"
+            }
+
+            let response = await addNewBlog(blogInputData);
+            expect(response.status).toBe(201)
+            const newBlog = response.body
+            expect(newBlog).toEqual({
+                id: expect.any(String),
+                name: blogInputData.name,
+                description: blogInputData.description,
+                websiteUrl: blogInputData.websiteUrl,
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({blog: newBlog})
+        })
+
+        it('try add post by unauthorized user and return 401', async () => {
+            const {blog} = expect.getState()
+
+            const postInputData = {
+                title: 'Money',
+                shortDescription: 'How to make money?',
+                content: 'Just born in Billionare family',
+                blogId: blog.id,
+                blogName: 'finance'
+            }
+            let response = await request(app)
+                .post('/blogs')
+                .send(postInputData);
+            expect(response.status).toBe(401)
+        })
+
+        it('should return 201 status and add new post', async () => {
+            const {blog} = expect.getState()
+
+            const postsInputData = {
+                title: 'Money',
+                shortDescription: 'How to make money?',
+                content: 'Just born in Billionare family',
+                blogId: blog.id,
+            }
+
+            let response = await addNewPost(postsInputData);
+            expect(response.status).toBe(201)
+            const newPost = response.body
+            expect(newPost).toEqual({
+                id: expect.any(String),
+                title: postsInputData.title,
+                shortDescription: postsInputData.shortDescription,
+                content: postsInputData.content,
+                blogId: postsInputData.blogId,
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({post: newPost})
+        })
+
+        it('try add new blog with wrong data and get 400', async () => {
+            const {blog} = expect.getState()
+
+            const postsInputData = {
+                title: 55,
+                shortDescription: 'How to make money?',
+                content: 'Just born in Billionare family',
+                blogId: blog.id,
+                blogName: 'finance'
+            }
+            // @ts-ignore
+            let response = await addNewPost(postsInputData);
+            expect(response.status).toBe(400)
+        })
+
+
+    })
+
+    describe('Posts router PUT method', () => {
+        it('should delete all blogs', async () => {
+            await request(app).delete('/testing/all-data');
+            await request(app)
+                .get('/posts')
+                .expect(200, [])
+        })
+        it('should return 201 status and add new blog', async () => {
+            const blogInputData = {
+                name: "Pavel Durov",
+                websiteUrl: "https://vk.com",
+                description: "it businessman"
+            }
+
+            let response = await addNewBlog(blogInputData);
+            expect(response.status).toBe(201)
+            const newBlog = response.body
+            expect(newBlog).toEqual({
+                id: expect.any(String),
+                name: blogInputData.name,
+                description: blogInputData.description,
+                websiteUrl: blogInputData.websiteUrl,
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({blog: newBlog})
+        })
+        it('should return 201 status and add new post', async () => {
+            const {blog} = expect.getState()
+
+            const postsInputData = {
+                title: 'Money',
+                shortDescription: 'How to make money?',
+                content: 'Just born in Billionare family',
+                blogId: blog.id,
+            }
+
+            let response = await addNewPost(postsInputData);
+            expect(response.status).toBe(201)
+            const newPost = response.body
+            expect(newPost).toEqual({
+                id: expect.any(String),
+                title: postsInputData.title,
+                shortDescription: postsInputData.shortDescription,
+                content: postsInputData.content,
+                blogId: postsInputData.blogId,
+                // createdAt: expect.any(String),
+                // isMembership: false
+            })
+            expect.setState({post: newPost})
+        })
+
+        it('should return 204 status and  change post', async () => {
+            const {blog} = expect.getState()
+            const {post} = expect.getState()
+            const resp = await request(app)
+                .put('/posts/' + post.id)
+                .send(
+                    {
+                        title: 'Women',
+                        shortDescription: 'How to sleep with 1000 women?',
+                        content: 'Just born in Billionare family',
+                        blogId: blog.id,
+                    })
+                .auth('admin', 'qwerty')
+
+            expect(resp.status).toBe(204)
+            const updatedPost = resp.body
+            const updatePostInputData = {
+                title: updatedPost.title,
+                shortDescription: updatedPost.shortDescription,
+                content: updatedPost.content,
+                blogId: updatedPost.blogId,
+            }
+            console.log(updatePostInputData)
+            await request(app)
+                .get('/posts')
+                .expect(200, [updatePostInputData])
+
+            expect.setState({post: updatePostInputData})
+
+        })
+        it('try change post unauthorized and return 401', async () => {
+            const {post} = expect.getState()
+            const resp = await request(app)
+                .put('/posts/' + post.id)
+                .send(
+                    {
+                        title: 'Sport',
+                        shortDescription: 'How to be Fit?',
+                        content: 'Just go to fu**cking gym and eat healthy men',
+                        blogId: '2',
+                        blogName: 'sport'
+                    })
+            expect(resp.status).toBe(401)
+
+        })
+        it('should return 400 status and try change post by wrong data', async () => {
+            const {post} = expect.getState()
+            const resp = await request(app)
+                .put('/posts/' + post.id)
+                .send(
+                    {
+                        title: 'Sport',
+                        shortDescription: 7777,
+                        content: 'Just go to fu**cking gym and eat healthy men',
+                        blogId: '2',
+                        blogName: 'sport'
+                    })
+                .auth('admin', 'qwerty')
+
+            expect(resp.status).toBe(400)
+            // const updateBlogInputData = {
+            //     id: blog.id,
+            //     name: "Nikolay Durov",
+            //     websiteUrl: "https://vk.com",
+            //     description: "it programming man"
+            // }
+            //
+            // await request(app)
+            //     .get('/blogs')
+            //     .expect(200, [updateBlogInputData])
+            //
+            // expect.setState({blog: updateBlogInputData})
+
+        })
+        it('try change  non-exist blog and return 404', async () => {
+            let randomNumber = 561649849;
+            const resp = await request(app)
+                .put('/posts/' + randomNumber)
+                .send(
+                    {
+                        title: 'Sport',
+                        shortDescription: 'How to be fit?',
+                        content: 'Just go to fu**cking gym and eat healthy men',
+                        blogId: '2',
+                        blogName: 'sport'
+                    })
+                .auth('admin', 'qwerty')
+            expect(resp.status).toBe(404)
+
+        })
+
+    })
 
 })

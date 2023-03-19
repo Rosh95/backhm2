@@ -43,7 +43,7 @@ postsRouter.post('/',
     blogIdMiddleware,
     errorsPostMiddleware,
     (req: Request, res: Response) => {
-        const newPost = postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName);
+        const newPost = postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
         res.status(201).send(newPost)
 
@@ -57,8 +57,8 @@ postsRouter.put('/:id',
     blogIdMiddleware,
     errorsPostMiddleware,
     (req: Request, res: Response) => {
-        let uodatedPost = postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, req.body.blogName );
-        if (uodatedPost) {
+        let updatedPost = postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+        if (updatedPost) {
             res.sendStatus(204)
         } else {
             res.sendStatus(404)

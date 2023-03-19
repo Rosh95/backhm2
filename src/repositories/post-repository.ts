@@ -18,28 +18,29 @@ export const postRepository = {
         }
         return false;
     },
-    createPost(title: string, shortDescription: string, content: string, blogId: string, blogName: string) {
+    createPost(title: string, shortDescription: string, content: string, blogId: string) {
+        let findBlogName = db.blogs.find(b => +b.id === +blogId);
+
         let newPost: postType = {
             id: `${Date.now()}`,
             title: title,
             shortDescription: shortDescription,
             content: content,
             blogId: blogId,
-            blogName: blogName
+            blogName: findBlogName? findBlogName.name : 'not found'
         }
 
         db.posts.push(newPost);
         return newPost;
     },
 
-    updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string, blogName: string) {
+    updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string) {
         let foundPost = postRepository.findPostById(id);
         if (foundPost) {
             foundPost.title = title;
             foundPost.shortDescription = shortDescription;
             foundPost.content = content;
             foundPost.blogId = blogId;
-            foundPost.blogName = blogName;
             return true;
         } else {
             return false;

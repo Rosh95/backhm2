@@ -68,5 +68,4 @@ export type postInputType = {
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string
 }
