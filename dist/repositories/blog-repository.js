@@ -14,12 +14,12 @@ const dbMongo_1 = require("../db/dbMongo");
 exports.blogRepository = {
     findBlogs() {
         return __awaiter(this, void 0, void 0, function* () {
-            return dbMongo_1.blogsCollection.find({}).toArray();
+            return yield dbMongo_1.blogsCollection.find({}, { projection: { "_id": false } }).toArray();
         });
     },
     findBlogById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundBlog = yield dbMongo_1.blogsCollection.findOne({ id: id.toString() });
+            const foundBlog = yield dbMongo_1.blogsCollection.findOne({ id: id.toString() }, { projection: { "_id": false } });
             return foundBlog;
         });
     },

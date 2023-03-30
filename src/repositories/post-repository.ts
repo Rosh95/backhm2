@@ -3,11 +3,11 @@ import {blogsCollection, postsCollection} from '../db/dbMongo';
 
 export const postRepository = {
     async findPosts() {
-        return postsCollection.find({}).toArray();
+        return postsCollection.find({}, {projection: {"_id": false}}).toArray();
     },
 
     async findPostById(id: number) {
-        const foundBlog = await postsCollection.findOne({id: id.toString()});
+        const foundBlog = await postsCollection.findOne({id: id.toString()}, {projection: {"_id": false}});
         return foundBlog;
     },
     async deletePost(id: number) {

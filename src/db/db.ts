@@ -33,14 +33,14 @@ export let db: dbType = {
             id: '1',
             name: 'Rosh',
             description: 'Awesome math tutor',
-            websiteUrl: 'vk.com',
+            websiteUrl: 'https://vk.com',
             createdAt: '2023-03-30T20:41:53.971Z',
             isMembership: false
         }, {
             id: '2',
             name: 'Gera',
             description: 'Awesome marketing',
-            websiteUrl: 'twitter.com',
+            websiteUrl: 'https://twitter.com',
             createdAt: '2023-03-30T20:41:53.971Z',
             isMembership: false
         }]

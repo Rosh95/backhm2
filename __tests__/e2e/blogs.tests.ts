@@ -37,8 +37,8 @@ describe('Blogs router', () => {
                 name: blogInputData.name,
                 description: blogInputData.description,
                 websiteUrl: blogInputData.websiteUrl,
-                // createdAt: expect.any(String),
-                // isMembership: false
+                 createdAt: expect.any(String),
+                 isMembership: expect.any(Boolean)
             })
             expect.setState({blog: newBlog})
         })
@@ -90,8 +90,8 @@ describe('Blogs router', () => {
                 name: blogInputData.name,
                 description: blogInputData.description,
                 websiteUrl: blogInputData.websiteUrl,
-                // createdAt: expect.any(String),
-                // isMembership: false
+                createdAt: expect.any(String),
+                isMembership: expect.any(Boolean)
             })
             expect.setState({blog: newBlog})
         })
@@ -139,8 +139,8 @@ describe('Blogs router', () => {
                 name: blogInputData.name,
                 description: blogInputData.description,
                 websiteUrl: blogInputData.websiteUrl,
-                // createdAt: expect.any(String),
-                // isMembership: false
+                createdAt: expect.any(String),
+                isMembership: expect.any(Boolean)
             })
             expect.setState({blog: newBlog})
         })
@@ -180,8 +180,8 @@ describe('Blogs router', () => {
                 name: blogInputData.name,
                 description: blogInputData.description,
                 websiteUrl: blogInputData.websiteUrl,
-                // createdAt: expect.any(String),
-                // isMembership: false
+                createdAt: expect.any(String),
+                isMembership: expect.any(Boolean)
             })
             expect.setState({blog: newBlog})
         })

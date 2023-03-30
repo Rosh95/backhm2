@@ -4,11 +4,11 @@ import {ObjectId} from 'mongodb';
 
 export const blogRepository = {
     async findBlogs() {
-        return blogsCollection.find({}).toArray();
+        return await blogsCollection.find({}, {projection: {"_id": false}}).toArray();
     },
 
     async findBlogById(id: number) {
-        const foundBlog = await blogsCollection.findOne({id: id.toString()});
+        const foundBlog = await blogsCollection.findOne({id: id.toString()}, {projection: {"_id": false}});
         return foundBlog;
     },
     async deleteBlog(id: number) {
