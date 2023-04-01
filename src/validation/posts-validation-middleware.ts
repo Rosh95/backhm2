@@ -2,6 +2,7 @@ import {body, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 import {db} from '../db/db';
 import {blogsCollection} from '../db/dbMongo';
+import {ObjectId} from 'mongodb';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({
     min: 1,
@@ -23,8 +24,9 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
     console.log(value);
     console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
-    const isIncluded = await blogsCollection.find({id:value}).toArray();
-    if (isIncluded.length === 0) {
+  //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
+    if (isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist')
     }
