@@ -26,7 +26,7 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
   //  const isIncluded = await blogsCollection.find({id:value}).toArray();
     const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
-    if (isIncluded) {
+    if (!isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist')
     }
