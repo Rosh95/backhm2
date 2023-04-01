@@ -1,17 +1,30 @@
-import {db, postType} from '../db/db';
+import {postType} from '../db/db';
 import {blogsCollection, postsCollection} from '../db/dbMongo';
+import {ObjectId} from 'mongodb';
+
+
+function postMapping(post: any) {
+    const postMongoId = post._id.toString();
+    delete post._id;
+
+    return {
+        id: postMongoId,
+        ...post
+    }
+}
 
 export const postRepository = {
     async findPosts() {
-        return postsCollection.find({}, {projection: {_id: false}}).toArray();
+        const posts = await postsCollection.find({}).toArray();
+        return posts.map(post => postMapping(post))
     },
 
     async findPostById(id: number) {
-        const foundBlog = await postsCollection.findOne({id: id.toString()}, {projection: {_id: false}});
-        return foundBlog;
+        const foundBlog:postType | null = await postsCollection.findOne({_id: new ObjectId(id.toString())});
+        return foundBlog ? postMapping(foundBlog) : null;
     },
     async deletePost(id: number) {
-        const result = await postsCollection.deleteOne({id: id.toString()});
+        const result = await postsCollection.deleteOne({_id: new ObjectId(id.toString())});
         return result.deletedCount === 1;
 
         // for (let i = 0; i < db.posts.length; i++) {
@@ -23,33 +36,39 @@ export const postRepository = {
         // return false;
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string) {
-        let findBlogName = await blogsCollection.findOne({id: blogId.toString()});
+        let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+        if (findBlogName) {
+            let newPost: postType = {
+                title: title,
+                shortDescription: shortDescription,
+                content: content,
+                blogId: blogId,
+                blogName: findBlogName.name,
+                createdAt: new Date().toISOString()
+            }
+            const result = await postsCollection.insertOne(newPost)
 
-        let newPost: postType = {
-            id: `${Date.now()}`,
-            title: title,
-            shortDescription: shortDescription,
-            content: content,
-            blogId: blogId,
-            blogName: findBlogName ? findBlogName.name : 'not found',
-            createdAt: new Date().toISOString()
+            return {
+                id: result.insertedId.toString(),
+                title: newPost.title,
+                shortDescription: newPost.shortDescription,
+                content: newPost.content,
+                blogId: newPost.blogId,
+                blogName: newPost.blogName,
+                createdAt: newPost.createdAt
+            };
         }
-        const result = await postsCollection.insertOne(newPost)
-
-        //      db.posts.push(newPost);
-        return newPost;
+        return false;
     },
 
     async updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string) {
 
-        const result = await blogsCollection.updateOne({id: id.toString()},
+        const result = await blogsCollection.updateOne({_id: new ObjectId(id.toString())},
             {
                 $set: {
                     title: title,
                     shortDescription: shortDescription,
                     content: content,
-                    blogId: blogId,
-                    createdAt: new Date().toISOString(),
                 }
             });
 

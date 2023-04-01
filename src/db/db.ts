@@ -51,7 +51,7 @@ export type dbType = {
 }
 
 export type blogType = {
-    id: string,
+    id?: string,
     name: string,
     description: string,
     websiteUrl: string,
@@ -66,13 +66,13 @@ export type blogInputType = {
 
 }
 export type postType = {
-    id: string,
+    id?: string,
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string,
-    createdAt: string
+    blogName?: string | null,
+    createdAt?: string
 
 }
 export type postInputType = {
