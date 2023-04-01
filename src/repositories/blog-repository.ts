@@ -19,12 +19,12 @@ export const blogRepository = {
         return blogs.map(blog => blogMapping(blog))
     },
 
-    async findBlogById(id: number) {
-        const foundBlog: blogType | null = await blogsCollection.findOne({_id: new ObjectId(id.toString())});
+    async findBlogById(id: string) {
+        const foundBlog: blogType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
         return foundBlog ? blogMapping(foundBlog) : null;
     },
-    async deleteBlog(id: number) {
-        const result = await blogsCollection.deleteOne({_id: new ObjectId(id.toString())});
+    async deleteBlog(id: string) {
+        const result = await blogsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
 
         // for (let i = 0; i < db.blogs.length; i++) {
@@ -57,9 +57,9 @@ export const blogRepository = {
         };
     },
 
-    async updateBlog(id: number, name: string, description: string, websiteUrl: string) {
+    async updateBlog(id: string, name: string, description: string, websiteUrl: string) {
 
-        const result = await blogsCollection.updateOne({_id: new ObjectId(id.toString())},
+        const result = await blogsCollection.updateOne({_id: new ObjectId(id)},
             {
                 $set: {
                     name: name,

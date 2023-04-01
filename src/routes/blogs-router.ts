@@ -17,7 +17,7 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
 })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundBlog = await blogRepository.findBlogById(+req.params.id)
+    let foundBlog = await blogRepository.findBlogById(req.params.id)
     if (foundBlog) {
         res.send(foundBlog)
         return;
@@ -29,7 +29,7 @@ blogsRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: Request, res: Response) => {
 
-        const isDeleted = await blogRepository.deleteBlog(+req.params.id)
+        const isDeleted = await blogRepository.deleteBlog(req.params.id)
 
         if (isDeleted) {
             res.sendStatus(204)
@@ -58,7 +58,7 @@ blogsRouter.put('/:id',
     errorsBlogMiddleware,
     async (req: Request, res: Response) => {
 
-        let foundBlog = await blogRepository.updateBlog(+req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
+        let foundBlog = await blogRepository.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
         if (foundBlog) {
             res.sendStatus(204)
         } else {

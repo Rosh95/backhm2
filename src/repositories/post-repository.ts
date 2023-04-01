@@ -19,12 +19,12 @@ export const postRepository = {
         return posts.map(post => postMapping(post))
     },
 
-    async findPostById(id: number) {
-        const foundBlog:postType | null = await postsCollection.findOne({_id: new ObjectId(id.toString())});
+    async findPostById(id: string) {
+        const foundBlog: postType | null = await postsCollection.findOne({_id: new ObjectId(id)});
         return foundBlog ? postMapping(foundBlog) : null;
     },
-    async deletePost(id: number) {
-        const result = await postsCollection.deleteOne({_id: new ObjectId(id.toString())});
+    async deletePost(id: string) {
+        const result = await postsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
 
         // for (let i = 0; i < db.posts.length; i++) {
@@ -61,9 +61,9 @@ export const postRepository = {
         return false;
     },
 
-    async updatePost(id: number, title: string, shortDescription: string, content: string, blogId: string) {
+    async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string) {
 
-        const result = await blogsCollection.updateOne({_id: new ObjectId(id.toString())},
+        const result = await blogsCollection.updateOne({_id: new ObjectId(id)},
             {
                 $set: {
                     title: title,

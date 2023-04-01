@@ -16,7 +16,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
 })
 
 postsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundPost = await postRepository.findPostById(+req.params.id)
+    let foundPost = await postRepository.findPostById(req.params.id)
     if (foundPost) {
         res.send(foundPost)
         return;
@@ -28,7 +28,7 @@ postsRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: Request, res: Response) => {
 
-        const isDeleted = await postRepository.deletePost(+req.params.id)
+        const isDeleted = await postRepository.deletePost(req.params.id)
 
         if (isDeleted) {
             res.sendStatus(204)
@@ -57,7 +57,7 @@ postsRouter.put('/:id',
     blogIdMiddleware,
     errorsPostMiddleware,
     async (req: Request, res: Response) => {
-        let updatedPost = await postRepository.updatePost(+req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+        let updatedPost = await postRepository.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
         if (updatedPost) {
             res.sendStatus(204)
         } else {
