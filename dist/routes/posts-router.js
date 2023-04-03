@@ -17,8 +17,21 @@ const authorization_1 = require("../validation/authorization");
 const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
     const posts = yield post_repository_1.postRepository.findPosts();
-    res.send(posts);
+    let postsPagesCount = Math.ceil(+posts.length / +pageSize);
+    let postsTotalCount = +posts.length;
+    const result = {
+        pagesCount: postsPagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: postsTotalCount,
+        items: posts
+    };
+    res.send(result);
 }));
 exports.postsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundPost = yield post_repository_1.postRepository.findPostById(req.params.id);

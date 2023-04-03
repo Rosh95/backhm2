@@ -19,8 +19,21 @@ const blog_repository_1 = require("../repositories/blog-repository");
 const posts_validation_middleware_1 = require("../validation/posts-validation-middleware");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
     const blogs = yield blog_service_1.blogService.findBlogs();
-    res.send(blogs);
+    let postsPagesCount = Math.ceil(+blogs.length / +pageSize);
+    let postsTotalCount = +blogs.length;
+    const result = {
+        pagesCount: postsPagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: postsTotalCount,
+        items: blogs
+    };
+    res.send(result);
 }));
 exports.blogsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlog = yield blog_service_1.blogService.findBlogById(req.params.id);

@@ -72,7 +72,7 @@ export const blogRepository = {
     async getAllPostOfBlog(blogIdd: any, pageNumber: string, pageSize: string, sortByProp: string, sortDirection: string): Promise<postType[]> {
 
         let skippedPages = skipPages(pageNumber, pageSize);
-        let sortDirectionInMongoDb: number = sortDirection === 'desc' ? -1 : 1;
+        let sortDirectionInMongoDb: number = sortDirection === 'desc' ? 1 : -1;
         let posts;
         if (sortDirectionInMongoDb === 1) {
             posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: 1}).toArray();
