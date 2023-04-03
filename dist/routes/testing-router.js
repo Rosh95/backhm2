@@ -14,12 +14,6 @@ const express_1 = require("express");
 const dbMongo_1 = require("../db/dbMongo");
 exports.testRouter = (0, express_1.Router)({});
 exports.testRouter.delete('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // if (db.blogs.length > 0) {
-    //     db.blogs.splice(0)
-    // }
-    // if (db.posts.length > 0) {
-    //     db.posts.splice(0)
-    // }
     yield dbMongo_1.blogsCollection.deleteMany({});
     yield dbMongo_1.postsCollection.deleteMany({});
     res.sendStatus(204);

@@ -1,4 +1,4 @@
-import {body, validationResult} from 'express-validator';
+import {body, param, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 import {db} from '../db/db';
 import {blogsCollection} from '../db/dbMongo';
@@ -33,20 +33,17 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
     return true;
 
 }).withMessage('Please, write exist blogId');
-
-export const errorsPostMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.status(400).send({
-            errorsMessages: errors.array({onlyFirstError: true}).map((e) => {
-                    return {
-                        message: e.msg,
-                        field: e.param
-                    }
-                }
-            )
-        })
-    } else {
-        next()
+export const blogIdMiddlewareInParams = param('id').isString().custom(async (value) => {
+    console.log(value);
+    console.log(`${blogsIdArray} exists blogID`)
+    //   const isIncluded = db.blogs.map(b => b.id).includes(value);
+  //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
+    if (!isIncluded) {
+        // return false;
+        throw new Error('This blogId doesn`t exist')
     }
-}
+    return true;
+
+}).withMessage('Please, write exist blogId');
+

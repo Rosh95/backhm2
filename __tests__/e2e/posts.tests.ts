@@ -43,7 +43,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -67,7 +66,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newPost = response.body
             expect(newPost).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 title: postsInputData.title,
                 shortDescription: postsInputData.shortDescription,
@@ -125,7 +123,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -152,7 +149,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newPost = response.body
             expect(newPost).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 title: postsInputData.title,
                 shortDescription: postsInputData.shortDescription,
@@ -194,7 +190,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -238,7 +233,6 @@ describe('Posts router', () => {
             const newPost = response.body
             console.log(newPost)
             expect(newPost).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 title: postsInputData.title,
                 shortDescription: postsInputData.shortDescription,
@@ -288,7 +282,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -314,7 +307,6 @@ describe('Posts router', () => {
             expect(response.status).toBe(201)
             const newPost = response.body
             expect(newPost).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 title: postsInputData.title,
                 shortDescription: postsInputData.shortDescription,
@@ -343,7 +335,7 @@ describe('Posts router', () => {
             expect(resp.status).toBe(204)
 
 
-            let getUpdatePost = await postRepository.findPostById(+post.id)
+            let getUpdatePost = await postRepository.findPostById(post.id)
             console.log(getUpdatePost + '  input data here!!')
             await request(app)
                 .get('/posts')

@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorsPostMiddleware = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
+exports.blogIdMiddlewareInParams = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
 const express_validator_1 = require("express-validator");
 const db_1 = require("../db/db");
 const dbMongo_1 = require("../db/dbMongo");
+const mongodb_1 = require("mongodb");
 exports.titlePostMiddleware = (0, express_validator_1.body)('title').isString().trim().isLength({
     min: 1,
     max: 30
@@ -31,27 +32,23 @@ exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().cu
     console.log(value);
     console.log(`${blogsIdArray} exists blogID`);
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
-    const isIncluded = yield dbMongo_1.blogsCollection.find({ id: value }).toArray();
-    if (isIncluded.length === 0) {
+    //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    const isIncluded = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(value.toString()) });
+    if (!isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist');
     }
     return true;
 })).withMessage('Please, write exist blogId');
-const errorsPostMiddleware = (req, res, next) => {
-    const errors = (0, express_validator_1.validationResult)(req);
-    if (!errors.isEmpty()) {
-        res.status(400).send({
-            errorsMessages: errors.array({ onlyFirstError: true }).map((e) => {
-                return {
-                    message: e.msg,
-                    field: e.param
-                };
-            })
-        });
+exports.blogIdMiddlewareInParams = (0, express_validator_1.param)('id').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(value);
+    console.log(`${blogsIdArray} exists blogID`);
+    //   const isIncluded = db.blogs.map(b => b.id).includes(value);
+    //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    const isIncluded = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(value.toString()) });
+    if (!isIncluded) {
+        // return false;
+        throw new Error('This blogId doesn`t exist');
     }
-    else {
-        next();
-    }
-};
-exports.errorsPostMiddleware = errorsPostMiddleware;
+    return true;
+})).withMessage('Please, write exist blogId');

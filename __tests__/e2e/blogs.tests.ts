@@ -32,7 +32,6 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -85,7 +84,6 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -134,7 +132,6 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,
@@ -175,7 +172,6 @@ describe('Blogs router', () => {
             expect(response.status).toBe(201)
             const newBlog = response.body
             expect(newBlog).toEqual({
-                _id: expect.any(String),
                 id: expect.any(String),
                 name: blogInputData.name,
                 description: blogInputData.description,

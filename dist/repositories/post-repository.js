@@ -9,74 +9,70 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postRepository = void 0;
+exports.postRepository = exports.postMapping = void 0;
 const dbMongo_1 = require("../db/dbMongo");
+const mongodb_1 = require("mongodb");
+function postMapping(post) {
+    const postMongoId = post._id.toString();
+    delete post._id;
+    return Object.assign({ id: postMongoId }, post);
+}
+exports.postMapping = postMapping;
 exports.postRepository = {
     findPosts() {
         return __awaiter(this, void 0, void 0, function* () {
-            return dbMongo_1.postsCollection.find({}, { projection: { _id: false } }).toArray();
+            const posts = yield dbMongo_1.postsCollection.find({}).toArray();
+            return posts.map(post => postMapping(post));
         });
     },
     findPostById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundBlog = yield dbMongo_1.postsCollection.findOne({ id: id.toString() }, { projection: { _id: false } });
-            return foundBlog;
+            const foundBlog = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return foundBlog ? postMapping(foundBlog) : null;
         });
     },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.postsCollection.deleteOne({ id: id.toString() });
+            const result = yield dbMongo_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return result.deletedCount === 1;
-            // for (let i = 0; i < db.posts.length; i++) {
-            //     if (+db.posts[i].id === id) {
-            //         db.posts.splice(i, 1)
-            //         return true;
-            //     }
-            // }
-            // return false;
         });
     },
     createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let findBlogName = yield dbMongo_1.blogsCollection.findOne({ id: blogId.toString() });
-            let newPost = {
-                id: `${Date.now()}`,
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: findBlogName ? findBlogName.name : 'not found',
-                createdAt: new Date().toISOString()
-            };
-            const result = yield dbMongo_1.postsCollection.insertOne(newPost);
-            //      db.posts.push(newPost);
-            return newPost;
-        });
-    },
-    updatePost(id, title, shortDescription, content, blogId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.blogsCollection.updateOne({ id: id.toString() }, {
-                $set: {
+            let findBlogName = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(blogId.toString()) });
+            if (findBlogName) {
+                let newPost = {
                     title: title,
                     shortDescription: shortDescription,
                     content: content,
                     blogId: blogId,
-                    createdAt: new Date().toISOString(),
+                    blogName: findBlogName.name,
+                    createdAt: new Date().toISOString()
+                };
+                const result = yield dbMongo_1.postsCollection.insertOne(newPost);
+                return {
+                    id: result.insertedId.toString(),
+                    title: newPost.title,
+                    shortDescription: newPost.shortDescription,
+                    content: newPost.content,
+                    blogId: newPost.blogId,
+                    blogName: newPost.blogName,
+                    createdAt: newPost.createdAt
+                };
+            }
+            return false;
+        });
+    },
+    updatePost(id, title, shortDescription, content, blogId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield dbMongo_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
+                $set: {
+                    title: title,
+                    shortDescription: shortDescription,
+                    content: content,
                 }
             });
             return result.matchedCount === 1;
         });
     }
-    //     let foundPost = await postRepository.findPostById(id);
-    //     if (foundPost) {
-    //         foundPost.title = title;
-    //         foundPost.shortDescription = shortDescription;
-    //         foundPost.content = content;
-    //         foundPost.blogId = blogId;
-    //         foundPost.createdAt = new Date().toISOString()
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
 };

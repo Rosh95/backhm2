@@ -3,7 +3,7 @@ import {blogsCollection, postsCollection} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
 
 
-function postMapping(post: any) {
+export function postMapping(post: any) {
     const postMongoId = post._id.toString();
     delete post._id;
 
@@ -14,28 +14,20 @@ function postMapping(post: any) {
 }
 
 export const postRepository = {
-    async findPosts() {
+    async findPosts(): Promise<postType[]> {
         const posts = await postsCollection.find({}).toArray();
         return posts.map(post => postMapping(post))
     },
 
-    async findPostById(id: string) {
+    async findPostById(id: string): Promise<postType> {
         const foundBlog: postType | null = await postsCollection.findOne({_id: new ObjectId(id)});
         return foundBlog ? postMapping(foundBlog) : null;
     },
-    async deletePost(id: string) {
+    async deletePost(id: string): Promise<boolean> {
         const result = await postsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
-
-        // for (let i = 0; i < db.posts.length; i++) {
-        //     if (+db.posts[i].id === id) {
-        //         db.posts.splice(i, 1)
-        //         return true;
-        //     }
-        // }
-        // return false;
     },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string) {
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postType | boolean> {
         let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
         if (findBlogName) {
             let newPost: postType = {
@@ -61,7 +53,7 @@ export const postRepository = {
         return false;
     },
 
-    async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string) {
+    async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
 
         const result = await postsCollection.updateOne({_id: new ObjectId(id)},
             {
@@ -75,16 +67,4 @@ export const postRepository = {
         return result.matchedCount === 1;
 
     }
-    //     let foundPost = await postRepository.findPostById(id);
-    //     if (foundPost) {
-    //         foundPost.title = title;
-    //         foundPost.shortDescription = shortDescription;
-    //         foundPost.content = content;
-    //         foundPost.blogId = blogId;
-    //         foundPost.createdAt = new Date().toISOString()
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
 }

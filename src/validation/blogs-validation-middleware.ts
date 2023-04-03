@@ -13,19 +13,3 @@ export const descriptionBlogMiddleware = body('description').isString().trim().i
 export const websiteUrlBlogMiddleware = body('websiteUrl').isString().isLength({max: 100}).matches('^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$').withMessage('websiteUrl should be less than 100 sympols string');
 
 
-export const errorsBlogMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.status(400).send({
-            errorsMessages: errors.array({onlyFirstError: true}).map((e) => {
-                    return {
-                        message: e.msg,
-                        field: e.param
-                    }
-                }
-            )
-        })
-    } else {
-        next()
-    }
-}

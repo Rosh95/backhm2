@@ -2,11 +2,12 @@ import {Request, Response, Router} from 'express';
 import {postRepository} from '../repositories/post-repository';
 import {
     blogIdMiddleware,
-    contentPostMiddleware, errorsPostMiddleware,
+    contentPostMiddleware,
     shortDescriptionPostMiddleware,
     titlePostMiddleware
 } from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
+import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 
 export const postsRouter = Router({})
 
@@ -41,7 +42,7 @@ postsRouter.post('/',
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
     blogIdMiddleware,
-    errorsPostMiddleware,
+    errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
@@ -55,7 +56,7 @@ postsRouter.put('/:id',
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
     blogIdMiddleware,
-    errorsPostMiddleware,
+    errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         let updatedPost = await postRepository.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
         if (updatedPost) {
