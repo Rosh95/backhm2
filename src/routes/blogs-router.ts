@@ -89,8 +89,8 @@ blogsRouter.get('/:id/posts',
 
             let foundBlogs = await blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
 
-            let postsPagesCount = Math.ceil(foundBlogs.length / pageSize);
-            let postsTotalCount = foundBlogs.length;
+            let postsPagesCount = Math.ceil(+foundBlogs.length / +pageSize);
+            let postsTotalCount = +foundBlogs.length;
 
             const result = {
                 pagesCount: postsPagesCount,
