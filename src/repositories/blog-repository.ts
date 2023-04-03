@@ -72,7 +72,7 @@ export const blogRepository = {
     async getAllPostOfBlog(blogIdd: any, pageNumber: string, pageSize: string, sortByProp: string, sortDirection: string): Promise<postType[]> {
 
         let skippedPages = skipPages(pageNumber, pageSize);
-        let sortDirectionInMongoDb: number = sortDirection === 'asc' ? 1 : -1;
+        let sortDirectionInMongoDb: number = sortDirection === 'desc' ? -1 : 1;
         let posts;
         if (sortDirectionInMongoDb === 1) {
             posts = await postsCollection.find({blogId: blogIdd}).skip(skippedPages).limit(+pageSize).sort({sortByProp: 1}).toArray();
@@ -85,25 +85,25 @@ export const blogRepository = {
     async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<postType | boolean> {
         let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
 
-            let newPost: postType = {
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: findBlogName!.name,
-                createdAt: new Date().toISOString()
-            }
-            const result = await postsCollection.insertOne(newPost)
+        let newPost: postType = {
+            title: title,
+            shortDescription: shortDescription,
+            content: content,
+            blogId: blogId,
+            blogName: findBlogName!.name,
+            createdAt: new Date().toISOString()
+        }
+        const result = await postsCollection.insertOne(newPost)
 
-            return {
-                id: result.insertedId.toString(),
-                title: newPost.title,
-                shortDescription: newPost.shortDescription,
-                content: newPost.content,
-                blogId: newPost.blogId,
-                blogName: newPost.blogName,
-                createdAt: newPost.createdAt
-            };
+        return {
+            id: result.insertedId.toString(),
+            title: newPost.title,
+            shortDescription: newPost.shortDescription,
+            content: newPost.content,
+            blogId: newPost.blogId,
+            blogName: newPost.blogName,
+            createdAt: newPost.createdAt
+        };
 
     },
 }
