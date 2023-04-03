@@ -8,12 +8,29 @@ import {
 } from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
+import {blogService} from '../domain/blog-service';
 
 export const postsRouter = Router({})
 
 postsRouter.get('/', async (req: Request, res: Response) => {
+    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+
     const posts = await postRepository.findPosts();
-    res.send(posts)
+    let postsPagesCount = Math.ceil(+posts.length / +pageSize);
+    let postsTotalCount = +posts.length;
+
+    const result = {
+        pagesCount: postsPagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: postsTotalCount,
+        items: posts
+
+    }
+    res.send(result)
 })
 
 postsRouter.get('/:id', async (req: Request, res: Response) => {

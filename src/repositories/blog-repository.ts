@@ -77,6 +77,7 @@ export const blogRepository = {
         if (sortDirectionInMongoDb === 1) {
             posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: 1}).toArray();
         } else {
+            // posts = await postsCollection.find({blogId: blogIdd}).skip(skippedPages).limit(+pageSize).sort({sortByProp: -1}).toArray();
             posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: -1}).toArray();
         }
 

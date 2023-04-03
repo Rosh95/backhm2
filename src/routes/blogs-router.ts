@@ -21,8 +21,24 @@ import {postsRouter} from './posts-router';
 export const blogsRouter = Router({})
 
 blogsRouter.get('/', async (req: Request, res: Response) => {
+    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+
     const blogs = await blogService.findBlogs();
-    res.send(blogs)
+    let postsPagesCount = Math.ceil(+blogs.length / +pageSize);
+    let postsTotalCount = +blogs.length;
+
+    const result = {
+        pagesCount: postsPagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: postsTotalCount,
+        items: blogs
+
+    }
+    res.send(result)
 })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
