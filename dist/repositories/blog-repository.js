@@ -76,9 +76,9 @@ exports.blogRepository = {
     getAllPostOfBlog(blogIdd, pageNumber, pageSize, sortByProp, sortDirection) {
         return __awaiter(this, void 0, void 0, function* () {
             let skippedPages = skipPages(pageNumber, pageSize);
-            let sortDirectionInMogoDb = sortDirection === 'asc' ? 1 : -1;
+            let sortDirectionInMongoDb = sortDirection === 'asc' ? 1 : -1;
             let posts;
-            if (sortDirectionInMogoDb === 1) {
+            if (sortDirectionInMongoDb === 1) {
                 posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd }).skip(skippedPages).limit(+pageSize).sort({ sortByProp: 1 }).toArray();
             }
             else {

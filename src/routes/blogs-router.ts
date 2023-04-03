@@ -76,24 +76,36 @@ blogsRouter.put('/:id',
     })
 
 
-blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
+blogsRouter.get('/:id/posts',
+    blogIdMiddlewareInParams,
+    async (req: Request, res: Response) => {
 
-    try {
-        let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-        let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-        let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-        let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+        try {
+            let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+            let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+            let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+            let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
 
-        let foundBlogs = await blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
-        if (foundBlogs) {
-            res.send(foundBlogs)
-            return;
+
+            let foundBlogs = await blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
+
+            const result = {
+                pagesCount: pageNumber + 1,
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: pageSize + pageNumber + 1,
+                items: foundBlogs
+
+            }
+            if (foundBlogs) {
+                res.send(result)
+                return;
+            }
+            res.sendStatus(404)
+        } catch (e) {
+            res.status(500).json(e)
         }
-        res.sendStatus(404)
-    } catch (e) {
-        res.status(500).json(e)
-    }
-})
+    })
 
 blogsRouter.post('/:id/posts',
     basicAuthMiddleware,

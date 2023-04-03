@@ -51,15 +51,22 @@ exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_valid
         res.sendStatus(404);
     }
 }));
-exports.blogsRouter.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.get('/:id/posts', posts_validation_middleware_1.blogIdMiddlewareInParams, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
         let pageSize = req.body.pageSize ? req.body.pageSize : '10';
         let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
         let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
         let foundBlogs = yield blog_repository_1.blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
+        const result = {
+            pagesCount: pageNumber + 1,
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: pageSize + pageNumber + 1,
+            items: foundBlogs
+        };
         if (foundBlogs) {
-            res.send(foundBlogs);
+            res.send(result);
             return;
         }
         res.sendStatus(404);
