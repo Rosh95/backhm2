@@ -75,9 +75,9 @@ export const blogRepository = {
         let sortDirectionInMongoDb: number = sortDirection === 'desc' ? -1 : 1;
         let posts;
         if (sortDirectionInMongoDb === 1) {
-            posts = await postsCollection.find({blogId: blogIdd}).skip(skippedPages).limit(+pageSize).sort({sortByProp: 1}).toArray();
+            posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: 1}).toArray();
         } else {
-            posts = await postsCollection.find({blogId: blogIdd}).skip(skippedPages).limit(+pageSize).sort({sortByProp: -1}).toArray();
+            posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: -1}).toArray();
         }
 
         return posts.map(post => postMapping(post))

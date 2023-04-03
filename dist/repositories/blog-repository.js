@@ -79,10 +79,10 @@ exports.blogRepository = {
             let sortDirectionInMongoDb = sortDirection === 'desc' ? -1 : 1;
             let posts;
             if (sortDirectionInMongoDb === 1) {
-                posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd }).skip(skippedPages).limit(+pageSize).sort({ sortByProp: 1 }).toArray();
+                posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd }).sort({ sortByProp: 1 }).toArray();
             }
             else {
-                posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd }).skip(skippedPages).limit(+pageSize).sort({ sortByProp: -1 }).toArray();
+                posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd }).sort({ sortByProp: -1 }).toArray();
             }
             return posts.map(post => (0, post_repository_1.postMapping)(post));
         });

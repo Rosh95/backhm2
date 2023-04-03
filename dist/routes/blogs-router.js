@@ -58,8 +58,8 @@ exports.blogsRouter.get('/:id/posts', posts_validation_middleware_1.blogIdMiddle
         let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
         let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
         let foundBlogs = yield blog_repository_1.blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
-        let postsPagesCount = Math.ceil(foundBlogs.length / pageSize);
-        let postsTotalCount = foundBlogs.length;
+        let postsPagesCount = Math.ceil(+foundBlogs.length / +pageSize);
+        let postsTotalCount = +foundBlogs.length;
         const result = {
             pagesCount: postsPagesCount,
             page: pageNumber,
