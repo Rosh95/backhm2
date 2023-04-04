@@ -100,7 +100,7 @@ exports.blogRepository = {
                 content: content,
                 blogId: blogId,
                 blogName: findBlogName.name,
-                createdAt: new Date().toISOString()
+                createdAt: new Date()
             };
             const result = yield dbMongo_1.postsCollection.insertOne(newPost);
             return {

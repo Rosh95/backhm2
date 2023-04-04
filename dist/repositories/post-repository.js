@@ -15,7 +15,7 @@ const mongodb_1 = require("mongodb");
 function postMapping(post) {
     const postMongoId = post._id.toString();
     delete post._id;
-    return Object.assign({ id: postMongoId }, post);
+    return Object.assign(Object.assign({ id: postMongoId }, post), { createdAt: post.createdAt.toISOString() });
 }
 exports.postMapping = postMapping;
 exports.postRepository = {
@@ -47,7 +47,7 @@ exports.postRepository = {
                     content: content,
                     blogId: blogId,
                     blogName: findBlogName.name,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date()
                 };
                 const result = yield dbMongo_1.postsCollection.insertOne(newPost);
                 return {

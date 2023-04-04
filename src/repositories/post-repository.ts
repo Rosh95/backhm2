@@ -9,7 +9,8 @@ export function postMapping(post: any) {
 
     return {
         id: postMongoId,
-        ...post
+        ...post,
+        createdAt: post.createdAt.toISOString()
     }
 }
 
@@ -36,7 +37,7 @@ export const postRepository = {
                 content: content,
                 blogId: blogId,
                 blogName: findBlogName.name,
-                createdAt: new Date().toISOString()
+                createdAt: new Date()
             }
             const result = await postsCollection.insertOne(newPost)
 
