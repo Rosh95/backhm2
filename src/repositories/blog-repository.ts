@@ -75,7 +75,7 @@ export const blogRepository = {
         console.log(sortByProp, sortDirectionInMongoDb)
         let newProp = `"` + sortByProp + `"`;
         let posts = await postsCollection.find({blogId: blogIdd})
-            .sort({newProp: sortDirectionInMongoDb})
+            .sort({'createdAt': sortDirectionInMongoDb})
             .skip(skippedPages)
             .limit(+pageSize)
             .toArray();
@@ -83,6 +83,16 @@ export const blogRepository = {
 
         return posts.map(post => postMapping(post))
     },
+
+    async getAllPostCount(blogIdd: any): Promise<number> {
+
+        let totalCount = await postsCollection.countDocuments({blogId: blogIdd})
+
+
+        return totalCount;
+    },
+
+
     async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<postType | boolean> {
         let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
 

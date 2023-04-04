@@ -80,11 +80,17 @@ exports.blogRepository = {
             console.log(sortByProp, sortDirectionInMongoDb);
             let newProp = `"` + sortByProp + `"`;
             let posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd })
-                .sort({ newProp: sortDirectionInMongoDb })
+                .sort({ 'createdAt': sortDirectionInMongoDb })
                 .skip(skippedPages)
                 .limit(+pageSize)
                 .toArray();
             return posts.map(post => (0, post_repository_1.postMapping)(post));
+        });
+    },
+    getAllPostCount(blogIdd) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let totalCount = yield dbMongo_1.postsCollection.countDocuments({ blogId: blogIdd });
+            return totalCount;
         });
     },
     createPostForExistingBlog(blogId, title, shortDescription, content) {
