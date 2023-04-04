@@ -110,8 +110,8 @@ blogsRouter.get('/:id/posts',
 
             const result = {
                 pagesCount: postsPagesCount,
-                page: pageNumber,
-                pageSize: pageSize,
+                page: +pageNumber,
+                pageSize: +pageSize,
                 totalCount: postsTotalCount,
                 items: foundBlogs
 

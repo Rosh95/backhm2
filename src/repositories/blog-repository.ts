@@ -69,13 +69,12 @@ export const blogRepository = {
         return result.matchedCount === 1;
 
     },
-    async getAllPostOfBlog(blogIdd: any, pageNumber: string, pageSize: string, sortByProp: string, sortDirection: string): Promise<postType[]> {
+    async getAllPostOfBlog(blogId: any, pageNumber: string, pageSize: string, sortByProp: string, sortDirection: string): Promise<postType[]> {
         let skippedPages = skipPages(pageNumber, pageSize);
         let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
         console.log(sortByProp, sortDirectionInMongoDb)
-        let newProp = `"` + sortByProp + `"`;
-        let posts = await postsCollection.find({blogId: blogIdd})
-            .sort({'createdAt': sortDirectionInMongoDb})
+        let posts = await postsCollection.find({blogId})
+            .sort({[sortByProp]: sortDirectionInMongoDb})
             .skip(skippedPages)
             .limit(+pageSize)
             .toArray();
