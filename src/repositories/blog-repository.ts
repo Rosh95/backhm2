@@ -13,7 +13,7 @@ function blogMapping(blog: any) {
     }
 }
 
-function skipPages(pageNumber: string, pageSize: string) {
+function skipPages(pageNumber: number, pageSize: number) {
     let result = (+pageNumber - 1) * (+pageSize);
     return result;
 }
@@ -69,14 +69,14 @@ export const blogRepository = {
         return result.matchedCount === 1;
 
     },
-    async getAllPostOfBlog(blogId: any, pageNumber: string, pageSize: string, sortByProp: string, sortDirection: string): Promise<postType[]> {
+    async getAllPostOfBlog(blogId: any, pageNumber: number, pageSize: number, sortByProp: string, sortDirection: string): Promise<postType[]> {
         let skippedPages = skipPages(pageNumber, pageSize);
         let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
         console.log(sortByProp, sortDirectionInMongoDb)
         let posts = await postsCollection.find({blogId})
             .sort({[sortByProp]: sortDirectionInMongoDb})
             .skip(skippedPages)
-            .limit(+pageSize)
+            .limit(pageSize)
             .toArray();
 
 

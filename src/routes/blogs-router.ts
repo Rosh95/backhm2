@@ -97,8 +97,8 @@ blogsRouter.get('/:id/posts',
     async (req: Request, res: Response) => {
 
         try {
-            let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-            let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+            let pageNumber = req.body.pageNumber ? req.body.pageNumber : 1;
+            let pageSize = req.body.pageSize ? req.body.pageSize : 10;
             let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
             let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
 
@@ -106,12 +106,12 @@ blogsRouter.get('/:id/posts',
             let foundBlogs = await blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
 
             let postsTotalCount = await blogRepository.getAllPostCount(req.params.id);
-            let postsPagesCount = Math.ceil(postsTotalCount / +pageSize);
+            let postsPagesCount = Math.ceil(postsTotalCount / pageSize);
 
             const result = {
                 pagesCount: postsPagesCount,
-                page: +pageNumber,
-                pageSize: +pageSize,
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: postsTotalCount,
                 items: foundBlogs
 
