@@ -77,17 +77,13 @@ exports.blogRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             let skippedPages = skipPages(pageNumber, pageSize);
             let sortDirectionInMongoDb = sortDirection === 'desc' ? -1 : 1;
-            let posts;
-            // if (sortDirectionInMongoDb === 1) {
-            posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd })
-                .sort({ sortByProp: sortDirectionInMongoDb })
+            console.log(sortByProp, sortDirectionInMongoDb);
+            let newProp = `"` + sortByProp + `"`;
+            let posts = yield dbMongo_1.postsCollection.find({ blogId: blogIdd })
+                .sort({ newProp: sortDirectionInMongoDb })
                 .skip(skippedPages)
                 .limit(+pageSize)
                 .toArray();
-            // } else {
-            //     // posts = await postsCollection.find({blogId: blogIdd}).skip(skippedPages).limit(+pageSize).sort({sortByProp: -1}).toArray();
-            //     posts = await postsCollection.find({blogId: blogIdd}).sort({sortByProp: -1}).toArray();
-            // }
             return posts.map(post => (0, post_repository_1.postMapping)(post));
         });
     },
