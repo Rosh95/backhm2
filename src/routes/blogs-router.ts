@@ -23,8 +23,8 @@ export const blogsRouter = Router({})
 blogsRouter.get('/', async (req: Request, res: Response) => {
     let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
     let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
 
     const blogs = await blogService.findBlogs();
     let postsPagesCount = Math.ceil(+blogs.length / +pageSize);
