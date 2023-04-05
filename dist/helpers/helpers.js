@@ -9,19 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
+exports.postMapping = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog-query-repository");
-const getDataFromQuery = (req) => {
-    let pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1;
-    let pageSize = req.query.pageSize ? +req.query.pageSize : 10;
-    let sortByProp = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
-    let sortDirection = req.query.sortDirection === 'asc' ? 1 : -1;
+const getDataFromQuery = (query) => {
+    // export const getDataFromQuery = (req: Request): queryDataType => {
+    // const pageNumberFromQuery: any = req.query.pageNumber
+    // const pageNumber = parseInt(pageNumberFromQuery, 10)
+    // if (pageNumber)
+    let pageNumber = query.pageNumber ? +query.pageNumber : 1; // NaN
+    let pageSize = query.pageSize ? +query.pageSize : 10; // NaN
+    let sortByProp = query.sortBy ? (query.sortBy).toString() : 'createdAt';
+    let sortDirection = query.sortDirection === 'asc' ? 1 : -1;
+    let searchName = query.searchName ? query.searchName : '';
     let skippedPages = skipPages(pageNumber, pageSize);
     return {
         pageNumber,
         pageSize,
         sortByProp,
         sortDirection,
+        searchName,
         skippedPages
     };
 };
@@ -37,8 +43,8 @@ function skipPages(pageNumber, pageSize) {
     return result;
 }
 exports.skipPages = skipPages;
-const countTotalPostsAndPagesOfBlog = (req, queryData) => __awaiter(void 0, void 0, void 0, function* () {
-    let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCountOfBlog(req.params.id);
+const countTotalPostsAndPagesOfBlog = (id, queryData) => __awaiter(void 0, void 0, void 0, function* () {
+    let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCountOfBlog(id);
     let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
     return {
         postsTotalCount,
@@ -46,8 +52,8 @@ const countTotalPostsAndPagesOfBlog = (req, queryData) => __awaiter(void 0, void
     };
 });
 exports.countTotalPostsAndPagesOfBlog = countTotalPostsAndPagesOfBlog;
-const countTotalBlogsAndPages = (req, queryData) => __awaiter(void 0, void 0, void 0, function* () {
-    let blogsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllBlogsCount();
+const countTotalBlogsAndPages = (queryData, filter) => __awaiter(void 0, void 0, void 0, function* () {
+    let blogsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllBlogsCount(filter);
     let blogsPagesCount = Math.ceil(blogsTotalCount / queryData.pageSize);
     return {
         blogsTotalCount,
@@ -55,3 +61,18 @@ const countTotalBlogsAndPages = (req, queryData) => __awaiter(void 0, void 0, vo
     };
 });
 exports.countTotalBlogsAndPages = countTotalBlogsAndPages;
+const countTotalPostsAndPages = (queryData) => __awaiter(void 0, void 0, void 0, function* () {
+    let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostsCount();
+    let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
+    return {
+        postsTotalCount,
+        postsPagesCount,
+    };
+});
+exports.countTotalPostsAndPages = countTotalPostsAndPages;
+function postMapping(post) {
+    const postMongoId = post._id.toString();
+    delete post._id;
+    return Object.assign(Object.assign({ id: postMongoId }, post), { createdAt: post.createdAt.toISOString() });
+}
+exports.postMapping = postMapping;

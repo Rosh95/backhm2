@@ -22,16 +22,8 @@ const helpers_1 = require("../helpers/helpers");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let queryData = (0, helpers_1.getDataFromQuery)(req);
-    const blogs = yield blog_service_1.blogService.findBlogs(queryData);
-    let pagesCount = yield (0, helpers_1.countTotalBlogsAndPages)(req, queryData);
-    const result = {
-        pagesCount: pagesCount.blogsPagesCount,
-        page: queryData.pageNumber,
-        pageSize: queryData.pageSize,
-        totalCount: pagesCount.blogsTotalCount,
-        items: blogs
-    };
-    res.send(result);
+    const allBlogs = yield blog_query_repository_1.blogQueryRepository.getAllBlogs(queryData);
+    return res.send(allBlogs);
 }));
 exports.blogsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlog = yield blog_service_1.blogService.findBlogById(req.params.id);
@@ -63,44 +55,45 @@ exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_valid
     }
 }));
 exports.blogsRouter.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let isExistBlog = blog_repository_1.blogRepository.findBlogById(req.params.id);
+    let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
-        res.sendStatus(404);
+        return res.sendStatus(404);
     }
     try {
         let queryData = (0, helpers_1.getDataFromQuery)(req);
-        let foundBlogs = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-        let pagesCount = yield (0, helpers_1.countTotalPostsAndPagesOfBlog)(req, queryData);
+        let foundPosts = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
+        //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
         // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
         // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
-        const result = {
-            pagesCount: pagesCount.postsPagesCount,
-            page: queryData.pageNumber,
-            pageSize: queryData.pageSize,
-            totalCount: pagesCount.postsTotalCount,
-            items: foundBlogs
-        };
-        res.send(result);
+        // const result = {
+        //     pagesCount: pagesCount.postsPagesCount,
+        //     page: queryData.pageNumber,
+        //     pageSize: queryData.pageSize,
+        //     totalCount: pagesCount.postsTotalCount,
+        //     items: foundBlogs
+        //
+        // }
         // if (foundBlogs) {
         //     res.send(result)
         //     return;
         // }
         // res.sendStatus(404)
+        return res.send(foundPosts);
     }
     catch (e) {
-        res.status(500).json(e);
+        return res.status(500).json(e);
     }
 }));
 exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let isExistBlog = blog_repository_1.blogRepository.findBlogById(req.params.id);
+    let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
-        res.sendStatus(404);
+        return res.sendStatus(404);
     }
     try {
         const newPost = yield blog_query_repository_1.blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
-        res.status(201).send(newPost);
+        return res.status(201).send(newPost);
     }
     catch (e) {
-        res.status(500).json(e);
+        return res.status(500).json(e);
     }
 }));

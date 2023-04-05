@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogIdMiddlewareInParams = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
 const express_validator_1 = require("express-validator");
-const db_1 = require("../db/db");
 const dbMongo_1 = require("../db/dbMongo");
 const mongodb_1 = require("mongodb");
 exports.titlePostMiddleware = (0, express_validator_1.body)('title').isString().trim().isLength({
@@ -26,11 +25,11 @@ exports.contentPostMiddleware = (0, express_validator_1.body)('content').isStrin
     min: 1,
     max: 1000
 }).withMessage('content should be less than 1000 symbols string');
-let blogsIdArray = db_1.db.blogs.map(b => b.id);
-console.log(blogsIdArray);
+//let blogsIdArray = db.blogs.map((b: { id: any; }) => b.id);
+//console.log(blogsIdArray)
 exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(value);
-    console.log(`${blogsIdArray} exists blogID`);
+    //  console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
     //  const isIncluded = await blogsCollection.find({id:value}).toArray();
     const isIncluded = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(value.toString()) });
@@ -42,7 +41,7 @@ exports.blogIdMiddleware = (0, express_validator_1.body)('blogId').isString().cu
 })).withMessage('Please, write exist blogId');
 exports.blogIdMiddlewareInParams = (0, express_validator_1.param)('id').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(value);
-    console.log(`${blogsIdArray} exists blogID`);
+    //   console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
     //  const isIncluded = await blogsCollection.find({id:value}).toArray();
     const isIncluded = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(value.toString()) });

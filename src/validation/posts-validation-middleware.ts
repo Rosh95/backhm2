@@ -1,6 +1,5 @@
 import {body, param, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
-import {db} from '../db/db';
 import {blogsCollection} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
 
@@ -18,13 +17,13 @@ export const contentPostMiddleware = body('content').isString().trim().isLength(
     max: 1000
 }).withMessage('content should be less than 1000 symbols string');
 
-let blogsIdArray = db.blogs.map(b => b.id);
-console.log(blogsIdArray)
+//let blogsIdArray = db.blogs.map((b: { id: any; }) => b.id);
+//console.log(blogsIdArray)
 export const blogIdMiddleware = body('blogId').isString().custom(async (value) => {
     console.log(value);
-    console.log(`${blogsIdArray} exists blogID`)
+    //  console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
-  //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    //  const isIncluded = await blogsCollection.find({id:value}).toArray();
     const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
     if (!isIncluded) {
         // return false;
@@ -35,9 +34,9 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
 }).withMessage('Please, write exist blogId');
 export const blogIdMiddlewareInParams = param('id').isString().custom(async (value) => {
     console.log(value);
-    console.log(`${blogsIdArray} exists blogID`)
+    //   console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
-  //  const isIncluded = await blogsCollection.find({id:value}).toArray();
+    //  const isIncluded = await blogsCollection.find({id:value}).toArray();
     const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
     if (!isIncluded) {
         // return false;

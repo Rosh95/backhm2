@@ -24,10 +24,13 @@ function skipPages(pageNumber, pageSize) {
 exports.blogRepository = {
     findBlogs(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blogs = yield dbMongo_1.blogsCollection.find({})
+            //TODO: searcnName Term
+            const filter = { name: { $regex: '', options: 'i' } };
+            const blogs = yield dbMongo_1.blogsCollection.find(filter)
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
+            const countOfBlogs = yield dbMongo_1.blogsCollection.countDocuments(filter);
             return blogs.map(blog => blogMapping(blog));
         });
     },
@@ -52,6 +55,7 @@ exports.blogRepository = {
                 createdAt: new Date().toISOString(),
                 isMembership: false
             };
+            // @ts-ignore
             const result = yield dbMongo_1.blogsCollection.insertOne(newBlog);
             return {
                 id: result.insertedId.toString(),

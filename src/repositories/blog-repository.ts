@@ -1,8 +1,7 @@
-import {blogType, postType} from '../db/db';
 import {blogsCollection, postsCollection} from '../db/dbMongo';
-import {ObjectId, SortDirection} from 'mongodb';
-import {postMapping} from './post-repository';
+import {Filter, ObjectId, SortDirection} from 'mongodb';
 import {queryDataType} from '../helpers/helpers';
+import {BlogInputModel, BlogViewType} from '../types/blog-types';
 
 function blogMapping(blog: any) {
     const blogMongoId = blog._id.toString();
@@ -21,16 +20,23 @@ function skipPages(pageNumber: number, pageSize: number) {
 
 
 export const blogRepository = {
-    async findBlogs(queryData: queryDataType): Promise<blogType[]> {
-        const blogs = await blogsCollection.find({})
+    async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
+        //TODO: searcnName Term
+        const filter: Filter<BlogViewType> = {name: {$regex: '', options: 'i'}}
+
+        const blogs = await blogsCollection.find(filter)
             .sort({[queryData.sortByProp]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
+
+        const countOfBlogs = await blogsCollection.countDocuments(filter)
+
         return blogs.map(blog => blogMapping(blog))
+
     },
 
-    async findBlogById(id: string): Promise<blogType> {
-        const foundBlog: blogType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+    async findBlogById(id: string): Promise<BlogViewType> {
+        const foundBlog: BlogViewType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
         return foundBlog ? blogMapping(foundBlog) : null;
     },
     async deleteBlog(id: string): Promise<boolean> {
@@ -38,15 +44,17 @@ export const blogRepository = {
         return result.deletedCount === 1;
 
     },
-    async createBlog(name: string, description: string, websiteUrl: string): Promise<blogType> {
+    async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogViewType> {
 
-        let newBlog: blogType = {
+        let newBlog: BlogInputModel = {
             name: name,
             description: description,
             websiteUrl: websiteUrl,
             createdAt: new Date().toISOString(),
             isMembership: false
         }
+
+        // @ts-ignore
         const result = await blogsCollection.insertOne(newBlog)
 
         return {

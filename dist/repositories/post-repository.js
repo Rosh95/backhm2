@@ -9,26 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postRepository = exports.postMapping = void 0;
+exports.postRepository = void 0;
 const dbMongo_1 = require("../db/dbMongo");
 const mongodb_1 = require("mongodb");
-function postMapping(post) {
-    const postMongoId = post._id.toString();
-    delete post._id;
-    return Object.assign(Object.assign({ id: postMongoId }, post), { createdAt: post.createdAt.toISOString() });
-}
-exports.postMapping = postMapping;
+const helpers_1 = require("../helpers/helpers");
 exports.postRepository = {
     findPosts() {
         return __awaiter(this, void 0, void 0, function* () {
             const posts = yield dbMongo_1.postsCollection.find({}).toArray();
-            return posts.map(post => postMapping(post));
+            return posts.map(post => (0, helpers_1.postMapping)(post));
         });
     },
     findPostById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundBlog = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            return foundBlog ? postMapping(foundBlog) : null;
+            return foundBlog ? (0, helpers_1.postMapping)(foundBlog) : null;
         });
     },
     deletePost(id) {
@@ -49,6 +44,7 @@ exports.postRepository = {
                     blogName: findBlogName.name,
                     createdAt: new Date()
                 };
+                // @ts-ignore
                 const result = yield dbMongo_1.postsCollection.insertOne(newPost);
                 return {
                     id: result.insertedId.toString(),

@@ -9,10 +9,16 @@ import {
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {blogService} from '../domain/blog-service';
+import {countTotalBlogsAndPages, getDataFromQuery, queryDataType} from '../helpers/helpers';
 
 export const postsRouter = Router({})
 
 postsRouter.get('/', async (req: Request, res: Response) => {
+
+    // let queryData: queryDataType = getDataFromQuery(req)
+    // const posts = await postService.findBlogs(queryData);
+    // let pagesCount = await countTotalBlogsAndPages(req, queryData);
+
     let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
     let pageSize = req.body.pageSize ? req.body.pageSize : '10';
     let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';

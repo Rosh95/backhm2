@@ -1,4 +1,4 @@
-import {Request, Response, Router} from 'express';
+import e, {Request, Response, Router} from 'express';
 import {
     descriptionBlogMiddleware,
     nameBlogMiddleware,
@@ -20,25 +20,15 @@ import {
     getDataFromQuery,
     queryDataType
 } from '../helpers/helpers';
+import {PaginatorBlogViewType} from '../types/blog-types';
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', async (req: Request, res: Response) => {
-    
+blogsRouter.get('/', async (req: Request, res: Response): Promise<e.Response<any, Record<string, any>>> => {
+
     let queryData: queryDataType = getDataFromQuery(req)
-    const blogs = await blogService.findBlogs(queryData);
-    let pagesCount = await countTotalBlogsAndPages(req, queryData);
-
-
-    const result = {
-        pagesCount: pagesCount.blogsPagesCount,
-        page: queryData.pageNumber,
-        pageSize: queryData.pageSize,
-        totalCount: pagesCount.blogsTotalCount,
-        items: blogs
-
-    }
-    res.send(result)
+    const allBlogs = await blogQueryRepository.getAllBlogs(queryData);
+    return res.send(allBlogs)
 })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
@@ -94,34 +84,35 @@ blogsRouter.put('/:id',
 
 blogsRouter.get('/:id/posts',
     async (req: Request, res: Response) => {
-        let isExistBlog = blogRepository.findBlogById(req.params.id);
+        let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
-            res.sendStatus(404)
+            return res.sendStatus(404)
         }
-
         try {
             let queryData: queryDataType = getDataFromQuery(req)
-            let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-            let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
+            let foundPosts = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
+            //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
             // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
             // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 
-            const result = {
-                pagesCount: pagesCount.postsPagesCount,
-                page: queryData.pageNumber,
-                pageSize: queryData.pageSize,
-                totalCount: pagesCount.postsTotalCount,
-                items: foundBlogs
-
-            }
-            res.send(result);
+            // const result = {
+            //     pagesCount: pagesCount.postsPagesCount,
+            //     page: queryData.pageNumber,
+            //     pageSize: queryData.pageSize,
+            //     totalCount: pagesCount.postsTotalCount,
+            //     items: foundBlogs
+            //
+            // }
             // if (foundBlogs) {
             //     res.send(result)
             //     return;
             // }
             // res.sendStatus(404)
+
+            return res.send(foundPosts);
+
         } catch (e) {
-            res.status(500).json(e)
+            return res.status(500).json(e)
         }
     })
 
@@ -132,16 +123,16 @@ blogsRouter.post('/:id/posts',
     contentPostMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        let isExistBlog = blogRepository.findBlogById(req.params.id);
+        let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
-            res.sendStatus(404)
+            return res.sendStatus(404)
         }
         try {
             const newPost = await blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
 
-            res.status(201).send(newPost)
+            return res.status(201).send(newPost)
         } catch (e) {
-            res.status(500).json(e)
+            return res.status(500).json(e)
         }
 
     })

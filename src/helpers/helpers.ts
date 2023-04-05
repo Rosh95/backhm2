@@ -8,13 +8,19 @@ export  type  queryDataType = {
     pageSize: number,
     sortByProp: string,
     sortDirection: SortDirection,
+    searchName: string,
     skippedPages: number
 }
-export const getDataFromQuery = (req: Request): queryDataType => {
-    let pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
-    let pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
-    let sortByProp: string = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
-    let sortDirection: SortDirection = req.query.sortDirection === 'asc' ? 1 : -1;
+export const getDataFromQuery = (query: any): queryDataType => {
+// export const getDataFromQuery = (req: Request): queryDataType => {
+    // const pageNumberFromQuery: any = req.query.pageNumber
+    // const pageNumber = parseInt(pageNumberFromQuery, 10)
+    // if (pageNumber)
+    let pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
+    let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
+    let sortByProp: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
+    let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
+    let searchName = query.searchName ? query.searchName : '';
     let skippedPages: number = skipPages(pageNumber, pageSize);
 
 
@@ -23,6 +29,7 @@ export const getDataFromQuery = (req: Request): queryDataType => {
         pageSize,
         sortByProp,
         sortDirection,
+        searchName,
         skippedPages
     }
 }
@@ -42,9 +49,9 @@ export function skipPages(pageNumber: number, pageSize: number) {
     return result;
 }
 
-export const countTotalPostsAndPagesOfBlog = async (req: Request, queryData: queryDataType) => {
+export const countTotalPostsAndPagesOfBlog = async (id: string, queryData: queryDataType) => {
 
-    let postsTotalCount = await blogQueryRepository.getAllPostCountOfBlog(req.params.id);
+    let postsTotalCount = await blogQueryRepository.getAllPostCountOfBlog(id);
     let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 
     return {
@@ -52,13 +59,34 @@ export const countTotalPostsAndPagesOfBlog = async (req: Request, queryData: que
         postsPagesCount,
     }
 }
-export const countTotalBlogsAndPages = async (req: Request, queryData: queryDataType) => {
+export const countTotalBlogsAndPages = async (queryData: queryDataType, filter: any) => {
 
-    let blogsTotalCount = await blogQueryRepository.getAllBlogsCount();
+    let blogsTotalCount = await blogQueryRepository.getAllBlogsCount(filter);
     let blogsPagesCount = Math.ceil(blogsTotalCount / queryData.pageSize);
 
     return {
         blogsTotalCount,
         blogsPagesCount,
+    }
+}
+export const countTotalPostsAndPages = async (queryData: queryDataType) => {
+
+    let postsTotalCount = await blogQueryRepository.getAllPostsCount();
+    let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
+
+    return {
+        postsTotalCount,
+        postsPagesCount,
+    }
+}
+
+export function postMapping(post: any) {
+    const postMongoId = post._id.toString();
+    delete post._id;
+
+    return {
+        id: postMongoId,
+        ...post,
+        createdAt: post.createdAt.toISOString()
     }
 }
