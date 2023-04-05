@@ -17,6 +17,7 @@ import {
 } from '../validation/posts-validation-middleware';
 import {postRepository} from '../repositories/post-repository';
 import {postsRouter} from './posts-router';
+import {blogQueryRepository} from '../repositories/blog-query-repository';
 
 export const blogsRouter = Router({})
 
@@ -93,19 +94,22 @@ blogsRouter.put('/:id',
 
 
 blogsRouter.get('/:id/posts',
-    blogIdMiddlewareInParams,
     async (req: Request, res: Response) => {
+        let isExistBlog = blogRepository.findBlogById(req.params.id);
+        if (!isExistBlog) {
+            res.sendStatus(404)
+        }
 
         try {
-            let pageNumber = req.body.pageNumber ? req.body.pageNumber : 1;
-            let pageSize = req.body.pageSize ? req.body.pageSize : 10;
-            let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-            let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+            let pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1;
+            let pageSize = req.query.pageSize ? +req.query.pageSize : 10;
+            let sortByProp   = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
+            let sortDirection = req.query.sortDirection ? (req.query.sortDirection).toString() : 'desc';
 
 
-            let foundBlogs = await blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
+            let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
 
-            let postsTotalCount = await blogRepository.getAllPostCount(req.params.id);
+            let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
             let postsPagesCount = Math.ceil(postsTotalCount / pageSize);
 
             const result = {
@@ -135,7 +139,7 @@ blogsRouter.post('/:id/posts',
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         try {
-            const newPost = await blogRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+            const newPost = await blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
 
             res.status(201).send(newPost)
         } catch (e) {
