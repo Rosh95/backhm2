@@ -42,13 +42,23 @@ export function skipPages(pageNumber: number, pageSize: number) {
     return result;
 }
 
-export const countTotalPostsAndPages = async (req: Request, queryData: queryDataType) => {
+export const countTotalPostsAndPagesOfBlog = async (req: Request, queryData: queryDataType) => {
 
-    let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
+    let postsTotalCount = await blogQueryRepository.getAllPostCountOfBlog(req.params.id);
     let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 
     return {
         postsTotalCount,
         postsPagesCount,
+    }
+}
+export const countTotalBlogsAndPages = async (req: Request, queryData: queryDataType) => {
+
+    let blogsTotalCount = await blogQueryRepository.getAllBlogsCount();
+    let blogsPagesCount = Math.ceil(blogsTotalCount / queryData.pageSize);
+
+    return {
+        blogsTotalCount,
+        blogsPagesCount,
     }
 }

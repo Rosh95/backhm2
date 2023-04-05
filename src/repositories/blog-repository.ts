@@ -2,6 +2,7 @@ import {blogType, postType} from '../db/db';
 import {blogsCollection, postsCollection} from '../db/dbMongo';
 import {ObjectId, SortDirection} from 'mongodb';
 import {postMapping} from './post-repository';
+import {queryDataType} from '../helpers/helpers';
 
 function blogMapping(blog: any) {
     const blogMongoId = blog._id.toString();
@@ -20,8 +21,11 @@ function skipPages(pageNumber: number, pageSize: number) {
 
 
 export const blogRepository = {
-    async findBlogs(): Promise<blogType[]> {
-        const blogs = await blogsCollection.find({}).toArray();
+    async findBlogs(queryData: queryDataType): Promise<blogType[]> {
+        const blogs = await blogsCollection.find({})
+            .sort({[queryData.sortByProp]: queryData.sortDirection})
+            .skip(queryData.skippedPages)
+            .limit(queryData.pageSize).toArray();
         return blogs.map(blog => blogMapping(blog))
     },
 

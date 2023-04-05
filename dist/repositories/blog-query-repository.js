@@ -28,9 +28,15 @@ exports.blogQueryRepository = {
             return posts.map(post => (0, post_repository_1.postMapping)(post));
         });
     },
-    getAllPostCount(blogIdd) {
+    getAllPostCountOfBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let totalCount = yield dbMongo_1.postsCollection.countDocuments({ blogId: blogIdd });
+            let totalCount = yield dbMongo_1.postsCollection.countDocuments({ blogId: blogId });
+            return totalCount;
+        });
+    },
+    getAllBlogsCount() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let totalCount = yield dbMongo_1.blogsCollection.countDocuments({});
             return totalCount;
         });
     },

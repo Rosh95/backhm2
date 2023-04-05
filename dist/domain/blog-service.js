@@ -12,9 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogService = void 0;
 const blog_repository_1 = require("../repositories/blog-repository");
 exports.blogService = {
-    findBlogs() {
+    findBlogs(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blog_repository_1.blogRepository.findBlogs();
+            return yield blog_repository_1.blogRepository.findBlogs(queryData);
         });
     },
     findBlogById(id) {

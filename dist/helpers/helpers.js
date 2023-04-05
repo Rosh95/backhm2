@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countTotalPostsAndPages = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
+exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog-query-repository");
 const getDataFromQuery = (req) => {
     let pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1;
@@ -37,12 +37,21 @@ function skipPages(pageNumber, pageSize) {
     return result;
 }
 exports.skipPages = skipPages;
-const countTotalPostsAndPages = (req, queryData) => __awaiter(void 0, void 0, void 0, function* () {
-    let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCount(req.params.id);
+const countTotalPostsAndPagesOfBlog = (req, queryData) => __awaiter(void 0, void 0, void 0, function* () {
+    let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCountOfBlog(req.params.id);
     let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
     return {
         postsTotalCount,
         postsPagesCount,
     };
 });
-exports.countTotalPostsAndPages = countTotalPostsAndPages;
+exports.countTotalPostsAndPagesOfBlog = countTotalPostsAndPagesOfBlog;
+const countTotalBlogsAndPages = (req, queryData) => __awaiter(void 0, void 0, void 0, function* () {
+    let blogsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllBlogsCount();
+    let blogsPagesCount = Math.ceil(blogsTotalCount / queryData.pageSize);
+    return {
+        blogsTotalCount,
+        blogsPagesCount,
+    };
+});
+exports.countTotalBlogsAndPages = countTotalBlogsAndPages;

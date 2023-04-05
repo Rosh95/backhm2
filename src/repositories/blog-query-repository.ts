@@ -23,9 +23,15 @@ export const blogQueryRepository = {
         return posts.map(post => postMapping(post))
     },
 
-    async getAllPostCount(blogIdd: any): Promise<number> {
+    async getAllPostCountOfBlog(blogId: any): Promise<number> {
 
-        let totalCount = await postsCollection.countDocuments({blogId: blogIdd});
+        let totalCount = await postsCollection.countDocuments({blogId: blogId});
+
+        return totalCount;
+    },
+    async getAllBlogsCount(): Promise<number> {
+
+        let totalCount = await blogsCollection.countDocuments({});
 
         return totalCount;
     },

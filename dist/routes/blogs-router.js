@@ -21,18 +21,14 @@ const blog_query_repository_1 = require("../repositories/blog-query-repository")
 const helpers_1 = require("../helpers/helpers");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
-    const blogs = yield blog_service_1.blogService.findBlogs();
-    let postsPagesCount = Math.ceil(+blogs.length / +pageSize);
-    let postsTotalCount = +blogs.length;
+    let queryData = (0, helpers_1.getDataFromQuery)(req);
+    const blogs = yield blog_service_1.blogService.findBlogs(queryData);
+    let pagesCount = yield (0, helpers_1.countTotalBlogsAndPages)(req, queryData);
     const result = {
-        pagesCount: postsPagesCount,
-        page: pageNumber,
-        pageSize: pageSize,
-        totalCount: postsTotalCount,
+        pagesCount: pagesCount.blogsPagesCount,
+        page: queryData.pageNumber,
+        pageSize: queryData.pageSize,
+        totalCount: pagesCount.blogsTotalCount,
         items: blogs
     };
     res.send(result);
@@ -74,13 +70,14 @@ exports.blogsRouter.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, vo
     try {
         let queryData = (0, helpers_1.getDataFromQuery)(req);
         let foundBlogs = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-        let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCount(req.params.id);
-        let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
+        let pagesCount = yield (0, helpers_1.countTotalPostsAndPagesOfBlog)(req, queryData);
+        // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
+        // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
         const result = {
-            pagesCount: postsPagesCount,
+            pagesCount: pagesCount.postsPagesCount,
             page: queryData.pageNumber,
             pageSize: queryData.pageSize,
-            totalCount: postsTotalCount,
+            totalCount: pagesCount.postsTotalCount,
             items: foundBlogs
         };
         res.send(result);

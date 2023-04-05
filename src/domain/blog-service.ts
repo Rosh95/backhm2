@@ -1,10 +1,11 @@
 import {blogType} from '../db/db';
 
 import {blogRepository} from '../repositories/blog-repository';
+import {queryDataType} from '../helpers/helpers';
 
 export const blogService = {
-    async findBlogs(): Promise<blogType[]> {
-        return await blogRepository.findBlogs();
+    async findBlogs(queryData:queryDataType): Promise<blogType[]> {
+        return await blogRepository.findBlogs(queryData);
     },
 
     async findBlogById(id: string): Promise<blogType> {

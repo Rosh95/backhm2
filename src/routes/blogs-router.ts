@@ -7,36 +7,34 @@ import {
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {blogService} from '../domain/blog-service';
-import {ObjectId} from 'mongodb';
 import {blogRepository} from '../repositories/blog-repository';
 import {
-    blogIdMiddleware, blogIdMiddlewareInParams,
     contentPostMiddleware,
     shortDescriptionPostMiddleware,
     titlePostMiddleware
 } from '../validation/posts-validation-middleware';
-import {postRepository} from '../repositories/post-repository';
-import {postsRouter} from './posts-router';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
-import {countTotalPostsAndPages, getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {
+    countTotalBlogsAndPages,
+    countTotalPostsAndPagesOfBlog,
+    getDataFromQuery,
+    queryDataType
+} from '../helpers/helpers';
 
 export const blogsRouter = Router({})
 
 blogsRouter.get('/', async (req: Request, res: Response) => {
-    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+    
+    let queryData: queryDataType = getDataFromQuery(req)
+    const blogs = await blogService.findBlogs(queryData);
+    let pagesCount = await countTotalBlogsAndPages(req, queryData);
 
-    const blogs = await blogService.findBlogs();
-    let postsPagesCount = Math.ceil(+blogs.length / +pageSize);
-    let postsTotalCount = +blogs.length;
 
     const result = {
-        pagesCount: postsPagesCount,
-        page: pageNumber,
-        pageSize: pageSize,
-        totalCount: postsTotalCount,
+        pagesCount: pagesCount.blogsPagesCount,
+        page: queryData.pageNumber,
+        pageSize: queryData.pageSize,
+        totalCount: pagesCount.blogsTotalCount,
         items: blogs
 
     }
@@ -104,7 +102,7 @@ blogsRouter.get('/:id/posts',
         try {
             let queryData: queryDataType = getDataFromQuery(req)
             let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-            let pagesCount = await countTotalPostsAndPages(req, queryData);
+            let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
             // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
             // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 

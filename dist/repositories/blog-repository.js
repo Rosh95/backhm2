@@ -22,9 +22,12 @@ function skipPages(pageNumber, pageSize) {
     return result;
 }
 exports.blogRepository = {
-    findBlogs() {
+    findBlogs(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blogs = yield dbMongo_1.blogsCollection.find({}).toArray();
+            const blogs = yield dbMongo_1.blogsCollection.find({})
+                .sort({ [queryData.sortByProp]: queryData.sortDirection })
+                .skip(queryData.skippedPages)
+                .limit(queryData.pageSize).toArray();
             return blogs.map(blog => blogMapping(blog));
         });
     },
