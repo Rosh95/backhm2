@@ -8,14 +8,14 @@ import {queryDataType, skipPages} from '../helpers/helpers';
 export const blogQueryRepository = {
 
     async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<postType[]> {
-        let skippedPages = skipPages(queryData.pageNumber, queryData.pageSize);
+        //let skippedPages = skipPages(queryData.pageNumber, queryData.pageSize);
         // let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
         //    .sort({[sortByProp]: sortDirectionInMongoDb})
 
         console.log(queryData.sortByProp, queryData.sortDirection)
         let posts = await postsCollection.find({blogId})
             .sort({[queryData.sortByProp]: queryData.sortDirection})
-            .skip(skippedPages)
+            .skip(queryData.skippedPages)
             .limit(queryData.pageSize)
             .toArray();
 

@@ -18,7 +18,7 @@ import {
 import {postRepository} from '../repositories/post-repository';
 import {postsRouter} from './posts-router';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
-import {getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {countTotalPostsAndPages, getDataFromQuery, queryDataType} from '../helpers/helpers';
 
 export const blogsRouter = Router({})
 
@@ -103,17 +103,16 @@ blogsRouter.get('/:id/posts',
 
         try {
             let queryData: queryDataType = getDataFromQuery(req)
-
             let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-
-            let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
-            let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
+            let pagesCount = await countTotalPostsAndPages(req, queryData);
+            // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
+            // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 
             const result = {
-                pagesCount: postsPagesCount,
+                pagesCount: pagesCount.postsPagesCount,
                 page: queryData.pageNumber,
                 pageSize: queryData.pageSize,
-                totalCount: postsTotalCount,
+                totalCount: pagesCount.postsTotalCount,
                 items: foundBlogs
 
             }
