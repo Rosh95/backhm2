@@ -18,6 +18,7 @@ import {
 import {postRepository} from '../repositories/post-repository';
 import {postsRouter} from './posts-router';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
+import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 
 export const blogsRouter = Router({})
 
@@ -101,21 +102,17 @@ blogsRouter.get('/:id/posts',
         }
 
         try {
-            let pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1;
-            let pageSize = req.query.pageSize ? +req.query.pageSize : 10;
-            let sortByProp = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
-            let sortDirection = req.query.sortDirection ? (req.query.sortDirection).toString() : 'desc';
+            let queryData: queryDataType = getDataFromQuery(req)
 
-
-            let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
+            let foundBlogs = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
 
             let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
-            let postsPagesCount = Math.ceil(postsTotalCount / pageSize);
+            let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
 
             const result = {
                 pagesCount: postsPagesCount,
-                page: pageNumber,
-                pageSize: pageSize,
+                page: queryData.pageNumber,
+                pageSize: queryData.pageSize,
                 totalCount: postsTotalCount,
                 items: foundBlogs
 

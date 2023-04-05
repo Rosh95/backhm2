@@ -2,33 +2,19 @@ import {blogType, postType} from '../db/db';
 import {blogsCollection, postsCollection} from '../db/dbMongo';
 import {ObjectId, SortDirection} from 'mongodb';
 import {postMapping} from './post-repository';
-
-function blogMapping(blog: any) {
-    const blogMongoId = blog._id.toString();
-    delete blog._id;
-
-    return {
-        id: blogMongoId,
-        ...blog
-    }
-}
-
-function skipPages(pageNumber: number, pageSize: number) {
-    let result = (+pageNumber - 1) * (+pageSize);
-    return result;
-}
+import {queryDataType, skipPages} from '../helpers/helpers';
 
 
 export const blogQueryRepository = {
 
-    async getAllPostOfBlog(blogId: any, pageNumber: number, pageSize: number, sortByProp: string, sortDirection: string): Promise<postType[]> {
-        let skippedPages = skipPages(pageNumber, pageSize);
-        let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
-        console.log(sortByProp, sortDirectionInMongoDb)
+    async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<postType[]> {
+        let skippedPages = skipPages(queryData.pageNumber, queryData.pageSize);
+        // let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
+        // console.log(sortByProp, sortDirectionInMongoDb)
         let posts = await postsCollection.find({blogId})
-            .sort({[sortByProp]: sortDirectionInMongoDb})
+            .sort({[queryData.sortByProp]: queryData.sortDirection})
             .skip(skippedPages)
-            .limit(pageSize)
+            .limit(queryData.pageSize)
             .toArray();
 
 
