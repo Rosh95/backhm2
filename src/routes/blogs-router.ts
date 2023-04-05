@@ -103,7 +103,7 @@ blogsRouter.get('/:id/posts',
         try {
             let pageNumber = req.query.pageNumber ? +req.query.pageNumber : 1;
             let pageSize = req.query.pageSize ? +req.query.pageSize : 10;
-            let sortByProp   = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
+            let sortByProp = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
             let sortDirection = req.query.sortDirection ? (req.query.sortDirection).toString() : 'desc';
 
 
@@ -120,11 +120,12 @@ blogsRouter.get('/:id/posts',
                 items: foundBlogs
 
             }
-            if (foundBlogs) {
-                res.send(result)
-                return;
-            }
-            res.sendStatus(404)
+            res.send(result);
+            // if (foundBlogs) {
+            //     res.send(result)
+            //     return;
+            // }
+            // res.sendStatus(404)
         } catch (e) {
             res.status(500).json(e)
         }
@@ -135,9 +136,12 @@ blogsRouter.post('/:id/posts',
     titlePostMiddleware,
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
-    blogIdMiddlewareInParams,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
+        let isExistBlog = blogRepository.findBlogById(req.params.id);
+        if (!isExistBlog) {
+            res.sendStatus(404)
+        }
         try {
             const newPost = await blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
 
