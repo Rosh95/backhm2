@@ -11,7 +11,7 @@ export const getDataFromQuery = (req: Request): queryDataType => {
     let pageNumber: number = req.query.pageNumber ? +req.query.pageNumber : 1;
     let pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
     let sortByProp: string = req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
-    let sortDirection: SortDirection = req.query.sortDirection === 'desc' ? -1 : 1;
+    let sortDirection: SortDirection = req.query.sortDirection === 'asc' ? 1 : -1;
 
     return {
         pageNumber,

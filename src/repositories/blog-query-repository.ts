@@ -9,10 +9,12 @@ export const blogQueryRepository = {
 
     async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<postType[]> {
         let skippedPages = skipPages(queryData.pageNumber, queryData.pageSize);
-        let sortDirectionInMongoDb: SortDirection = queryData.sortDirection === 'desc' ? -1 : 1;
-        // console.log(sortByProp, sortDirectionInMongoDb)
+        // let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
+        //    .sort({[sortByProp]: sortDirectionInMongoDb})
+
+        console.log(queryData.sortByProp, queryData.sortDirection)
         let posts = await postsCollection.find({blogId})
-            .sort({[queryData.sortByProp]: sortDirectionInMongoDb})
+            .sort({[queryData.sortByProp]: queryData.sortDirection})
             .skip(skippedPages)
             .limit(queryData.pageSize)
             .toArray();

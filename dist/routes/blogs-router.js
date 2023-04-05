@@ -17,6 +17,8 @@ const error_validation_middleware_1 = require("../validation/error-validation-mi
 const blog_service_1 = require("../domain/blog-service");
 const blog_repository_1 = require("../repositories/blog-repository");
 const posts_validation_middleware_1 = require("../validation/posts-validation-middleware");
+const blog_query_repository_1 = require("../repositories/blog-query-repository");
+const helpers_1 = require("../helpers/helpers");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
@@ -64,35 +66,41 @@ exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_valid
         res.sendStatus(404);
     }
 }));
-exports.blogsRouter.get('/:id/posts', posts_validation_middleware_1.blogIdMiddlewareInParams, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let isExistBlog = blog_repository_1.blogRepository.findBlogById(req.params.id);
+    if (!isExistBlog) {
+        res.sendStatus(404);
+    }
     try {
-        let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-        let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-        let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-        let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
-        let foundBlogs = yield blog_repository_1.blogRepository.getAllPostOfBlog(req.params.id, pageNumber, pageSize, sortByProp, sortDirection);
-        let postsTotalCount = yield blog_repository_1.blogRepository.getAllPostCount(req.params.id);
-        let postsPagesCount = Math.ceil(postsTotalCount / +pageSize);
+        let queryData = (0, helpers_1.getDataFromQuery)(req);
+        let foundBlogs = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
+        let postsTotalCount = yield blog_query_repository_1.blogQueryRepository.getAllPostCount(req.params.id);
+        let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
         const result = {
             pagesCount: postsPagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
+            page: queryData.pageNumber,
+            pageSize: queryData.pageSize,
             totalCount: postsTotalCount,
             items: foundBlogs
         };
-        if (foundBlogs) {
-            res.send(result);
-            return;
-        }
-        res.sendStatus(404);
+        res.send(result);
+        // if (foundBlogs) {
+        //     res.send(result)
+        //     return;
+        // }
+        // res.sendStatus(404)
     }
     catch (e) {
         res.status(500).json(e);
     }
 }));
-exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, posts_validation_middleware_1.blogIdMiddlewareInParams, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let isExistBlog = blog_repository_1.blogRepository.findBlogById(req.params.id);
+    if (!isExistBlog) {
+        res.sendStatus(404);
+    }
     try {
-        const newPost = yield blog_repository_1.blogRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+        const newPost = yield blog_query_repository_1.blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
         res.status(201).send(newPost);
     }
     catch (e) {
