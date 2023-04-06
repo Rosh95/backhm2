@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogQueryRepository = void 0;
 const dbMongo_1 = require("../db/dbMongo");
-const mongodb_1 = require("mongodb");
 const helpers_1 = require("../helpers/helpers");
 exports.blogQueryRepository = {
     getAllBlogs(queryData) {
@@ -70,28 +69,30 @@ exports.blogQueryRepository = {
             return yield dbMongo_1.postsCollection.countDocuments();
         });
     },
-    createPostForExistingBlog(blogId, title, shortDescription, content) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let findBlogName = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(blogId.toString()) });
-            let newPost = {
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: findBlogName.name,
-                createdAt: new Date()
-            };
-            // @ts-ignore
-            const result = yield dbMongo_1.postsCollection.insertOne(newPost);
-            return {
-                id: result.insertedId.toString(),
-                title: newPost.title,
-                shortDescription: newPost.shortDescription,
-                content: newPost.content,
-                blogId: newPost.blogId,
-                blogName: newPost.blogName,
-                createdAt: newPost.createdAt
-            };
-        });
-    },
+    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
+    //     let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+    //
+    //     let newPost: postInputType = {
+    //         title: title,
+    //         shortDescription: shortDescription,
+    //         content: content,
+    //         blogId: blogId,
+    //         blogName: findBlogName!.name,
+    //         createdAt: new Date()
+    //     }
+    //
+    //     // @ts-ignore
+    //     const result = await postsCollection.insertOne(newPost)
+    //
+    //     return {
+    //         id: result.insertedId.toString(),
+    //         title: newPost.title,
+    //         shortDescription: newPost.shortDescription,
+    //         content: newPost.content,
+    //         blogId: newPost.blogId,
+    //         blogName: newPost.blogName,
+    //         createdAt: newPost.createdAt
+    //     };
+    //
+    // },
 };

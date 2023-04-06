@@ -16,10 +16,11 @@ import {
 import {blogQueryRepository} from '../repositories/blog-query-repository';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {queryValidation} from '../validation/query-validation';
+import {postService} from '../domain/post-service';
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', async (req: Request, res: Response): Promise<e.Response<any, Record<string, any>>> => {
+blogsRouter.get('/', async (req: Request, res: Response): Promise<e.Response> => {
 
     let queryData: queryDataType = await getDataFromQuery(req.query)
     const allBlogs = await blogQueryRepository.getAllBlogs(queryData);
@@ -87,23 +88,6 @@ blogsRouter.get('/:id/posts',
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
             let foundPosts = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-            //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
-            // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
-            // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
-
-            // const result = {
-            //     pagesCount: pagesCount.postsPagesCount,
-            //     page: queryData.pageNumber,
-            //     pageSize: queryData.pageSize,
-            //     totalCount: pagesCount.postsTotalCount,
-            //     items: foundBlogs
-            //
-            // }
-            // if (foundBlogs) {
-            //     res.send(result)
-            //     return;
-            // }
-            // res.sendStatus(404)
 
             return res.send(foundPosts);
 
@@ -125,9 +109,10 @@ blogsRouter.post('/:id/posts',
             return res.sendStatus(404)
         }
         try {
-          //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+            //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
-            const newPost = await blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+            const newPost = await postService.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+            // const newPost = await blogQueryRepository.createPostForExistingBlog( req.body.title, req.body.shortDescription, req.body.content, req.params.id);
 
             return res.status(201).send(newPost)
         } catch (e) {

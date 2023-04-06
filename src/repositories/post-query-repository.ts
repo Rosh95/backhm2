@@ -4,7 +4,7 @@ import {PaginatorPostViewType, PostViewModel} from '../types/post-types';
 
 export const postQueryRepository = {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
-        // //TODO: searcnName Term
+        // TODO: searcnName Term
         // const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchName, options: 'i'}}
 
         const posts = await postsCollection.find()
@@ -18,16 +18,14 @@ export const postQueryRepository = {
         let pagesCount = await countTotalPostsAndPages(queryData);
 
 
-        const result = {
+        return {
             pagesCount: pagesCount.postsPagesCount,
             page: queryData.pageNumber,
             pageSize: queryData.pageSize,
             totalCount: pagesCount.postsTotalCount,
             items: postViewArray
 
-        }
-
-        return result;
+        };
 
     },
 }

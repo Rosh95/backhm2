@@ -32,9 +32,14 @@ exports.postService = {
             return yield post_repository_1.postRepository.createPost(name, description, websiteUrl, blogId);
         });
     },
-    updatePost(id, name, description, websiteUrl) {
+    createPostForExistingBlog(blogId, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.postRepository.updatePost(id, name, description, websiteUrl);
+            return yield post_repository_1.postRepository.createPostForExistingBlog(blogId, title, shortDescription, content);
+        });
+    },
+    updatePost(id, title, shortDescription, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.updatePost(id, title, shortDescription, content);
         });
     }
 };

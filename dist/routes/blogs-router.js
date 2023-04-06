@@ -20,6 +20,7 @@ const posts_validation_middleware_1 = require("../validation/posts-validation-mi
 const blog_query_repository_1 = require("../repositories/blog-query-repository");
 const helpers_1 = require("../helpers/helpers");
 const query_validation_1 = require("../validation/query-validation");
+const post_service_1 = require("../domain/post-service");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
@@ -63,22 +64,6 @@ exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, 
     try {
         let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
         let foundPosts = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-        //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
-        // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
-        // let postsPagesCount = Math.ceil(postsTotalCount / queryData.pageSize);
-        // const result = {
-        //     pagesCount: pagesCount.postsPagesCount,
-        //     page: queryData.pageNumber,
-        //     pageSize: queryData.pageSize,
-        //     totalCount: pagesCount.postsTotalCount,
-        //     items: foundBlogs
-        //
-        // }
-        // if (foundBlogs) {
-        //     res.send(result)
-        //     return;
-        // }
-        // res.sendStatus(404)
         return res.send(foundPosts);
     }
     catch (e) {
@@ -92,7 +77,8 @@ exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, post
     }
     try {
         //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
-        const newPost = yield blog_query_repository_1.blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+        const newPost = yield post_service_1.postService.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+        // const newPost = await blogQueryRepository.createPostForExistingBlog( req.body.title, req.body.shortDescription, req.body.content, req.params.id);
         return res.status(201).send(newPost);
     }
     catch (e) {

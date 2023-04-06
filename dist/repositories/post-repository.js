@@ -59,6 +59,30 @@ exports.postRepository = {
             return false;
         });
     },
+    createPostForExistingBlog(blogId, title, shortDescription, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let findBlogName = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(blogId.toString()) });
+            let newPost = {
+                title: title,
+                shortDescription: shortDescription,
+                content: content,
+                blogId: blogId,
+                blogName: findBlogName.name,
+                createdAt: new Date()
+            };
+            // @ts-ignore
+            const result = yield dbMongo_1.postsCollection.insertOne(newPost);
+            return {
+                id: result.insertedId.toString(),
+                title: newPost.title,
+                shortDescription: newPost.shortDescription,
+                content: newPost.content,
+                blogId: newPost.blogId,
+                blogName: newPost.blogName,
+                createdAt: newPost.createdAt
+            };
+        });
+    },
     updatePost(id, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {

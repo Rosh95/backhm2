@@ -45,6 +45,33 @@ export const postRepository = {
         return false;
     },
 
+    async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
+        let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+
+        let newPost: postInputType = {
+            title: title,
+            shortDescription: shortDescription,
+            content: content,
+            blogId: blogId,
+            blogName: findBlogName!.name,
+            createdAt: new Date()
+        }
+
+        // @ts-ignore
+        const result = await postsCollection.insertOne(newPost)
+
+        return {
+            id: result.insertedId.toString(),
+            title: newPost.title,
+            shortDescription: newPost.shortDescription,
+            content: newPost.content,
+            blogId: newPost.blogId,
+            blogName: newPost.blogName,
+            createdAt: newPost.createdAt
+        };
+
+    },
+
     async updatePost(id: string, title: string, shortDescription: string, content: string): Promise<boolean> {
 
         const result = await postsCollection.updateOne({_id: new ObjectId(id)},
