@@ -34,10 +34,6 @@ exports.blogQueryRepository = {
     },
     getAllPostOfBlog(blogId, queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            //let skippedPages = skipPages(queryData.pageNumber, queryData.pageSize);
-            // let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
-            //    .sort({[sortByProp]: sortDirectionInMongoDb})
-            console.log(queryData.sortByProp, queryData.sortDirection);
             let posts = yield dbMongo_1.postsCollection.find({ blogId })
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
@@ -69,30 +65,4 @@ exports.blogQueryRepository = {
             return yield dbMongo_1.postsCollection.countDocuments();
         });
     },
-    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
-    //     let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-    //
-    //     let newPost: postInputType = {
-    //         title: title,
-    //         shortDescription: shortDescription,
-    //         content: content,
-    //         blogId: blogId,
-    //         blogName: findBlogName!.name,
-    //         createdAt: new Date()
-    //     }
-    //
-    //     // @ts-ignore
-    //     const result = await postsCollection.insertOne(newPost)
-    //
-    //     return {
-    //         id: result.insertedId.toString(),
-    //         title: newPost.title,
-    //         shortDescription: newPost.shortDescription,
-    //         content: newPost.content,
-    //         blogId: newPost.blogId,
-    //         blogName: newPost.blogName,
-    //         createdAt: newPost.createdAt
-    //     };
-    //
-    // },
 };

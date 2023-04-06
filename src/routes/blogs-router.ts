@@ -1,5 +1,6 @@
 import e, {Request, Response, Router} from 'express';
 import {
+    blogValidation,
     descriptionBlogMiddleware,
     nameBlogMiddleware,
     websiteUrlBlogMiddleware
@@ -9,7 +10,7 @@ import {errorsValidationMiddleware} from '../validation/error-validation-middlew
 import {blogService} from '../domain/blog-service';
 import {blogRepository} from '../repositories/blog-repository';
 import {
-    contentPostMiddleware,
+    contentPostMiddleware, postValidation,
     shortDescriptionPostMiddleware,
     titlePostMiddleware
 } from '../validation/posts-validation-middleware';
@@ -20,12 +21,14 @@ import {postService} from '../domain/post-service';
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', async (req: Request, res: Response): Promise<e.Response> => {
+blogsRouter.get('/',
+    queryValidation,
+    async (req: Request, res: Response): Promise<e.Response> => {
 
-    let queryData: queryDataType = await getDataFromQuery(req.query)
-    const allBlogs = await blogQueryRepository.getAllBlogs(queryData);
-    return res.send(allBlogs)
-})
+        let queryData: queryDataType = await getDataFromQuery(req.query)
+        const allBlogs = await blogQueryRepository.getAllBlogs(queryData);
+        return res.send(allBlogs)
+    })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
     let foundBlog = await blogService.findBlogById(req.params.id)
@@ -49,9 +52,10 @@ blogsRouter.delete('/:id',
 
 blogsRouter.post('/',
     basicAuthMiddleware,
-    websiteUrlBlogMiddleware,
-    nameBlogMiddleware,
-    descriptionBlogMiddleware,
+    // websiteUrlBlogMiddleware,
+    // nameBlogMiddleware,
+    // descriptionBlogMiddleware,
+    blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
@@ -63,9 +67,10 @@ blogsRouter.post('/',
 
 blogsRouter.put('/:id',
     basicAuthMiddleware,
-    websiteUrlBlogMiddleware,
-    nameBlogMiddleware,
-    descriptionBlogMiddleware,
+    // websiteUrlBlogMiddleware,
+    // nameBlogMiddleware,
+    // descriptionBlogMiddleware,
+    blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
@@ -98,21 +103,20 @@ blogsRouter.get('/:id/posts',
 
 blogsRouter.post('/:id/posts',
     basicAuthMiddleware,
-    titlePostMiddleware,
-    shortDescriptionPostMiddleware,
-    contentPostMiddleware,
-    errorsValidationMiddleware,
+    // titlePostMiddleware,
+    // shortDescriptionPostMiddleware,
+    // contentPostMiddleware,
+    postValidation,
     queryValidation,
+    errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             return res.sendStatus(404)
         }
         try {
-            //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
             const newPost = await postService.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
-            // const newPost = await blogQueryRepository.createPostForExistingBlog( req.body.title, req.body.shortDescription, req.body.content, req.params.id);
 
             return res.status(201).send(newPost)
         } catch (e) {

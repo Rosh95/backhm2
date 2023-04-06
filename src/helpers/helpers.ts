@@ -21,7 +21,6 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let skippedPages: number = skipPages(pageNumber, pageSize);
 
-
     return {
         pageNumber,
         pageSize,

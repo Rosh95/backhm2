@@ -2,6 +2,7 @@ import {body, param, validationResult} from 'express-validator';
 import {NextFunction, Response, Request} from 'express';
 import {blogsCollection} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
+import {descriptionBlogMiddleware, nameBlogMiddleware, websiteUrlBlogMiddleware} from './blogs-validation-middleware';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({
     min: 1,
@@ -46,3 +47,5 @@ export const blogIdMiddlewareInParams = param('id').isString().custom(async (val
 
 }).withMessage('Please, write exist blogId');
 
+
+export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware ]

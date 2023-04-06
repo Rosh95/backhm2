@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postService = void 0;
 const post_repository_1 = require("../repositories/post-repository");
+const blog_repository_1 = require("../repositories/blog-repository");
 exports.postService = {
     findPosts(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27,14 +28,37 @@ exports.postService = {
             return yield post_repository_1.postRepository.deletePost(id);
         });
     },
-    createPost(name, description, websiteUrl, blogId) {
+    createPost(title, shortDescription, content, blogId, foundBlogName) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.postRepository.createPost(name, description, websiteUrl, blogId);
+            // let foundBlogName = await blogRepository.findBlogById(blogId)
+            // if (!foundBlogName) {
+            //     return false;
+            // }
+            let newPost = {
+                title: title,
+                shortDescription: shortDescription,
+                content: content,
+                blogId: blogId,
+                blogName: foundBlogName.name,
+                createdAt: new Date()
+            };
+            return yield post_repository_1.postRepository.createPost(newPost);
         });
     },
     createPostForExistingBlog(blogId, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.postRepository.createPostForExistingBlog(blogId, title, shortDescription, content);
+            // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+            let foundBlog = yield blog_repository_1.blogRepository.findBlogById(blogId);
+            let newPost = {
+                title: title,
+                shortDescription: shortDescription,
+                content: content,
+                blogId: blogId,
+                blogName: foundBlog.name,
+                createdAt: new Date()
+            };
+            // return await postRepository.createPostForExistingBlog(blogId, title, shortDescription, content);
+            return yield post_repository_1.postRepository.createPostForExistingBlog(newPost);
         });
     },
     updatePost(id, title, shortDescription, content) {

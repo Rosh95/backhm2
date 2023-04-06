@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogIdMiddlewareInParams = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
+exports.postValidation = exports.blogIdMiddlewareInParams = exports.blogIdMiddleware = exports.contentPostMiddleware = exports.shortDescriptionPostMiddleware = exports.titlePostMiddleware = void 0;
 const express_validator_1 = require("express-validator");
 const dbMongo_1 = require("../db/dbMongo");
 const mongodb_1 = require("mongodb");
@@ -51,3 +51,4 @@ exports.blogIdMiddlewareInParams = (0, express_validator_1.param)('id').isString
     }
     return true;
 })).withMessage('Please, write exist blogId');
+exports.postValidation = [exports.titlePostMiddleware, exports.shortDescriptionPostMiddleware, exports.contentPostMiddleware];

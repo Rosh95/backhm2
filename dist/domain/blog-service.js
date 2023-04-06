@@ -12,11 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogService = void 0;
 const blog_repository_1 = require("../repositories/blog-repository");
 exports.blogService = {
-    findBlogs(queryData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield blog_repository_1.blogRepository.findBlogs(queryData);
-        });
-    },
+    // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
+    //     return await blogRepository.findBlogs(queryData);
+    // },
     findBlogById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield blog_repository_1.blogRepository.findBlogById(id);
@@ -29,7 +27,14 @@ exports.blogService = {
     },
     createBlog(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blog_repository_1.blogRepository.createBlog(name, description, websiteUrl);
+            let newBlog = {
+                name: name,
+                description: description,
+                websiteUrl: websiteUrl,
+                createdAt: new Date().toISOString(),
+                isMembership: false
+            };
+            return yield blog_repository_1.blogRepository.createBlog(newBlog);
         });
     },
     updateBlog(id, name, description, websiteUrl) {

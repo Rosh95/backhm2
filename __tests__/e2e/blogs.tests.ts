@@ -1,5 +1,5 @@
 import request from 'supertest'
-import {blogInputType, db} from '../../src/db/db';
+import {blogInputType} from '../../src/db';
 import {app} from '../../src/app';
 
 export const addNewBlog = async (blog: blogInputType) => {

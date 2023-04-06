@@ -22,7 +22,7 @@ const helpers_1 = require("../helpers/helpers");
 const query_validation_1 = require("../validation/query-validation");
 const post_service_1 = require("../domain/post-service");
 exports.blogsRouter = (0, express_1.Router)({});
-exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
     const allBlogs = yield blog_query_repository_1.blogQueryRepository.getAllBlogs(queryData);
     return res.send(allBlogs);
@@ -43,11 +43,19 @@ exports.blogsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     else
         res.sendStatus(404);
 }));
-exports.blogsRouter.post('/', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.post('/', authorization_1.basicAuthMiddleware, 
+// websiteUrlBlogMiddleware,
+// nameBlogMiddleware,
+// descriptionBlogMiddleware,
+blogs_validation_middleware_1.blogValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newBlog = yield blog_service_1.blogService.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
     res.status(201).send(newBlog);
 }));
-exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.websiteUrlBlogMiddleware, blogs_validation_middleware_1.nameBlogMiddleware, blogs_validation_middleware_1.descriptionBlogMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, 
+// websiteUrlBlogMiddleware,
+// nameBlogMiddleware,
+// descriptionBlogMiddleware,
+blogs_validation_middleware_1.blogValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlog = yield blog_service_1.blogService.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
     if (foundBlog) {
         res.sendStatus(204);
@@ -70,15 +78,17 @@ exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, 
         return res.status(500).json(e);
     }
 }));
-exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, 
+// titlePostMiddleware,
+// shortDescriptionPostMiddleware,
+// contentPostMiddleware,
+posts_validation_middleware_1.postValidation, query_validation_1.queryValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
         return res.sendStatus(404);
     }
     try {
-        //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
         const newPost = yield post_service_1.postService.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
-        // const newPost = await blogQueryRepository.createPostForExistingBlog( req.body.title, req.body.shortDescription, req.body.content, req.params.id);
         return res.status(201).send(newPost);
     }
     catch (e) {

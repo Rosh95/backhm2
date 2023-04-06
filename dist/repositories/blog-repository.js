@@ -17,23 +17,21 @@ function blogMapping(blog) {
     delete blog._id;
     return Object.assign({ id: blogMongoId }, blog);
 }
-function skipPages(pageNumber, pageSize) {
-    let result = (+pageNumber - 1) * (+pageSize);
-    return result;
-}
 exports.blogRepository = {
-    findBlogs(queryData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //TODO: searcnName Term
-            const filter = { name: { $regex: '', options: 'i' } };
-            const blogs = yield dbMongo_1.blogsCollection.find(filter)
-                .sort({ [queryData.sortByProp]: queryData.sortDirection })
-                .skip(queryData.skippedPages)
-                .limit(queryData.pageSize).toArray();
-            const countOfBlogs = yield dbMongo_1.blogsCollection.countDocuments(filter);
-            return blogs.map(blog => blogMapping(blog));
-        });
-    },
+    // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
+    //     //TODO: searcnName Term
+    //     const filter: Filter<BlogViewType> = {name: {$regex: '', options: 'i'}}
+    //
+    //     const blogs = await blogsCollection.find(filter)
+    //         .sort({[queryData.sortByProp]: queryData.sortDirection})
+    //         .skip(queryData.skippedPages)
+    //         .limit(queryData.pageSize).toArray();
+    //
+    //     const countOfBlogs = await blogsCollection.countDocuments(filter)
+    //
+    //     return blogs.map(blog => blogMapping(blog))
+    //
+    // },
     findBlogById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundBlog = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
@@ -46,15 +44,8 @@ exports.blogRepository = {
             return result.deletedCount === 1;
         });
     },
-    createBlog(name, description, websiteUrl) {
+    createBlog(newBlog) {
         return __awaiter(this, void 0, void 0, function* () {
-            let newBlog = {
-                name: name,
-                description: description,
-                websiteUrl: websiteUrl,
-                createdAt: new Date().toISOString(),
-                isMembership: false
-            };
             // @ts-ignore
             const result = yield dbMongo_1.blogsCollection.insertOne(newBlog);
             return {
@@ -79,51 +70,4 @@ exports.blogRepository = {
             return result.matchedCount === 1;
         });
     },
-    // async getAllPostOfBlog(blogId: any, pageNumber: number, pageSize: number, sortByProp: string, sortDirection: string): Promise<postType[]> {
-    //     let skippedPages = skipPages(pageNumber, pageSize);
-    //     let sortDirectionInMongoDb: SortDirection = sortDirection === 'desc' ? -1 : 1;
-    //     console.log(sortByProp, sortDirectionInMongoDb)
-    //     let posts = await postsCollection.find({blogId})
-    //         .sort({[sortByProp]: sortDirectionInMongoDb})
-    //         .skip(skippedPages)
-    //         .limit(pageSize)
-    //         .toArray();
-    //
-    //
-    //     return posts.map(post => postMapping(post))
-    // },
-    //
-    // async getAllPostCount(blogIdd: any): Promise<number> {
-    //
-    //     let totalCount = await postsCollection.countDocuments({blogId: blogIdd})
-    //
-    //
-    //     return totalCount;
-    // },
-    //
-    //
-    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<postType | boolean> {
-    //     let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-    //
-    //     let newPost: postType = {
-    //         title: title,
-    //         shortDescription: shortDescription,
-    //         content: content,
-    //         blogId: blogId,
-    //         blogName: findBlogName!.name,
-    //         createdAt: new Date()
-    //     }
-    //     const result = await postsCollection.insertOne(newPost)
-    //
-    //     return {
-    //         id: result.insertedId.toString(),
-    //         title: newPost.title,
-    //         shortDescription: newPost.shortDescription,
-    //         content: newPost.content,
-    //         blogId: newPost.blogId,
-    //         blogName: newPost.blogName,
-    //         createdAt: newPost.createdAt
-    //     };
-    //
-    // },
 };

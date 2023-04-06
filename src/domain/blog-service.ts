@@ -1,11 +1,10 @@
 import {blogRepository} from '../repositories/blog-repository';
-import {queryDataType} from '../helpers/helpers';
-import {BlogViewType} from '../types/blog-types';
+import {BlogInputModel, BlogViewType} from '../types/blog-types';
 
 export const blogService = {
-    async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
-        return await blogRepository.findBlogs(queryData);
-    },
+    // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
+    //     return await blogRepository.findBlogs(queryData);
+    // },
 
     async findBlogById(id: string): Promise<BlogViewType> {
         return await blogRepository.findBlogById(id)
@@ -15,7 +14,15 @@ export const blogService = {
 
     },
     async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogViewType> {
-        return await blogRepository.createBlog(name, description, websiteUrl);
+
+        let newBlog: BlogInputModel = {
+            name: name,
+            description: description,
+            websiteUrl: websiteUrl,
+            createdAt: new Date().toISOString(),
+            isMembership: false
+        }
+        return await blogRepository.createBlog(newBlog);
 
     },
 

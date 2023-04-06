@@ -18,44 +18,45 @@ export const postRepository = {
         const result = await postsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
     },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<PostViewModel | boolean> {
-        let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-        if (findBlogName) {
-            let newPost: postInputType = {
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: findBlogName.name,
-                createdAt: new Date()
-            }
-            // @ts-ignore
-            const result = await postsCollection.insertOne(newPost)
+    async createPost(newPost: postInputType): Promise<PostViewModel | boolean> {
+        // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+        //   if (foundBlogName) {
+        // let newPost: postInputType = {
+        //     title: title,
+        //     shortDescription: shortDescription,
+        //     content: content,
+        //     blogId: blogId,
+        //     blogName: findBlogName.name,
+        //     createdAt: new Date()
+        // }
+        // @ts-ignore
+        const result = await postsCollection.insertOne(newPost)
 
-            return {
-                id: result.insertedId.toString(),
-                title: newPost.title,
-                shortDescription: newPost.shortDescription,
-                content: newPost.content,
-                blogId: newPost.blogId,
-                blogName: newPost.blogName,
-                createdAt: newPost.createdAt
-            };
-        }
-        return false;
+        return {
+            id: result.insertedId.toString(),
+            title: newPost.title,
+            shortDescription: newPost.shortDescription,
+            content: newPost.content,
+            blogId: newPost.blogId,
+            blogName: newPost.blogName,
+            createdAt: newPost.createdAt
+        };
+        // }
+        // return false;
     },
 
-    async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
-        let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-
-        let newPost: postInputType = {
-            title: title,
-            shortDescription: shortDescription,
-            content: content,
-            blogId: blogId,
-            blogName: findBlogName!.name,
-            createdAt: new Date()
-        }
+    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
+    async createPostForExistingBlog(newPost: postInputType): Promise<PostViewModel | boolean> {
+        // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
+        //
+        // let newPost: postInputType = {
+        //     title: title,
+        //     shortDescription: shortDescription,
+        //     content: content,
+        //     blogId: blogId,
+        //     blogName: findBlogName!.name,
+        //     createdAt: new Date()
+        // }
 
         // @ts-ignore
         const result = await postsCollection.insertOne(newPost)

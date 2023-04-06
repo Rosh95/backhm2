@@ -18,32 +18,12 @@ const helpers_1 = require("../helpers/helpers");
 const post_query_repository_1 = require("../repositories/post-query-repository");
 const post_service_1 = require("../domain/post-service");
 const query_validation_1 = require("../validation/query-validation");
+const blog_repository_1 = require("../repositories/blog-repository");
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // let queryData: queryDataType = getDataFromQuery(req)
-    // const posts = await postService.findBlogs(queryData);
-    // let pagesCount = await countTotalBlogsAndPages(req, queryData);
     let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
     const allPosts = yield post_query_repository_1.postQueryRepository.getAllPosts(queryData);
     return res.send(allPosts);
-    // let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-    // let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
-    //
-    // const posts = await postRepository.findPosts();
-    // let postsPagesCount = Math.ceil(+posts.length / +pageSize);
-    // let postsTotalCount = +posts.length;
-    //
-    // const result = {
-    //     pagesCount: postsPagesCount,
-    //     page: pageNumber,
-    //     pageSize: pageSize,
-    //     totalCount: postsTotalCount,
-    //     items: posts
-    //
-    // }
-    // res.send(result)
 }));
 exports.postsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundPost = yield post_service_1.postService.findPostById(req.params.id);
@@ -61,11 +41,23 @@ exports.postsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     else
         res.sendStatus(404);
 }));
-exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newPost = yield post_service_1.postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
-    res.status(201).send(newPost);
+exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, 
+// titlePostMiddleware,
+// shortDescriptionPostMiddleware,
+// contentPostMiddleware,
+posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundBlogName = yield blog_repository_1.blogRepository.findBlogById(req.body.blogId);
+    if (!foundBlogName) {
+        return res.sendStatus(404);
+    }
+    const newPost = yield post_service_1.postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, foundBlogName);
+    return res.status(201).send(newPost);
 }));
-exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.titlePostMiddleware, posts_validation_middleware_1.shortDescriptionPostMiddleware, posts_validation_middleware_1.contentPostMiddleware, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, 
+// titlePostMiddleware,
+// shortDescriptionPostMiddleware,
+// contentPostMiddleware,
+posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let updatedPost = yield post_service_1.postService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
     if (updatedPost) {
         res.sendStatus(204);
