@@ -10,38 +10,41 @@ import {errorsValidationMiddleware} from '../validation/error-validation-middlew
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {postQueryRepository} from '../repositories/post-query-repository';
 import {postService} from '../domain/post-service';
+import {queryValidation} from '../validation/query-validation';
 
 export const postsRouter = Router({})
 
-postsRouter.get('/', async (req: Request, res: Response) => {
+postsRouter.get('/',
+    queryValidation,
+    async (req: Request, res: Response) => {
 
-    // let queryData: queryDataType = getDataFromQuery(req)
-    // const posts = await postService.findBlogs(queryData);
-    // let pagesCount = await countTotalBlogsAndPages(req, queryData);
-    let queryData: queryDataType = await getDataFromQuery(req.query)
-    const allPosts = await postQueryRepository.getAllPosts(queryData);
-    return res.send(allPosts)
+        // let queryData: queryDataType = getDataFromQuery(req)
+        // const posts = await postService.findBlogs(queryData);
+        // let pagesCount = await countTotalBlogsAndPages(req, queryData);
+        let queryData: queryDataType = await getDataFromQuery(req.query)
+        const allPosts = await postQueryRepository.getAllPosts(queryData);
+        return res.send(allPosts)
 
 
-    // let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-    // let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
-    //
-    // const posts = await postRepository.findPosts();
-    // let postsPagesCount = Math.ceil(+posts.length / +pageSize);
-    // let postsTotalCount = +posts.length;
-    //
-    // const result = {
-    //     pagesCount: postsPagesCount,
-    //     page: pageNumber,
-    //     pageSize: pageSize,
-    //     totalCount: postsTotalCount,
-    //     items: posts
-    //
-    // }
-    // res.send(result)
-})
+        // let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+        // let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+        // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+        // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+        //
+        // const posts = await postRepository.findPosts();
+        // let postsPagesCount = Math.ceil(+posts.length / +pageSize);
+        // let postsTotalCount = +posts.length;
+        //
+        // const result = {
+        //     pagesCount: postsPagesCount,
+        //     page: pageNumber,
+        //     pageSize: pageSize,
+        //     totalCount: postsTotalCount,
+        //     items: posts
+        //
+        // }
+        // res.send(result)
+    })
 
 postsRouter.get('/:id', async (req: Request, res: Response) => {
     let foundPost = await postService.findPostById(req.params.id)

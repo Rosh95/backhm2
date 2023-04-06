@@ -15,6 +15,7 @@ import {
 } from '../validation/posts-validation-middleware';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {queryValidation} from '../validation/query-validation';
 
 export const blogsRouter = Router({})
 
@@ -77,6 +78,7 @@ blogsRouter.put('/:id',
 
 
 blogsRouter.get('/:id/posts',
+    queryValidation,
     async (req: Request, res: Response) => {
         let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
@@ -116,6 +118,7 @@ blogsRouter.post('/:id/posts',
     shortDescriptionPostMiddleware,
     contentPostMiddleware,
     errorsValidationMiddleware,
+    queryValidation,
     async (req: Request, res: Response) => {
         let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
