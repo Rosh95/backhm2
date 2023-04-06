@@ -13,7 +13,7 @@ import {BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
 
 export const blogQueryRepository = {
     async getAllBlogs(queryData: queryDataType): Promise<PaginatorBlogViewType> {
-        const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchNameTerm, options: 'i'}}
+        const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
 
         const blogs = await blogsCollection.find(filter)
             .sort({[queryData.sortByProp]: queryData.sortDirection})

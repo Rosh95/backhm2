@@ -16,7 +16,7 @@ const helpers_1 = require("../helpers/helpers");
 exports.blogQueryRepository = {
     getAllBlogs(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = { name: { $regex: queryData.searchNameTerm, options: 'i' } };
+            const filter = { name: { $regex: queryData.searchNameTerm, $options: 'i' } };
             const blogs = yield dbMongo_1.blogsCollection.find(filter)
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
