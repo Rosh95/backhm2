@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postMapping = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog-query-repository");
-const getDataFromQuery = (query) => {
+const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
     // export const getDataFromQuery = (req: Request): queryDataType => {
     // const pageNumberFromQuery: any = req.query.pageNumber
     // const pageNumber = parseInt(pageNumberFromQuery, 10)
@@ -20,17 +20,17 @@ const getDataFromQuery = (query) => {
     let pageSize = query.pageSize ? +query.pageSize : 10; // NaN
     let sortByProp = query.sortBy ? (query.sortBy).toString() : 'createdAt';
     let sortDirection = query.sortDirection === 'asc' ? 1 : -1;
-    let searchName = query.searchName ? query.searchName : '';
+    let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let skippedPages = skipPages(pageNumber, pageSize);
     return {
         pageNumber,
         pageSize,
         sortByProp,
         sortDirection,
-        searchName,
+        searchNameTerm,
         skippedPages
     };
-};
+});
 exports.getDataFromQuery = getDataFromQuery;
 function blogMapping(blog) {
     const blogMongoId = blog._id.toString();
@@ -39,8 +39,7 @@ function blogMapping(blog) {
 }
 exports.blogMapping = blogMapping;
 function skipPages(pageNumber, pageSize) {
-    let result = (+pageNumber - 1) * (+pageSize);
-    return result;
+    return (+pageNumber - 1) * (+pageSize);
 }
 exports.skipPages = skipPages;
 const countTotalPostsAndPagesOfBlog = (id, queryData) => __awaiter(void 0, void 0, void 0, function* () {

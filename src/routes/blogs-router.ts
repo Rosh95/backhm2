@@ -14,19 +14,13 @@ import {
     titlePostMiddleware
 } from '../validation/posts-validation-middleware';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
-import {
-    countTotalBlogsAndPages,
-    countTotalPostsAndPagesOfBlog,
-    getDataFromQuery,
-    queryDataType
-} from '../helpers/helpers';
-import {PaginatorBlogViewType} from '../types/blog-types';
+import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 
 export const blogsRouter = Router({})
 
 blogsRouter.get('/', async (req: Request, res: Response): Promise<e.Response<any, Record<string, any>>> => {
 
-    let queryData: queryDataType = getDataFromQuery(req)
+    let queryData: queryDataType = await getDataFromQuery(req.query)
     const allBlogs = await blogQueryRepository.getAllBlogs(queryData);
     return res.send(allBlogs)
 })
@@ -89,7 +83,7 @@ blogsRouter.get('/:id/posts',
             return res.sendStatus(404)
         }
         try {
-            let queryData: queryDataType = getDataFromQuery(req)
+            let queryData: queryDataType = await getDataFromQuery(req.query)
             let foundPosts = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
             //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
             // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
@@ -128,6 +122,8 @@ blogsRouter.post('/:id/posts',
             return res.sendStatus(404)
         }
         try {
+          //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+
             const newPost = await blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
 
             return res.status(201).send(newPost)

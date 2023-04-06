@@ -1,30 +1,40 @@
 "use strict";
-// import {blogType, postType} from '../db/db';
-//
-// import {blogRepository} from '../repositories/blog-repository';
-// import {queryDataType} from '../helpers/helpers';
-// import {postRepository} from '../repositories/post-repository';
-//
-// export const postService = {
-//     async findPosts(queryData:queryDataType): Promise<postType[]> {
-//         return await postRepository.findPosts();
-//     },
-//
-//     async findPostById(id: string): Promise<postType> {
-//         return await postRepository.findPostById(id)
-//     },
-//     async deletePost(id: string): Promise<boolean> {
-//         return await postRepository.deletePost(id);
-//
-//     },
-//     async createBlog(name: string, description: string, websiteUrl: string): Promise<postType> {
-//         return await postRepository.createPost(name, description, websiteUrl);
-//
-//     },
-//
-//     async updateBlog(id: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
-//
-//         return await postRepository.updatePost(id, name, description, websiteUrl)
-//
-//     }
-// }
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.postService = void 0;
+const post_repository_1 = require("../repositories/post-repository");
+exports.postService = {
+    findPosts(queryData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.findPosts();
+        });
+    },
+    findPostById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.findPostById(id);
+        });
+    },
+    deletePost(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.deletePost(id);
+        });
+    },
+    createPost(name, description, websiteUrl, blogId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.createPost(name, description, websiteUrl, blogId);
+        });
+    },
+    updatePost(id, name, description, websiteUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield post_repository_1.postRepository.updatePost(id, name, description, websiteUrl);
+        });
+    }
+};

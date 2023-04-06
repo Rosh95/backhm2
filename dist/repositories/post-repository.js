@@ -59,7 +59,7 @@ exports.postRepository = {
             return false;
         });
     },
-    updatePost(id, title, shortDescription, content, blogId) {
+    updatePost(id, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {

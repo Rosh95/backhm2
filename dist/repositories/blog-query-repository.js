@@ -16,8 +16,7 @@ const helpers_1 = require("../helpers/helpers");
 exports.blogQueryRepository = {
     getAllBlogs(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            //TODO: searcnName Term
-            const filter = { name: { $regex: queryData.searchName, options: 'i' } };
+            const filter = { name: { $regex: queryData.searchNameTerm, options: 'i' } };
             const blogs = yield dbMongo_1.blogsCollection.find(filter)
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
@@ -25,14 +24,13 @@ exports.blogQueryRepository = {
             //   const countOfBlogs = await blogsCollection.countDocuments(filter)
             let blogViewArray = blogs.map(blog => (0, helpers_1.blogMapping)(blog));
             let pagesCount = yield (0, helpers_1.countTotalBlogsAndPages)(queryData, filter);
-            const result = {
+            return {
                 pagesCount: pagesCount.blogsPagesCount,
                 page: queryData.pageNumber,
                 pageSize: queryData.pageSize,
                 totalCount: pagesCount.blogsTotalCount,
                 items: blogViewArray
             };
-            return result;
         });
     },
     getAllPostOfBlog(blogId, queryData) {
@@ -48,32 +46,28 @@ exports.blogQueryRepository = {
                 .toArray();
             let postViewArray = posts.map(post => (0, helpers_1.postMapping)(post));
             let pagesCount = yield (0, helpers_1.countTotalPostsAndPagesOfBlog)(blogId, queryData);
-            const result = {
+            return {
                 pagesCount: pagesCount.postsPagesCount,
                 page: queryData.pageNumber,
                 pageSize: queryData.pageSize,
                 totalCount: pagesCount.postsTotalCount,
                 items: postViewArray
             };
-            return result;
         });
     },
     getAllPostCountOfBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let totalCount = yield dbMongo_1.postsCollection.countDocuments({ blogId: blogId });
-            return totalCount;
+            return yield dbMongo_1.postsCollection.countDocuments({ blogId: blogId });
         });
     },
     getAllBlogsCount(filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            let totalCount = yield dbMongo_1.blogsCollection.countDocuments(filter);
-            return totalCount;
+            return yield dbMongo_1.blogsCollection.countDocuments(filter);
         });
     },
     getAllPostsCount() {
         return __awaiter(this, void 0, void 0, function* () {
-            let totalCount = yield dbMongo_1.postsCollection.countDocuments();
-            return totalCount;
+            return yield dbMongo_1.postsCollection.countDocuments();
         });
     },
     createPostForExistingBlog(blogId, title, shortDescription, content) {

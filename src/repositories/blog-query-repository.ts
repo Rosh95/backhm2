@@ -1,12 +1,11 @@
 import {blogsCollection, postsCollection} from '../db/dbMongo';
-import {Filter, ObjectId, SortDirection} from 'mongodb';
+import {Filter, ObjectId} from 'mongodb';
 import {
     blogMapping,
     countTotalBlogsAndPages,
     countTotalPostsAndPagesOfBlog,
     postMapping,
-    queryDataType,
-    skipPages
+    queryDataType
 } from '../helpers/helpers';
 import {PaginatorPostViewType, postInputType, PostViewModel} from '../types/post-types';
 import {BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
@@ -14,8 +13,7 @@ import {BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
 
 export const blogQueryRepository = {
     async getAllBlogs(queryData: queryDataType): Promise<PaginatorBlogViewType> {
-        //TODO: searcnName Term
-        const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchName, options: 'i'}}
+        const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchNameTerm, options: 'i'}}
 
         const blogs = await blogsCollection.find(filter)
             .sort({[queryData.sortByProp]: queryData.sortDirection})
@@ -28,16 +26,14 @@ export const blogQueryRepository = {
         let pagesCount = await countTotalBlogsAndPages(queryData, filter);
 
 
-        const result = {
+        return {
             pagesCount: pagesCount.blogsPagesCount,
             page: queryData.pageNumber,
             pageSize: queryData.pageSize,
             totalCount: pagesCount.blogsTotalCount,
             items: blogViewArray
 
-        }
-
-        return result;
+        };
 
     },
     async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<PaginatorPostViewType> {
@@ -56,37 +52,29 @@ export const blogQueryRepository = {
         let pagesCount = await countTotalPostsAndPagesOfBlog( blogId, queryData);
 
 
-        const result = {
+        return {
             pagesCount: pagesCount.postsPagesCount,
             page: queryData.pageNumber,
             pageSize: queryData.pageSize,
             totalCount: pagesCount.postsTotalCount,
             items: postViewArray
 
-        }
-
-        return result;
+        };
 
 
     },
 
     async getAllPostCountOfBlog(blogId: any): Promise<number> {
 
-        let totalCount = await postsCollection.countDocuments({blogId: blogId});
-
-        return totalCount;
+        return await postsCollection.countDocuments({blogId: blogId});
     },
     async getAllBlogsCount(filter: any): Promise<number> {
 
-        let totalCount = await blogsCollection.countDocuments(filter);
-
-        return totalCount;
+        return await blogsCollection.countDocuments(filter);
     },
     async getAllPostsCount(): Promise<number> {
 
-        let totalCount = await postsCollection.countDocuments();
-
-        return totalCount;
+        return await postsCollection.countDocuments();
     },
 
 
@@ -101,6 +89,7 @@ export const blogQueryRepository = {
             blogName: findBlogName!.name,
             createdAt: new Date()
         }
+
         // @ts-ignore
         const result = await postsCollection.insertOne(newPost)
 

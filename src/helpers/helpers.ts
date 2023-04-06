@@ -1,17 +1,15 @@
-import {Request} from 'express';
 import {SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
-import exp from 'constants';
 
 export  type  queryDataType = {
     pageNumber: number,
     pageSize: number,
     sortByProp: string,
     sortDirection: SortDirection,
-    searchName: string,
+    searchNameTerm?: string,
     skippedPages: number
 }
-export const getDataFromQuery = (query: any): queryDataType => {
+export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
 // export const getDataFromQuery = (req: Request): queryDataType => {
     // const pageNumberFromQuery: any = req.query.pageNumber
     // const pageNumber = parseInt(pageNumberFromQuery, 10)
@@ -20,7 +18,7 @@ export const getDataFromQuery = (query: any): queryDataType => {
     let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
     let sortByProp: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
     let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
-    let searchName = query.searchName ? query.searchName : '';
+    let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let skippedPages: number = skipPages(pageNumber, pageSize);
 
 
@@ -29,7 +27,7 @@ export const getDataFromQuery = (query: any): queryDataType => {
         pageSize,
         sortByProp,
         sortDirection,
-        searchName,
+        searchNameTerm,
         skippedPages
     }
 }
@@ -45,8 +43,8 @@ export function blogMapping(blog: any) {
 }
 
 export function skipPages(pageNumber: number, pageSize: number) {
-    let result = (+pageNumber - 1) * (+pageSize);
-    return result;
+    return (+pageNumber - 1) * (+pageSize);
+
 }
 
 export const countTotalPostsAndPagesOfBlog = async (id: string, queryData: queryDataType) => {

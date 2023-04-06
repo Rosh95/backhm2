@@ -21,7 +21,7 @@ const blog_query_repository_1 = require("../repositories/blog-query-repository")
 const helpers_1 = require("../helpers/helpers");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let queryData = (0, helpers_1.getDataFromQuery)(req);
+    let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
     const allBlogs = yield blog_query_repository_1.blogQueryRepository.getAllBlogs(queryData);
     return res.send(allBlogs);
 }));
@@ -60,7 +60,7 @@ exports.blogsRouter.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, vo
         return res.sendStatus(404);
     }
     try {
-        let queryData = (0, helpers_1.getDataFromQuery)(req);
+        let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
         let foundPosts = yield blog_query_repository_1.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
         //let pagesCount = await countTotalPostsAndPagesOfBlog(req, queryData);
         // let postsTotalCount = await blogQueryRepository.getAllPostCount(req.params.id);
@@ -90,6 +90,7 @@ exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, post
         return res.sendStatus(404);
     }
     try {
+        //  const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
         const newPost = yield blog_query_repository_1.blogQueryRepository.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
         return res.status(201).send(newPost);
     }

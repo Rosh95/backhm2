@@ -1,5 +1,4 @@
 import {Request, Response, Router} from 'express';
-import {postRepository} from '../repositories/post-repository';
 import {
     blogIdMiddleware,
     contentPostMiddleware,
@@ -8,8 +7,9 @@ import {
 } from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {blogService} from '../domain/blog-service';
-import {countTotalBlogsAndPages, getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {postQueryRepository} from '../repositories/post-query-repository';
+import {postService} from '../domain/post-service';
 
 export const postsRouter = Router({})
 
@@ -18,29 +18,33 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     // let queryData: queryDataType = getDataFromQuery(req)
     // const posts = await postService.findBlogs(queryData);
     // let pagesCount = await countTotalBlogsAndPages(req, queryData);
+    let queryData: queryDataType = await getDataFromQuery(req.query)
+    const allPosts = await postQueryRepository.getAllPosts(queryData);
+    return res.send(allPosts)
 
-    let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
-    let pageSize = req.body.pageSize ? req.body.pageSize : '10';
-    let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
-    let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
 
-    const posts = await postRepository.findPosts();
-    let postsPagesCount = Math.ceil(+posts.length / +pageSize);
-    let postsTotalCount = +posts.length;
-
-    const result = {
-        pagesCount: postsPagesCount,
-        page: pageNumber,
-        pageSize: pageSize,
-        totalCount: postsTotalCount,
-        items: posts
-
-    }
-    res.send(result)
+    // let pageNumber = req.body.pageNumber ? req.body.pageNumber : '1';
+    // let pageSize = req.body.pageSize ? req.body.pageSize : '10';
+    // let sortByProp = req.body.sortBy ? req.body.sortBy : 'createdAt';
+    // let sortDirection = req.body.sortDirection ? req.body.sortDirection : 'desc';
+    //
+    // const posts = await postRepository.findPosts();
+    // let postsPagesCount = Math.ceil(+posts.length / +pageSize);
+    // let postsTotalCount = +posts.length;
+    //
+    // const result = {
+    //     pagesCount: postsPagesCount,
+    //     page: pageNumber,
+    //     pageSize: pageSize,
+    //     totalCount: postsTotalCount,
+    //     items: posts
+    //
+    // }
+    // res.send(result)
 })
 
 postsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundPost = await postRepository.findPostById(req.params.id)
+    let foundPost = await postService.findPostById(req.params.id)
     if (foundPost) {
         res.send(foundPost)
         return;
@@ -52,7 +56,7 @@ postsRouter.delete('/:id',
     basicAuthMiddleware,
     async (req: Request, res: Response) => {
 
-        const isDeleted = await postRepository.deletePost(req.params.id)
+        const isDeleted = await postService.deletePost(req.params.id)
 
         if (isDeleted) {
             res.sendStatus(204)
@@ -67,7 +71,7 @@ postsRouter.post('/',
     blogIdMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        const newPost = await postRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+        const newPost = await postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
         res.status(201).send(newPost)
 
@@ -81,7 +85,7 @@ postsRouter.put('/:id',
     blogIdMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        let updatedPost = await postRepository.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+        let updatedPost = await postService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
         if (updatedPost) {
             res.sendStatus(204)
         } else {

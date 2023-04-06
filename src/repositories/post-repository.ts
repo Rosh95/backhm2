@@ -45,7 +45,7 @@ export const postRepository = {
         return false;
     },
 
-    async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
+    async updatePost(id: string, title: string, shortDescription: string, content: string): Promise<boolean> {
 
         const result = await postsCollection.updateOne({_id: new ObjectId(id)},
             {
