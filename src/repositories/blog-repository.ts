@@ -13,20 +13,6 @@ function blogMapping(blog: any) {
 }
 
 export const blogRepository = {
-    // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
-    //     //TODO: searcnName Term
-    //     const filter: Filter<BlogViewType> = {name: {$regex: '', options: 'i'}}
-    //
-    //     const blogs = await blogsCollection.find(filter)
-    //         .sort({[queryData.sortByProp]: queryData.sortDirection})
-    //         .skip(queryData.skippedPages)
-    //         .limit(queryData.pageSize).toArray();
-    //
-    //     const countOfBlogs = await blogsCollection.countDocuments(filter)
-    //
-    //     return blogs.map(blog => blogMapping(blog))
-    //
-    // },
 
     async findBlogById(id: string): Promise<BlogViewType> {
         const foundBlog: BlogViewType | null = await blogsCollection.findOne({_id: new ObjectId(id)});

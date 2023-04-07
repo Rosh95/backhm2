@@ -15,13 +15,10 @@ const dbMongo_1 = require("../db/dbMongo");
 exports.postQueryRepository = {
     getAllPosts(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: searcnName Term
-            // const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchName, options: 'i'}}
             const posts = yield dbMongo_1.postsCollection.find()
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
-            //   const countOfBlogs = await blogsCollection.countDocuments(filter)
             let postViewArray = posts.map(post => (0, helpers_1.postMapping)(post));
             let pagesCount = yield (0, helpers_1.countTotalPostsAndPages)(queryData);
             return {

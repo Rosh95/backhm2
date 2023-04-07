@@ -18,20 +18,6 @@ function blogMapping(blog) {
     return Object.assign({ id: blogMongoId }, blog);
 }
 exports.blogRepository = {
-    // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
-    //     //TODO: searcnName Term
-    //     const filter: Filter<BlogViewType> = {name: {$regex: '', options: 'i'}}
-    //
-    //     const blogs = await blogsCollection.find(filter)
-    //         .sort({[queryData.sortByProp]: queryData.sortDirection})
-    //         .skip(queryData.skippedPages)
-    //         .limit(queryData.pageSize).toArray();
-    //
-    //     const countOfBlogs = await blogsCollection.countDocuments(filter)
-    //
-    //     return blogs.map(blog => blogMapping(blog))
-    //
-    // },
     findBlogById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundBlog = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });

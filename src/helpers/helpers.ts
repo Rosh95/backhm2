@@ -10,10 +10,7 @@ export  type  queryDataType = {
     skippedPages: number
 }
 export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
-// export const getDataFromQuery = (req: Request): queryDataType => {
-    // const pageNumberFromQuery: any = req.query.pageNumber
-    // const pageNumber = parseInt(pageNumberFromQuery, 10)
-    // if (pageNumber)
+
     let pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
     let sortByProp: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
@@ -84,6 +81,5 @@ export function postMapping(post: any) {
     return {
         id: postMongoId,
         ...post,
-        createdAt: post.createdAt.toISOString()
     }
 }

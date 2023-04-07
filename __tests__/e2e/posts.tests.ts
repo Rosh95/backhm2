@@ -1,25 +1,21 @@
 import request from 'supertest'
-import {blogInputType, db, postInputType} from '../../src/db/db';
 import {app} from '../../src/app';
 import {postRepository} from '../../src/repositories/post-repository';
-import {isBooleanObject} from 'util/types';
+import {BlogInputModel} from '../../src/types/blog-types';
+import {postInputType} from '../../src/types/post-types';
 
 
-export const addNewBlog = async (blog: blogInputType) => {
-    let response = await request(app)
+export const addNewBlog = async (blog: BlogInputModel) => {
+    return request(app)
         .post('/blogs')
         .auth('admin', 'qwerty')
-        .send(blog)
-
-    return response;
+        .send(blog);
 }
 const addNewPost = async (post: postInputType) => {
-    let response = await request(app)
+    return request(app)
         .post('/posts')
         .auth('admin', 'qwerty')
-        .send(post)
-
-    return response;
+        .send(post);
 }
 describe('Posts router', () => {
     beforeAll(async () => {
@@ -30,13 +26,15 @@ describe('Posts router', () => {
         it('should return 200 and empty array posts', async () => {
             await request(app)
                 .get('/posts')
-                .expect(200, [])
+                .expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
         })
         it('should return 201 status and add new blog', async () => {
             const blogInputData = {
                 name: "Pavel Durov",
                 websiteUrl: "https://vk.com",
-                description: "it businessman"
+                description: "it businessman",
+                createdAt: new Date().toISOString(),
+                isMembership: false
             }
 
             let response = await addNewBlog(blogInputData);
@@ -60,6 +58,8 @@ describe('Posts router', () => {
                 shortDescription: 'How to make money?',
                 content: 'Just born in Billionare family',
                 blogId: blog.id,
+                blogName: blog.name,
+                createdAt: new Date().toISOString(),
             }
 
             let response = await addNewPost(postsInputData);
@@ -88,7 +88,7 @@ describe('Posts router', () => {
             expect(postFromAPi).toEqual(post)
         })
         it('should get non-existent post and return 404', async () => {
-            let randomNumber = 1222555;
+            let randomNumber = '6348acd2e1a47ca32e79f46f';
             const getPostResponse = await request(app).get(`/posts/${randomNumber}`)
             expect(getPostResponse.status).toBe(404)
         })
@@ -100,14 +100,14 @@ describe('Posts router', () => {
             await request(app).delete('/testing/all-data')
         })
         it('should delete unexciting posts by id and return 404', async () => {
-            let randomNumber = 55555;
+            let randomNumber = '6348acd2e1a47ca32e79f46f';
             await request(app)
                 .delete(`/posts/${randomNumber}`)
                 .auth('admin', 'qwerty')
                 .expect(404)
         })
         it('should delete  blog by id unauthorized and return 401 ', async () => {
-            let randomNumber = 55555;
+            let randomNumber = '6348acd2e1a47ca32e79f46f';
             await request(app)
                 .delete(`/posts/${randomNumber}`)
                 .expect(401)
@@ -116,7 +116,9 @@ describe('Posts router', () => {
             const blogInputData = {
                 name: "Pavel Durov",
                 websiteUrl: "https://vk.com",
-                description: "it businessman"
+                description: "it businessman",
+                createdAt: new Date().toISOString(),
+                isMembership: false
             }
 
             let response = await addNewBlog(blogInputData);
@@ -142,7 +144,8 @@ describe('Posts router', () => {
                 shortDescription: 'How to make money?',
                 content: 'Just born in Billionare family',
                 blogId: blog.id,
-                blogName: blog.name
+                blogName: blog.name,
+                createdAt: new Date().toISOString(),
             }
 
             let response = await addNewPost(postsInputData);
@@ -171,7 +174,7 @@ describe('Posts router', () => {
 
             await request(app)
                 .get('/posts')
-                .expect(200, [])
+                .expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
         })
     })
 
@@ -183,7 +186,9 @@ describe('Posts router', () => {
             const blogInputData = {
                 name: "Pavel Durov",
                 websiteUrl: "https://vk.com",
-                description: "it businessman"
+                description: "it businessman",
+                createdAt: new Date().toISOString(),
+                isMembership: false
             }
 
             let response = await addNewBlog(blogInputData);
@@ -226,6 +231,8 @@ describe('Posts router', () => {
                 shortDescription: 'How to make money?',
                 content: 'Just born in Billionare family',
                 blogId: blog.id,
+                blogName: blog.name,
+                createdAt: new Date().toISOString(),
             }
 
             let response = await addNewPost(postsInputData);
@@ -269,13 +276,15 @@ describe('Posts router', () => {
             await request(app).delete('/testing/all-data');
             await request(app)
                 .get('/posts')
-                .expect(200, [])
+                .expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
         })
         it('should return 201 status and add new blog', async () => {
             const blogInputData = {
                 name: "Pavel Durov",
                 websiteUrl: "https://vk.com",
-                description: "it businessman"
+                description: "it businessman",
+                createdAt: new Date().toISOString(),
+                isMembership: false
             }
 
             let response = await addNewBlog(blogInputData);
@@ -301,6 +310,8 @@ describe('Posts router', () => {
                 shortDescription: 'How to make money?',
                 content: 'Just born in Billionare family',
                 blogId: blog.id,
+                blogName: blog.name,
+                createdAt: new Date().toISOString(),
             }
 
             let response = await addNewPost(postsInputData);
@@ -339,7 +350,13 @@ describe('Posts router', () => {
             console.log(getUpdatePost + '  input data here!!')
             await request(app)
                 .get('/posts')
-                .expect(200, [getUpdatePost])
+                .expect(200, {
+                    pagesCount: 1,
+                    page: 1,
+                    pageSize: 10,
+                    totalCount: 1,
+                    items: [getUpdatePost]
+                })
 
             expect.setState({post: getUpdatePost})
 

@@ -1,19 +1,10 @@
 import e, {Request, Response, Router} from 'express';
-import {
-    blogValidation,
-    descriptionBlogMiddleware,
-    nameBlogMiddleware,
-    websiteUrlBlogMiddleware
-} from '../validation/blogs-validation-middleware';
+import {blogValidation} from '../validation/blogs-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {blogService} from '../domain/blog-service';
 import {blogRepository} from '../repositories/blog-repository';
-import {
-    contentPostMiddleware, postValidation,
-    shortDescriptionPostMiddleware,
-    titlePostMiddleware
-} from '../validation/posts-validation-middleware';
+import {postValidation} from '../validation/posts-validation-middleware';
 import {blogQueryRepository} from '../repositories/blog-query-repository';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {queryValidation} from '../validation/query-validation';
@@ -31,12 +22,13 @@ blogsRouter.get('/',
     })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
+
     let foundBlog = await blogService.findBlogById(req.params.id)
     if (foundBlog) {
-        res.send(foundBlog)
-        return;
+        return res.send(foundBlog)
+
     }
-    res.sendStatus(404)
+    return res.sendStatus(404)
 })
 
 blogsRouter.delete('/:id',
@@ -52,9 +44,6 @@ blogsRouter.delete('/:id',
 
 blogsRouter.post('/',
     basicAuthMiddleware,
-    // websiteUrlBlogMiddleware,
-    // nameBlogMiddleware,
-    // descriptionBlogMiddleware,
     blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -67,9 +56,6 @@ blogsRouter.post('/',
 
 blogsRouter.put('/:id',
     basicAuthMiddleware,
-    // websiteUrlBlogMiddleware,
-    // nameBlogMiddleware,
-    // descriptionBlogMiddleware,
     blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -103,9 +89,6 @@ blogsRouter.get('/:id/posts',
 
 blogsRouter.post('/:id/posts',
     basicAuthMiddleware,
-    // titlePostMiddleware,
-    // shortDescriptionPostMiddleware,
-    // contentPostMiddleware,
     postValidation,
     queryValidation,
     errorsValidationMiddleware,

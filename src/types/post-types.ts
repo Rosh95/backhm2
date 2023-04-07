@@ -1,5 +1,3 @@
-import {BlogViewType} from './blog-types';
-
 export type PostViewModel = {
     id: string,
     title: string,
@@ -7,7 +5,7 @@ export type PostViewModel = {
     content: string,
     blogId: string,
     blogName?: string | null,
-    createdAt?: Date
+    createdAt?: string
 
 }
 export type postInputType = {
@@ -17,7 +15,7 @@ export type postInputType = {
     content: string,
     blogId: string,
     blogName: string,
-    createdAt: Date
+    createdAt: string
 }
 
 

@@ -41,11 +41,7 @@ exports.postsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     else
         res.sendStatus(404);
 }));
-exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, 
-// titlePostMiddleware,
-// shortDescriptionPostMiddleware,
-// contentPostMiddleware,
-posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlogName = yield blog_repository_1.blogRepository.findBlogById(req.body.blogId);
     if (!foundBlogName) {
         return res.sendStatus(404);
@@ -53,11 +49,7 @@ posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blog
     const newPost = yield post_service_1.postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, foundBlogName);
     return res.status(201).send(newPost);
 }));
-exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, 
-// titlePostMiddleware,
-// shortDescriptionPostMiddleware,
-// contentPostMiddleware,
-posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let updatedPost = yield post_service_1.postService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
     if (updatedPost) {
         res.sendStatus(204);

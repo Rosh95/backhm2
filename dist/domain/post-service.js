@@ -30,24 +30,19 @@ exports.postService = {
     },
     createPost(title, shortDescription, content, blogId, foundBlogName) {
         return __awaiter(this, void 0, void 0, function* () {
-            // let foundBlogName = await blogRepository.findBlogById(blogId)
-            // if (!foundBlogName) {
-            //     return false;
-            // }
             let newPost = {
                 title: title,
                 shortDescription: shortDescription,
                 content: content,
                 blogId: blogId,
                 blogName: foundBlogName.name,
-                createdAt: new Date()
+                createdAt: new Date().toISOString()
             };
             return yield post_repository_1.postRepository.createPost(newPost);
         });
     },
     createPostForExistingBlog(blogId, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
             let foundBlog = yield blog_repository_1.blogRepository.findBlogById(blogId);
             let newPost = {
                 title: title,
@@ -55,9 +50,8 @@ exports.postService = {
                 content: content,
                 blogId: blogId,
                 blogName: foundBlog.name,
-                createdAt: new Date()
+                createdAt: new Date().toISOString()
             };
-            // return await postRepository.createPostForExistingBlog(blogId, title, shortDescription, content);
             return yield post_repository_1.postRepository.createPostForExistingBlog(newPost);
         });
     },

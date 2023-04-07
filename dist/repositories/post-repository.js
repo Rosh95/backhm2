@@ -34,16 +34,6 @@ exports.postRepository = {
     },
     createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-            //   if (foundBlogName) {
-            // let newPost: postInputType = {
-            //     title: title,
-            //     shortDescription: shortDescription,
-            //     content: content,
-            //     blogId: blogId,
-            //     blogName: findBlogName.name,
-            //     createdAt: new Date()
-            // }
             // @ts-ignore
             const result = yield dbMongo_1.postsCollection.insertOne(newPost);
             return {
@@ -55,23 +45,10 @@ exports.postRepository = {
                 blogName: newPost.blogName,
                 createdAt: newPost.createdAt
             };
-            // }
-            // return false;
         });
     },
-    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
     createPostForExistingBlog(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-            //
-            // let newPost: postInputType = {
-            //     title: title,
-            //     shortDescription: shortDescription,
-            //     content: content,
-            //     blogId: blogId,
-            //     blogName: findBlogName!.name,
-            //     createdAt: new Date()
-            // }
             // @ts-ignore
             const result = yield dbMongo_1.postsCollection.insertOne(newPost);
             return {

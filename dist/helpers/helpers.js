@@ -12,10 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postMapping = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog-query-repository");
 const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    // export const getDataFromQuery = (req: Request): queryDataType => {
-    // const pageNumberFromQuery: any = req.query.pageNumber
-    // const pageNumber = parseInt(pageNumberFromQuery, 10)
-    // if (pageNumber)
     let pageNumber = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize = query.pageSize ? +query.pageSize : 10; // NaN
     let sortByProp = query.sortBy ? (query.sortBy).toString() : 'createdAt';
@@ -72,6 +68,6 @@ exports.countTotalPostsAndPages = countTotalPostsAndPages;
 function postMapping(post) {
     const postMongoId = post._id.toString();
     delete post._id;
-    return Object.assign(Object.assign({ id: postMongoId }, post), { createdAt: post.createdAt.toISOString() });
+    return Object.assign({ id: postMongoId }, post);
 }
 exports.postMapping = postMapping;

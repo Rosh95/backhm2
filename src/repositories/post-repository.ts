@@ -1,4 +1,4 @@
-import {blogsCollection, postsCollection} from '../db/dbMongo';
+import {postsCollection} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
 import {postMapping} from '../helpers/helpers';
 import {postInputType, PostViewModel} from '../types/post-types';
@@ -19,16 +19,7 @@ export const postRepository = {
         return result.deletedCount === 1;
     },
     async createPost(newPost: postInputType): Promise<PostViewModel | boolean> {
-        // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-        //   if (foundBlogName) {
-        // let newPost: postInputType = {
-        //     title: title,
-        //     shortDescription: shortDescription,
-        //     content: content,
-        //     blogId: blogId,
-        //     blogName: findBlogName.name,
-        //     createdAt: new Date()
-        // }
+
         // @ts-ignore
         const result = await postsCollection.insertOne(newPost)
 
@@ -41,22 +32,11 @@ export const postRepository = {
             blogName: newPost.blogName,
             createdAt: newPost.createdAt
         };
-        // }
-        // return false;
+
     },
 
-    // async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
     async createPostForExistingBlog(newPost: postInputType): Promise<PostViewModel | boolean> {
-        // let findBlogName = await blogsCollection.findOne({_id: new ObjectId(blogId.toString())});
-        //
-        // let newPost: postInputType = {
-        //     title: title,
-        //     shortDescription: shortDescription,
-        //     content: content,
-        //     blogId: blogId,
-        //     blogName: findBlogName!.name,
-        //     createdAt: new Date()
-        // }
+
 
         // @ts-ignore
         const result = await postsCollection.insertOne(newPost)

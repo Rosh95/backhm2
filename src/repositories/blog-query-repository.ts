@@ -20,7 +20,6 @@ export const blogQueryRepository = {
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
 
-        //   const countOfBlogs = await blogsCollection.countDocuments(filter)
 
         let blogViewArray = blogs.map(blog => blogMapping(blog))
         let pagesCount = await countTotalBlogsAndPages(queryData, filter);

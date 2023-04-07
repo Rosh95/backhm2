@@ -20,7 +20,6 @@ exports.blogQueryRepository = {
                 .sort({ [queryData.sortByProp]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
-            //   const countOfBlogs = await blogsCollection.countDocuments(filter)
             let blogViewArray = blogs.map(blog => (0, helpers_1.blogMapping)(blog));
             let pagesCount = yield (0, helpers_1.countTotalBlogsAndPages)(queryData, filter);
             return {

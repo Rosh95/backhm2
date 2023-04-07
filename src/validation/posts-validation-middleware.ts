@@ -1,8 +1,6 @@
-import {body, param, validationResult} from 'express-validator';
-import {NextFunction, Response, Request} from 'express';
+import {body, param} from 'express-validator';
 import {blogsCollection} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
-import {descriptionBlogMiddleware, nameBlogMiddleware, websiteUrlBlogMiddleware} from './blogs-validation-middleware';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({
     min: 1,

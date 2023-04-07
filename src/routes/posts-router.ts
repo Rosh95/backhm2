@@ -1,10 +1,5 @@
 import {Request, Response, Router} from 'express';
-import {
-    blogIdMiddleware,
-    contentPostMiddleware, postValidation,
-    shortDescriptionPostMiddleware,
-    titlePostMiddleware
-} from '../validation/posts-validation-middleware';
+import {blogIdMiddleware, postValidation} from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
@@ -46,9 +41,6 @@ postsRouter.delete('/:id',
 
 postsRouter.post('/',
     basicAuthMiddleware,
-    // titlePostMiddleware,
-    // shortDescriptionPostMiddleware,
-    // contentPostMiddleware,
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
@@ -66,9 +58,6 @@ postsRouter.post('/',
 
 postsRouter.put('/:id',
     basicAuthMiddleware,
-    // titlePostMiddleware,
-    // shortDescriptionPostMiddleware,
-    // contentPostMiddleware,
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
