@@ -3,10 +3,10 @@ import {blogIdMiddleware, postValidation} from '../validation/posts-validation-m
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
-import {postQueryRepository} from '../repositories/post-query-repository';
+import {postQueryRepository} from '../repositories/post/post-query-repository';
 import {postService} from '../domain/post-service';
 import {queryValidation} from '../validation/query-validation';
-import {blogRepository} from '../repositories/blog-repository';
+import {blogRepository} from '../repositories/blog/blog-repository';
 
 export const postsRouter = Router({})
 

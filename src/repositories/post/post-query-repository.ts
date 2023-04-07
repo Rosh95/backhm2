@@ -1,6 +1,6 @@
-import {countTotalPostsAndPages, postMapping, queryDataType} from '../helpers/helpers';
-import {postsCollection} from '../db/dbMongo';
-import {PaginatorPostViewType, PostViewModel} from '../types/post-types';
+import {countTotalPostsAndPages, postMapping, queryDataType} from '../../helpers/helpers';
+import {postsCollection} from '../../db/dbMongo';
+import {PaginatorPostViewType, PostViewModel} from '../../types/post-types';
 
 export const postQueryRepository = {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {

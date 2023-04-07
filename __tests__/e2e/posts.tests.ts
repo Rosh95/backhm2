@@ -1,6 +1,6 @@
 import request from 'supertest'
 import {app} from '../../src/app';
-import {postRepository} from '../../src/repositories/post-repository';
+import {postRepository} from '../../src/repositories/post/post-repository';
 import {BlogInputModel} from '../../src/types/blog-types';
 import {postInputType} from '../../src/types/post-types';
 

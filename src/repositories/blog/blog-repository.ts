@@ -1,6 +1,6 @@
-import {blogsCollection} from '../db/dbMongo';
+import {blogsCollection} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
-import {BlogInputModel, BlogViewType} from '../types/blog-types';
+import {BlogInputModel, BlogViewType} from '../../types/blog-types';
 
 function blogMapping(blog: any) {
     const blogMongoId = blog._id.toString();

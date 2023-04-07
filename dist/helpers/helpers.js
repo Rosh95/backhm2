@@ -9,14 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postMapping = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
-const blog_query_repository_1 = require("../repositories/blog-query-repository");
+exports.usersMapping = exports.postMapping = exports.countTotalUsersAndPages = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
+const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
+const user_query_repository_1 = require("../repositories/user/user-query-repository");
 const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
     let pageNumber = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize = query.pageSize ? +query.pageSize : 10; // NaN
     let sortByProp = query.sortBy ? (query.sortBy).toString() : 'createdAt';
     let sortDirection = query.sortDirection === 'asc' ? 1 : -1;
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
+    let searchLoginTerm = query.searchLoginTerm ? query.searchLoginTerm : '';
+    let searchEmailTerm = query.searchEmailTerm ? query.searchEmailTerm : '';
     let skippedPages = skipPages(pageNumber, pageSize);
     return {
         pageNumber,
@@ -24,6 +27,8 @@ const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* 
         sortByProp,
         sortDirection,
         searchNameTerm,
+        searchLoginTerm,
+        searchEmailTerm,
         skippedPages
     };
 });
@@ -65,9 +70,28 @@ const countTotalPostsAndPages = (queryData) => __awaiter(void 0, void 0, void 0,
     };
 });
 exports.countTotalPostsAndPages = countTotalPostsAndPages;
+const countTotalUsersAndPages = (queryData) => __awaiter(void 0, void 0, void 0, function* () {
+    let usersTotalCount = yield user_query_repository_1.usersQueryRepository.getAllUsersCount();
+    let usersPagesCount = Math.ceil(usersTotalCount / queryData.pageSize);
+    return {
+        usersTotalCount,
+        usersPagesCount,
+    };
+});
+exports.countTotalUsersAndPages = countTotalUsersAndPages;
 function postMapping(post) {
     const postMongoId = post._id.toString();
     delete post._id;
     return Object.assign({ id: postMongoId }, post);
 }
 exports.postMapping = postMapping;
+function usersMapping(user) {
+    const userMongoId = user._id.toString();
+    return {
+        id: userMongoId,
+        login: user.login,
+        email: user.email,
+        createdAt: user.createdAt.toString()
+    };
+}
+exports.usersMapping = usersMapping;

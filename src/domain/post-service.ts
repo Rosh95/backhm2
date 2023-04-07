@@ -1,7 +1,7 @@
 import {queryDataType} from '../helpers/helpers';
-import {postRepository} from '../repositories/post-repository';
+import {postRepository} from '../repositories/post/post-repository';
 import {postInputType, PostViewModel} from '../types/post-types';
-import {blogRepository} from '../repositories/blog-repository';
+import {blogRepository} from '../repositories/blog/blog-repository';
 import {BlogViewType} from '../types/blog-types';
 
 export const postService = {
@@ -14,7 +14,6 @@ export const postService = {
     },
     async deletePost(id: string): Promise<boolean> {
         return await postRepository.deletePost(id);
-
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string, foundBlogName: BlogViewType): Promise<PostViewModel | boolean> {
 

@@ -1,7 +1,7 @@
-import {postsCollection} from '../db/dbMongo';
+import {postsCollection} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
-import {postMapping} from '../helpers/helpers';
-import {postInputType, PostViewModel} from '../types/post-types';
+import {postMapping} from '../../helpers/helpers';
+import {postInputType, PostViewModel} from '../../types/post-types';
 
 
 export const postRepository = {

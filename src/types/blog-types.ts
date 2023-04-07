@@ -1,9 +1,9 @@
 import {ObjectId} from 'mongodb';
 
 export type BlogPostInputModel = {
-    title: string,
-    shortDescription: string,
     content: string,
+    shortDescription: string,
+    title: string,
 
 }
 export type BlogInputModel = {

@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogService = void 0;
-const blog_repository_1 = require("../repositories/blog-repository");
+const blog_repository_1 = require("../repositories/blog/blog-repository");
 exports.blogService = {
     // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
     //     return await blogRepository.findBlogs(queryData);

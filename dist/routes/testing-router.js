@@ -16,5 +16,6 @@ exports.testRouter = (0, express_1.Router)({});
 exports.testRouter.delete('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield dbMongo_1.blogsCollection.deleteMany({});
     yield dbMongo_1.postsCollection.deleteMany({});
+    yield dbMongo_1.usersCollection.deleteMany({});
     res.sendStatus(204);
 }));

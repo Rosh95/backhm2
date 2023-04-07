@@ -1,4 +1,4 @@
-import {blogsCollection, postsCollection} from '../db/dbMongo';
+import {blogsCollection, postsCollection} from '../../db/dbMongo';
 import {Filter} from 'mongodb';
 import {
     blogMapping,
@@ -6,9 +6,9 @@ import {
     countTotalPostsAndPagesOfBlog,
     postMapping,
     queryDataType
-} from '../helpers/helpers';
-import {PaginatorPostViewType, PostViewModel} from '../types/post-types';
-import {BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
+} from '../../helpers/helpers';
+import {PaginatorPostViewType, PostViewModel} from '../../types/post-types';
+import {BlogViewType, PaginatorBlogViewType} from '../../types/blog-types';
 
 
 export const blogQueryRepository = {

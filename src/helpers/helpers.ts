@@ -1,5 +1,6 @@
 import {SortDirection} from 'mongodb';
-import {blogQueryRepository} from '../repositories/blog-query-repository';
+import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
+import {usersQueryRepository} from '../repositories/user/user-query-repository';
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -7,6 +8,8 @@ export  type  queryDataType = {
     sortByProp: string,
     sortDirection: SortDirection,
     searchNameTerm?: string,
+    searchLoginTerm?: string,
+    searchEmailTerm?: string,
     skippedPages: number
 }
 export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
@@ -16,6 +19,8 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
     let sortByProp: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
     let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
+    let searchLoginTerm = query.searchLoginTerm ? query.searchLoginTerm : '';
+    let searchEmailTerm = query.searchEmailTerm ? query.searchEmailTerm : '';
     let skippedPages: number = skipPages(pageNumber, pageSize);
 
     return {
@@ -24,6 +29,8 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
         sortByProp,
         sortDirection,
         searchNameTerm,
+        searchLoginTerm,
+        searchEmailTerm,
         skippedPages
     }
 }
@@ -73,6 +80,16 @@ export const countTotalPostsAndPages = async (queryData: queryDataType) => {
         postsPagesCount,
     }
 }
+export const countTotalUsersAndPages = async (queryData: queryDataType) => {
+
+    let usersTotalCount = await usersQueryRepository.getAllUsersCount();
+    let usersPagesCount = Math.ceil(usersTotalCount / queryData.pageSize);
+
+    return {
+        usersTotalCount,
+        usersPagesCount,
+    }
+}
 
 export function postMapping(post: any) {
     const postMongoId = post._id.toString();
@@ -81,5 +98,16 @@ export function postMapping(post: any) {
     return {
         id: postMongoId,
         ...post,
+    }
+}
+
+export function usersMapping(user: any) {
+    const userMongoId = user._id.toString();
+
+    return {
+        id: userMongoId,
+        login: user.login,
+        email: user.email,
+        createdAt: user.createdAt.toString()
     }
 }
