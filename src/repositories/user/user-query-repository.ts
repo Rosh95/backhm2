@@ -21,7 +21,7 @@ export const usersQueryRepository = {
         }
 
         const users = await usersCollection.find(filter)
-            .sort({[queryData.sortByProp]: queryData.sortDirection})
+            .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
 

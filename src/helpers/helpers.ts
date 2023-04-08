@@ -5,7 +5,7 @@ import {usersQueryRepository} from '../repositories/user/user-query-repository';
 export  type  queryDataType = {
     pageNumber: number,
     pageSize: number,
-    sortByProp: string,
+    sortBy: string,
     sortDirection: SortDirection,
     searchNameTerm?: string,
     searchLoginTerm?: string,
@@ -16,7 +16,7 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
 
     let pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
-    let sortByProp: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
+    let sortBy: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
     let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let searchLoginTerm = query.searchLoginTerm ? query.searchLoginTerm : '';
@@ -26,7 +26,7 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
     return {
         pageNumber,
         pageSize,
-        sortByProp,
+        sortBy,
         sortDirection,
         searchNameTerm,
         searchLoginTerm,

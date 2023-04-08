@@ -16,7 +16,7 @@ export const blogQueryRepository = {
         const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
 
         const blogs = await blogsCollection.find(filter)
-            .sort({[queryData.sortByProp]: queryData.sortDirection})
+            .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
 
@@ -38,7 +38,7 @@ export const blogQueryRepository = {
     async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<PaginatorPostViewType> {
 
         let posts = await postsCollection.find({blogId})
-            .sort({[queryData.sortByProp]: queryData.sortDirection})
+            .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize)
             .toArray();
