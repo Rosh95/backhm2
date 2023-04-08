@@ -22,7 +22,7 @@ exports.usersQueryRepository = {
                             $options: 'i'
                         }
                     }, {
-                        userName: {
+                        login: {
                             $regex: queryData.searchLoginTerm,
                             $options: 'i'
                         }

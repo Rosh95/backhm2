@@ -5,7 +5,7 @@ const express_validator_1 = require("express-validator");
 exports.loginUserMiddleware = (0, express_validator_1.body)('login').isString().trim().isLength({
     min: 3,
     max: 10
-}).matches('^[a-zA-Z0-9_-]*$').withMessage('login should be between 6 and 20 symbols string');
+}).matches('^[a-zA-Z0-9_-]*$').withMessage('login should be between 3 and 10 symbols string');
 exports.passwordUserMiddleware = (0, express_validator_1.body)('password').isString().trim().isLength({
     min: 6,
     max: 20
