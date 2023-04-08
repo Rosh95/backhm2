@@ -16,13 +16,15 @@ const helpers_1 = require("../helpers/helpers");
 const user_query_repository_1 = require("../repositories/user/user-query-repository");
 const users_service_1 = require("../domain/users-service");
 const authorization_1 = require("../validation/authorization");
+const users_validation_1 = require("../validation/users-validation");
+const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 exports.usersRouter = (0, express_1.Router)({});
-exports.usersRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter.get('/', query_validation_1.queryValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
     const allUsers = yield user_query_repository_1.usersQueryRepository.getAllUsers(queryData);
     return res.send(allUsers);
 }));
-exports.usersRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter.delete('/:id', authorization_1.basicAuthMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const isDeleted = yield users_service_1.userService.deleteUser(req.params.id);
     if (isDeleted) {
         res.sendStatus(204);
@@ -30,7 +32,7 @@ exports.usersRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     else
         res.sendStatus(404);
 }));
-exports.usersRouter.post('/', authorization_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter.post('/', authorization_1.basicAuthMiddleware, users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newUser = yield users_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     return res.status(201).send(newUser);
 }));

@@ -1,5 +1,4 @@
-import {body, validationResult} from 'express-validator';
-import {NextFunction, Response, Request} from 'express';
+import {body} from 'express-validator';
 
 export const nameBlogMiddleware = body('name').isString().trim().isLength({
     min: 1,

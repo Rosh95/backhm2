@@ -108,6 +108,6 @@ export function usersMapping(user: any) {
         id: userMongoId,
         login: user.login,
         email: user.email,
-        createdAt: user.createdAt.toString()
+        createdAt: user.createdAt.toISOString()
     }
 }
