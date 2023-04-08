@@ -29,7 +29,7 @@ exports.usersQueryRepository = {
                     }]
             };
             const users = yield dbMongo_1.usersCollection.find(filter)
-                .sort({ [queryData.sortByProp]: queryData.sortDirection })
+                .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
             let usersViewArray = users.map(user => (0, helpers_1.usersMapping)(user));

@@ -17,7 +17,7 @@ exports.blogQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = { name: { $regex: queryData.searchNameTerm, $options: 'i' } };
             const blogs = yield dbMongo_1.blogsCollection.find(filter)
-                .sort({ [queryData.sortByProp]: queryData.sortDirection })
+                .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
             let blogViewArray = blogs.map(blog => (0, helpers_1.blogMapping)(blog));
@@ -34,7 +34,7 @@ exports.blogQueryRepository = {
     getAllPostOfBlog(blogId, queryData) {
         return __awaiter(this, void 0, void 0, function* () {
             let posts = yield dbMongo_1.postsCollection.find({ blogId })
-                .sort({ [queryData.sortByProp]: queryData.sortDirection })
+                .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize)
                 .toArray();

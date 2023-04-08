@@ -16,7 +16,7 @@ exports.postQueryRepository = {
     getAllPosts(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
             const posts = yield dbMongo_1.postsCollection.find()
-                .sort({ [queryData.sortByProp]: queryData.sortDirection })
+                .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize).toArray();
             let postViewArray = posts.map(post => (0, helpers_1.postMapping)(post));

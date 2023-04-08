@@ -6,7 +6,7 @@ export const postQueryRepository = {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
 
         const posts = await postsCollection.find()
-            .sort({[queryData.sortByProp]: queryData.sortDirection})
+            .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
 
