@@ -26,7 +26,7 @@ export const usersQueryRepository = {
             .limit(queryData.pageSize).toArray();
 
         let usersViewArray: UserViewModel[] = users.map(user => usersMapping(user))
-        let pagesCount = await countTotalUsersAndPages(queryData);
+        let pagesCount = await countTotalUsersAndPages(queryData, filter);
 
         return {
             pagesCount: pagesCount.usersPagesCount,
