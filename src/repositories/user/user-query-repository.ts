@@ -7,7 +7,7 @@ export const usersQueryRepository = {
     async getAllUsers(queryData: queryDataType): Promise<PaginatorUserViewType> {
 
         const filter: Filter<UsersDBType> = {
-            $or: [{
+            $and: [{
                 email: {
                     $regex: queryData.searchEmailTerm,
                     $options: 'i'
