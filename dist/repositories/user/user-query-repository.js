@@ -16,7 +16,7 @@ exports.usersQueryRepository = {
     getAllUsers(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {
-                $or: [{
+                $and: [{
                         email: {
                             $regex: queryData.searchEmailTerm,
                             $options: 'i'

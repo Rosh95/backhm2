@@ -20,7 +20,7 @@ export const userService = {
             passwordSalt,
             createdAt: new Date()
         }
-        return await userRepository.createBlog(newUser);
+        return await userRepository.createUser(newUser);
 
     },
     async deleteUser(id: string): Promise<boolean> {

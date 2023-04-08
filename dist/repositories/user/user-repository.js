@@ -18,7 +18,7 @@ exports.userRepository = {
             return yield dbMongo_1.usersCollection.find().sort({ 'createdAt': -1 }).toArray();
         });
     },
-    createBlog(newUser) {
+    createUser(newUser) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.usersCollection.insertOne(newUser);
             return (0, helpers_1.usersMapping)(newUser);
@@ -26,7 +26,7 @@ exports.userRepository = {
     },
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.postsCollection.deleteOne({ _id: id });
+            const result = yield dbMongo_1.usersCollection.deleteOne({ _id: id });
             return result.deletedCount === 1;
         });
     },
