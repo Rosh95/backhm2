@@ -1,14 +1,14 @@
 import {body} from 'express-validator';
 
-export const nameUserMiddleware = body('login').isString().trim().isLength({
+export const loginUserMiddleware = body('login').isString().trim().isLength({
     min: 3,
     max: 10
-}).matches('^[a-zA-Z0-9_-]*$').withMessage('name should be less than 15 symbols string');
+}).matches('^[a-zA-Z0-9_-]*$').withMessage('login should be between 6 and 20 symbols string');
 export const passwordUserMiddleware = body('password').isString().trim().isLength({
     min: 6,
     max: 20
-}).withMessage('description should be less than 500 symbols string');
+}).withMessage('password should be between 6 and 20 symbols string');
 
-export const emailUserMiddleware = body('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$\n').withMessage('websiteUrl should be less than 100 sympols string');
+export const emailUserMiddleware = body('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
 
-export const userValidation = [nameUserMiddleware, passwordUserMiddleware, emailUserMiddleware]
+export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware]
