@@ -10,9 +10,9 @@ export const postRepository = {
         return posts.map(post => postMapping(post))
     },
 
-    async findPostById(id: string): Promise<PostViewModel> {
-        const foundBlog: PostViewModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
-        return foundBlog ? postMapping(foundBlog) : null;
+    async findPostById(id: string): Promise<PostViewModel | null> {
+        const foundPost: PostViewModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
+        return foundPost ? postMapping(foundPost) : null;
     },
     async deletePost(id: string): Promise<boolean> {
         const result = await postsCollection.deleteOne({_id: new ObjectId(id)});

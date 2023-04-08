@@ -1,6 +1,7 @@
 import {SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
+import {PostViewModel} from '../types/post-types';
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -16,7 +17,7 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
 
     let pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
-    let sortBy: string = query.sortBy ? (query.sortBy).toString() : 'createdAt';
+    let sortBy: string = query.sortBy ? query.sortBy : 'createdAt';
     let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let searchLoginTerm = query.searchLoginTerm ? query.searchLoginTerm : '';
@@ -91,7 +92,7 @@ export const countTotalUsersAndPages = async (queryData: queryDataType, filter?:
     }
 }
 
-export function postMapping(post: any) {
+export function postMapping(post: any): PostViewModel {
     const postMongoId = post._id.toString();
     delete post._id;
 

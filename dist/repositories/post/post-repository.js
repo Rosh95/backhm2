@@ -22,8 +22,8 @@ exports.postRepository = {
     },
     findPostById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundBlog = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            return foundBlog ? (0, helpers_1.postMapping)(foundBlog) : null;
+            const foundPost = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return foundPost ? (0, helpers_1.postMapping)(foundPost) : null;
         });
     },
     deletePost(id) {

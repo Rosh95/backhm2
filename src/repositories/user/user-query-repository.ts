@@ -20,10 +20,12 @@ export const usersQueryRepository = {
             }]
         }
 
+        console.log({[queryData.sortBy]: queryData.sortDirection})
         const users = await usersCollection.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
-            .limit(queryData.pageSize).toArray();
+            .limit(queryData.pageSize)
+            .toArray();
 
         let usersViewArray: UserViewModel[] = users.map(user => usersMapping(user))
         let pagesCount = await countTotalUsersAndPages(queryData, filter);

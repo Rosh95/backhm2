@@ -7,7 +7,7 @@ const sortDirectionValidation = query('sortDirection').optional().custom((v, {re
     v === 'asc' ? req.query!.sortDirection = 1 : req.query!.sortDirection = -1
     return true
 })
-const sortByPropValidation = query('sortBy').optional().custom((v, {req} ) => {
+const sortByValidation = query('sortBy').optional().custom((v, {req} ) => {
     v === req.query!.sortBy ? (req.query!.sortBy).toString() : 'createdAt';
     return true
 })
@@ -15,4 +15,4 @@ const sortByPropValidation = query('sortBy').optional().custom((v, {req} ) => {
 // const pageNumberValidation = query('pageNumber').optional().isInt({}).default(1)
 // const pageNumberValidation = query('pageNumber').optional().isInt({}).default(1)
 
-export const queryValidation = [pageNumberValidation, sortDirectionValidation ,pageSizeValidation, sortByPropValidation]
+export const queryValidation = [pageNumberValidation, sortDirectionValidation ,pageSizeValidation, sortByValidation]

@@ -28,10 +28,12 @@ exports.usersQueryRepository = {
                         }
                     }]
             };
+            console.log({ [queryData.sortBy]: queryData.sortDirection });
             const users = yield dbMongo_1.usersCollection.find(filter)
                 .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
-                .limit(queryData.pageSize).toArray();
+                .limit(queryData.pageSize)
+                .toArray();
             let usersViewArray = users.map(user => (0, helpers_1.usersMapping)(user));
             let pagesCount = yield (0, helpers_1.countTotalUsersAndPages)(queryData, filter);
             return {

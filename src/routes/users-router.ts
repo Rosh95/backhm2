@@ -15,7 +15,7 @@ usersRouter.get('/',
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
-        let queryData: queryDataType = await getDataFromQuery(req.query)
+        const queryData: queryDataType = await getDataFromQuery(req.query)
         const allUsers = await usersQueryRepository.getAllUsers(queryData);
         return res.send(allUsers)
     })

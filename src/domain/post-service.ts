@@ -9,7 +9,7 @@ export const postService = {
         return await postRepository.findPosts();
     },
 
-    async findPostById(id: string): Promise<PostViewModel> {
+    async findPostById(id: string): Promise<PostViewModel | null> {
         return await postRepository.findPostById(id)
     },
     async deletePost(id: string): Promise<boolean> {

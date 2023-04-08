@@ -20,7 +20,7 @@ const users_validation_1 = require("../validation/users-validation");
 const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 exports.usersRouter = (0, express_1.Router)({});
 exports.usersRouter.get('/', query_validation_1.queryValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
+    const queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
     const allUsers = yield user_query_repository_1.usersQueryRepository.getAllUsers(queryData);
     return res.send(allUsers);
 }));

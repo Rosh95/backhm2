@@ -15,7 +15,7 @@ const user_query_repository_1 = require("../repositories/user/user-query-reposit
 const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
     let pageNumber = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize = query.pageSize ? +query.pageSize : 10; // NaN
-    let sortBy = query.sortBy ? (query.sortBy).toString() : 'createdAt';
+    let sortBy = query.sortBy ? query.sortBy : 'createdAt';
     let sortDirection = query.sortDirection === 'asc' ? 1 : -1;
     let searchNameTerm = query.searchNameTerm ? query.searchNameTerm : '';
     let searchLoginTerm = query.searchLoginTerm ? query.searchLoginTerm : '';

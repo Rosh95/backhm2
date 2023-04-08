@@ -21,7 +21,7 @@ exports.userService = {
             const passwordHash = yield this._generateHash(password, passwordSalt);
             let newUser = {
                 _id: new mongodb_1.ObjectId(),
-                userName: login,
+                login: login,
                 email: email,
                 passwordHash,
                 passwordSalt,

@@ -15,7 +15,7 @@ export type UserInputType = {
 }
 export type UsersDBType = {
     _id: ObjectId,
-    userName: string,
+    login: string,
     email: string,
     passwordHash: string,
     passwordSalt: string,
