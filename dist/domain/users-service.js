@@ -27,7 +27,7 @@ exports.userService = {
                 passwordSalt,
                 createdAt: new Date()
             };
-            return yield user_repository_1.userRepository.createBlog(newUser);
+            return yield user_repository_1.userRepository.createUser(newUser);
         });
     },
     deleteUser(id) {
