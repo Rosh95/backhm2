@@ -37,8 +37,8 @@ export const usersQueryRepository = {
         };
     },
 
-    async getAllUsersCount(): Promise<number> {
+    async getAllUsersCount(filter?: Filter<any>): Promise<number> {
 
-        return await usersCollection.countDocuments();
+        return await usersCollection.countDocuments(filter);
     },
 }

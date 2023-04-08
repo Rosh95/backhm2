@@ -80,9 +80,9 @@ export const countTotalPostsAndPages = async (queryData: queryDataType) => {
         postsPagesCount,
     }
 }
-export const countTotalUsersAndPages = async (queryData: queryDataType) => {
+export const countTotalUsersAndPages = async (queryData: queryDataType, filter?: any) => {
 
-    let usersTotalCount = await usersQueryRepository.getAllUsersCount();
+    let usersTotalCount = await usersQueryRepository.getAllUsersCount(filter);
     let usersPagesCount = Math.ceil(usersTotalCount / queryData.pageSize);
 
     return {

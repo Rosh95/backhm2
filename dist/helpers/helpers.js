@@ -70,8 +70,8 @@ const countTotalPostsAndPages = (queryData) => __awaiter(void 0, void 0, void 0,
     };
 });
 exports.countTotalPostsAndPages = countTotalPostsAndPages;
-const countTotalUsersAndPages = (queryData) => __awaiter(void 0, void 0, void 0, function* () {
-    let usersTotalCount = yield user_query_repository_1.usersQueryRepository.getAllUsersCount();
+const countTotalUsersAndPages = (queryData, filter) => __awaiter(void 0, void 0, void 0, function* () {
+    let usersTotalCount = yield user_query_repository_1.usersQueryRepository.getAllUsersCount(filter);
     let usersPagesCount = Math.ceil(usersTotalCount / queryData.pageSize);
     return {
         usersTotalCount,

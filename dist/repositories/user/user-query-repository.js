@@ -43,9 +43,9 @@ exports.usersQueryRepository = {
             };
         });
     },
-    getAllUsersCount() {
+    getAllUsersCount(filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield dbMongo_1.usersCollection.countDocuments();
+            return yield dbMongo_1.usersCollection.countDocuments(filter);
         });
     },
 };
