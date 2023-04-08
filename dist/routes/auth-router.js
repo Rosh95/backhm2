@@ -14,6 +14,10 @@ const express_1 = require("express");
 const users_service_1 = require("../domain/users-service");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield users_service_1.userService.checkCredential(req.body.loginOrEmail, req.body.password);
-    res.sendStatus(200);
+    let result = yield users_service_1.userService.checkCredential(req.body.loginOrEmail, req.body.password);
+    if (result) {
+        res.sendStatus(204);
+    }
+    else
+        res.sendStatus(401);
 }));
