@@ -2,6 +2,7 @@ import {SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
 import {PostViewModel} from '../types/post-types';
+import {UsersDBType} from '../types/user-types';
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -102,7 +103,7 @@ export function postMapping(post: any): PostViewModel {
     }
 }
 
-export function usersMapping(user: any) {
+export function usersMapping(user: UsersDBType) {
     const userMongoId = user._id.toString();
 
     return {

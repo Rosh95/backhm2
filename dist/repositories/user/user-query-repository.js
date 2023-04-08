@@ -28,7 +28,7 @@ exports.usersQueryRepository = {
                         }
                     }]
             };
-            console.log({ [queryData.sortBy]: queryData.sortDirection });
+            console.log(queryData);
             const users = yield dbMongo_1.usersCollection.find(filter)
                 .sort({ [queryData.sortBy]: queryData.sortDirection })
                 .skip(queryData.skippedPages)
