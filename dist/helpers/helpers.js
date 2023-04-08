@@ -89,7 +89,7 @@ function usersMapping(user) {
     const userMongoId = user._id.toString();
     return {
         id: userMongoId,
-        login: user.userName,
+        login: user.login,
         email: user.email,
         createdAt: user.createdAt.toISOString()
     };

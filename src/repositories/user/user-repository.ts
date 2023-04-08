@@ -26,6 +26,6 @@ export const userRepository = {
         }
     },
     async findLoginOrEmail(loginOrEmail: string) {
-        return await usersCollection.findOne({$or: [{email: loginOrEmail}, {userName: loginOrEmail}]});
+        return await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]});
     }
 }
