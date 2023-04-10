@@ -3,6 +3,7 @@ import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
 import {PostViewModel} from '../types/post-types';
 import {UsersDBType} from '../types/user-types';
+import {CommentatorInfo, CommentsDBType, CommentsViewModel} from '../types/comments-types';
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -111,5 +112,19 @@ export function usersMapping(user: UsersDBType) {
         login: user.login,
         email: user.email,
         createdAt: user.createdAt.toISOString()
+    }
+}
+
+export function commentsMapping(comment: CommentsDBType): CommentsViewModel {
+    const commentMongoId = comment._id.toString();
+
+    return {
+        id: commentMongoId,
+        content: comment.content,
+        commentatorInfo: {
+            userId: comment.userId,
+            userLogin: comment.userLogin
+        },
+        createdAt: comment.createdAt.toISOString()
     }
 }

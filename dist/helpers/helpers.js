@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersMapping = exports.postMapping = exports.countTotalUsersAndPages = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
+exports.commentsMapping = exports.usersMapping = exports.postMapping = exports.countTotalUsersAndPages = exports.countTotalPostsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
 const user_query_repository_1 = require("../repositories/user/user-query-repository");
 const getDataFromQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
@@ -95,3 +95,16 @@ function usersMapping(user) {
     };
 }
 exports.usersMapping = usersMapping;
+function commentsMapping(comment) {
+    const commentMongoId = comment._id.toString();
+    return {
+        id: commentMongoId,
+        content: comment.content,
+        commentatorInfo: {
+            userId: comment.userId,
+            userLogin: comment.userLogin
+        },
+        createdAt: comment.createdAt.toISOString()
+    };
+}
+exports.commentsMapping = commentsMapping;

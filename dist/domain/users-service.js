@@ -39,10 +39,15 @@ exports.userService = {
     checkCredential(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_repository_1.userRepository.findLoginOrEmail(loginOrEmail);
+            console.log(user + ' in find');
             if (!user)
                 return false;
             const passwordHash = yield this._generateHash(password, user.passwordSalt);
-            return user.passwordHash === passwordHash;
+            if (user.passwordHash === passwordHash) {
+                return user;
+            }
+            else
+                return false;
         });
     },
     findUserById(userId) {

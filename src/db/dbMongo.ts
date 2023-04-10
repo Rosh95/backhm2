@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import {BlogViewType} from '../types/blog-types';
 import {PostViewModel} from '../types/post-types';
 import {UsersDBType} from '../types/user-types';
+import {CommentsDBType} from '../types/comments-types';
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ const db = client.db();
 export const blogsCollection = db.collection<BlogViewType>('blogs');
 export const postsCollection = db.collection<PostViewModel>('posts');
 export const usersCollection = db.collection<UsersDBType>('users');
+export const commentsCollection = db.collection<CommentsDBType>('comments');
 export async function runDb() {
     try {
         await client.connect();
