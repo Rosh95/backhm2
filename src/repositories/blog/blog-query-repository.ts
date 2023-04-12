@@ -8,12 +8,12 @@ import {
     queryDataType
 } from '../../helpers/helpers';
 import {PaginatorPostViewType, PostViewModel} from '../../types/post-types';
-import {BlogViewType, PaginatorBlogViewType} from '../../types/blog-types';
+import {BlogDbType, BlogViewType, PaginatorBlogViewType} from '../../types/blog-types';
 
 
 export const blogQueryRepository = {
     async getAllBlogs(queryData: queryDataType): Promise<PaginatorBlogViewType> {
-        const filter: Filter<BlogViewType> = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
+        const filter: Filter<BlogDbType> = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
 
         const blogs = await blogsCollection.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})

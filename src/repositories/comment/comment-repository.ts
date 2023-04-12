@@ -1,7 +1,6 @@
-import {PostViewModel} from '../../types/post-types';
-import {commentsCollection, postsCollection} from '../../db/dbMongo';
-import {commentsMapping, postMapping} from '../../helpers/helpers';
-import {CommentsViewModel} from '../../types/comments-types';
+import {blogsCollection, commentsCollection} from '../../db/dbMongo';
+import {commentsMapping} from '../../helpers/helpers';
+import {CommentsDBType, CommentsViewModel} from '../../types/comments-types';
 import {ObjectId} from 'mongodb';
 
 
@@ -13,4 +12,25 @@ export const commentRepository = {
         }
         return null
     },
+    async createCommentForPost(newComment: CommentsDBType): Promise<CommentsViewModel> {
+        await commentsCollection.insertOne(newComment)
+        return commentsMapping(newComment)
+    },
+
+    async deleteCommentById(commentId: string) {
+        const result = await commentsCollection.deleteOne({_id: new ObjectId(commentId)});
+        return result.deletedCount === 1;
+    },
+
+    async updatedCommentById(commentId: string, commentContent: string) {
+        const result = await commentsCollection.updateOne({_id: new ObjectId(commentId)},
+            {
+                $set: {
+                    content: commentContent,
+                }
+            });
+        return result.matchedCount === 1;
+
+    }
+
 }

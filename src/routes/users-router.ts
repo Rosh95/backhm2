@@ -19,6 +19,15 @@ usersRouter.get('/',
         const allUsers = await usersQueryRepository.getAllUsers(queryData);
         return res.send(allUsers)
     })
+usersRouter.get('/:userId',
+    queryValidation,
+    errorsValidationMiddleware,
+    async (req: Request, res: Response) => {
+
+        const queryData: queryDataType = await getDataFromQuery(req.query)
+        const user = await userService.findUserById(req.params.userId)
+        return res.send(user)
+    })
 
 usersRouter.delete('/:id',
     basicAuthMiddleware,

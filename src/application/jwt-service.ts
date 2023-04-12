@@ -14,8 +14,8 @@ export const jwtService = {
 
     async getUserIdByToken(token: string): Promise<ObjectId | null> {
         try {
-            const result: any = jwt.verify(token, settings.JWT_SECRET);
-            return new ObjectId(result.userId)
+            const result = jwt.verify(token, settings.JWT_SECRET) as { userID: string };
+            return new ObjectId(result.userID)
         } catch (error) {
             return null
         }

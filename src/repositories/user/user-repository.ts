@@ -17,8 +17,8 @@ export const userRepository = {
         const result = await usersCollection.deleteOne({_id: id});
         return result.deletedCount === 1;
     },
-    async findUserById(userId: ObjectId) {
-        let foundUser = await usersCollection.findOne({_id: userId});
+    async findUserById(userId: string) {
+        let foundUser = await usersCollection.findOne({_id: new ObjectId(userId)});
         if (foundUser) {
             return foundUser
         } else {

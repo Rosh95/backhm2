@@ -60,7 +60,7 @@ blogsRouter.put('/:id',
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
-        let foundBlog = await blogService.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
+        const foundBlog = await blogService.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
         if (foundBlog) {
             res.sendStatus(204)
         } else {

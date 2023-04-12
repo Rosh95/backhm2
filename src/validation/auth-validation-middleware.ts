@@ -8,18 +8,18 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
         res.send(401)
         return;
     }
+    const token = req.headers.authorization.split(' ')[1];
 
-    const token = req.headers.authorization.split('')[1];
-
-    const userId = await jwtService.getUserIdByToken(token);
+    const userId = await jwtService.getUserIdByToken(token.toString());
     if (userId) {
-
-        req.user = await userService.findUserById(userId)
-        next()
+  
+        req.user = await userService.findUserById(userId.toString())
+        next();
         return
+
     }
 
-    res.send(401);
+    res.sendStatus(401);
 
 
 }

@@ -1,9 +1,11 @@
-import {SortDirection} from 'mongodb';
+import {ObjectId, SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
-import {PostViewModel} from '../types/post-types';
+import {PostDBModel, PostViewModel} from '../types/post-types';
 import {UsersDBType} from '../types/user-types';
 import {CommentatorInfo, CommentsDBType, CommentsViewModel} from '../types/comments-types';
+import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
+import {BlogDbType, BlogViewType} from '../types/blog-types';
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -17,7 +19,7 @@ export  type  queryDataType = {
 }
 export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
 
-    let pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
+    const pageNumber: number = query.pageNumber ? +query.pageNumber : 1; // NaN
     let pageSize: number = query.pageSize ? +query.pageSize : 10; // NaN
     let sortBy: string = query.sortBy ? query.sortBy : 'createdAt';
     let sortDirection: SortDirection = query.sortDirection === 'asc' ? 1 : -1;
@@ -38,13 +40,16 @@ export const getDataFromQuery = async (query: any): Promise<queryDataType> => {
     }
 }
 
-export function blogMapping(blog: any) {
+export function blogMapping(blog: BlogDbType): BlogViewType {
     const blogMongoId = blog._id.toString();
-    delete blog._id;
 
     return {
         id: blogMongoId,
-        ...blog
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+        isMembership: blog.isMembership
     }
 }
 
@@ -73,6 +78,16 @@ export const countTotalBlogsAndPages = async (queryData: queryDataType, filter: 
         blogsPagesCount,
     }
 }
+export const countTotalCommentsAndPages = async (queryData: queryDataType, filter: any) => {
+
+    let commentsTotalCount = await commentQueryRepository.getAllCommentsWithFilter(filter);
+    let commentsPagesCount = Math.ceil(commentsTotalCount / queryData.pageSize);
+
+    return {
+        commentsTotalCount,
+        commentsPagesCount,
+    }
+}
 export const countTotalPostsAndPages = async (queryData: queryDataType) => {
 
     let postsTotalCount = await blogQueryRepository.getAllPostsCount();
@@ -94,13 +109,17 @@ export const countTotalUsersAndPages = async (queryData: queryDataType, filter?:
     }
 }
 
-export function postMapping(post: any): PostViewModel {
+export function postMapping(post: PostDBModel): PostViewModel {
     const postMongoId = post._id.toString();
-    delete post._id;
 
     return {
         id: postMongoId,
-        ...post,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt.toISOString()
     }
 }
 

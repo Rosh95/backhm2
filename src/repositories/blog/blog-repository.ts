@@ -1,6 +1,6 @@
 import {blogsCollection} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
-import {BlogInputModel, BlogViewType} from '../../types/blog-types';
+import {BlogDbType, BlogInputModel, BlogViewType} from '../../types/blog-types';
 
 function blogMapping(blog: any) {
     const blogMongoId = blog._id.toString();
@@ -15,7 +15,7 @@ function blogMapping(blog: any) {
 export const blogRepository = {
 
     async findBlogById(id: string): Promise<BlogViewType> {
-        const foundBlog: BlogViewType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+        const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
         return foundBlog ? blogMapping(foundBlog) : null;
     },
     async deleteBlog(id: string): Promise<boolean> {

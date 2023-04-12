@@ -1,7 +1,7 @@
 import {postsCollection} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
 import {postMapping} from '../../helpers/helpers';
-import {postInputType, PostViewModel} from '../../types/post-types';
+import {PostDBModel, postInputType, PostViewModel} from '../../types/post-types';
 
 
 export const postRepository = {
@@ -11,17 +11,17 @@ export const postRepository = {
     },
 
     async findPostById(id: string): Promise<PostViewModel | null> {
-        const foundPost: PostViewModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
+        const foundPost: PostDBModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
         return foundPost ? postMapping(foundPost) : null;
     },
     async deletePost(id: string): Promise<boolean> {
         const result = await postsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
     },
-    async createPost(newPost: postInputType): Promise<PostViewModel | boolean> {
+    async createPost(newPost: PostDBModel): Promise<PostViewModel | boolean> {
 
-        // @ts-ignore
-        const result = await postsCollection.insertOne(newPost)
+        const result = await postsCollection.insertOne(newPost);
+
 
         return {
             id: result.insertedId.toString(),
@@ -30,7 +30,7 @@ export const postRepository = {
             content: newPost.content,
             blogId: newPost.blogId,
             blogName: newPost.blogName,
-            createdAt: newPost.createdAt
+            createdAt: newPost.createdAt.toISOString()
         };
 
     },

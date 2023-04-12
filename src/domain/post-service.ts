@@ -1,8 +1,9 @@
 import {queryDataType} from '../helpers/helpers';
 import {postRepository} from '../repositories/post/post-repository';
-import {postInputType, PostViewModel} from '../types/post-types';
+import {PostDBModel, postInputType, PostViewModel} from '../types/post-types';
 import {blogRepository} from '../repositories/blog/blog-repository';
 import {BlogViewType} from '../types/blog-types';
+import {ObjectId} from 'mongodb';
 
 export const postService = {
     async findPosts(queryData: queryDataType): Promise<PostViewModel[]> {
@@ -17,13 +18,14 @@ export const postService = {
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string, foundBlogName: BlogViewType): Promise<PostViewModel | boolean> {
 
-        let newPost: postInputType = {
+        let newPost: PostDBModel = {
+            _id: new ObjectId(),
             title: title,
             shortDescription: shortDescription,
             content: content,
             blogId: blogId,
             blogName: foundBlogName.name,
-            createdAt: new Date().toISOString()
+            createdAt: new Date()
         }
 
         return await postRepository.createPost(newPost);

@@ -38,13 +38,14 @@ export const userService = {
 
 
     },
-    async findUserById(userId: ObjectId) {
-        let foundUser = await usersCollection.findOne({_id: userId});
-        if (foundUser) {
-            return foundUser
-        } else {
-            return null;
-        }
+    async findUserById(userId: string) {
+        return await userRepository.findUserById(userId)
+        // let foundUser = await usersCollection.findOne({_id: new ObjectId(userId)});
+        // if (foundUser) {
+        //     return foundUser
+        // } else {
+        //     return null;
+        // }
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);
