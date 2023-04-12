@@ -1,5 +1,6 @@
 import {blogRepository} from '../repositories/blog/blog-repository';
-import {BlogInputModel, BlogViewType} from '../types/blog-types';
+import {BlogDbType, BlogInputModel, BlogViewType} from '../types/blog-types';
+import {ObjectId} from 'mongodb';
 
 export const blogService = {
     // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
@@ -15,11 +16,12 @@ export const blogService = {
     },
     async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogViewType> {
 
-        let newBlog: BlogInputModel = {
+        let newBlog: BlogDbType = {
+            _id: new ObjectId(),
             name: name,
             description: description,
             websiteUrl: websiteUrl,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date(),
             isMembership: false
         }
         return await blogRepository.createBlog(newBlog);

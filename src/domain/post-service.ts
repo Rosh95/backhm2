@@ -33,13 +33,14 @@ export const postService = {
     async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
         let foundBlog = await blogRepository.findBlogById(blogId);
 
-        let newPost: postInputType = {
+        let newPost: PostDBModel = {
+            _id: new ObjectId(),
             title: title,
             shortDescription: shortDescription,
             content: content,
             blogId: blogId,
             blogName: foundBlog!.name,
-            createdAt: new Date().toISOString()
+            createdAt: new Date()
         }
 
         return await postRepository.createPostForExistingBlog(newPost);

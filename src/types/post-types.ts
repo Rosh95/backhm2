@@ -6,8 +6,8 @@ export type PostViewModel = {
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName?: string | null,
-    createdAt?: string
+    blogName: string | null,
+    createdAt: string
 }
 
 export type PostDBModel = {

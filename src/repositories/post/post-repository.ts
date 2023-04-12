@@ -35,10 +35,9 @@ export const postRepository = {
 
     },
 
-    async createPostForExistingBlog(newPost: postInputType): Promise<PostViewModel | boolean> {
+    async createPostForExistingBlog(newPost: PostDBModel): Promise<PostViewModel | boolean> {
 
 
-        // @ts-ignore
         const result = await postsCollection.insertOne(newPost)
 
         return {
@@ -48,7 +47,7 @@ export const postRepository = {
             content: newPost.content,
             blogId: newPost.blogId,
             blogName: newPost.blogName,
-            createdAt: newPost.createdAt
+            createdAt: newPost.createdAt.toISOString()
         };
 
     },

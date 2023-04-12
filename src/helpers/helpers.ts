@@ -48,7 +48,7 @@ export function blogMapping(blog: BlogDbType): BlogViewType {
         name: blog.name,
         description: blog.description,
         websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
+        createdAt: blog.createdAt.toISOString(),
         isMembership: blog.isMembership
     }
 }

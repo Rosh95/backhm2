@@ -92,7 +92,7 @@ postsRouter.post('/:postId/comments',
             }
 
             const newComment = await commentsService.createCommentForPost(req.user._id, req.user.login, req.params.postId, req.body.content);
-            return res.send(newComment);
+            return res.status(201).send(newComment);
         } catch (e) {
             console.log(e)
             return res.sendStatus(500)
