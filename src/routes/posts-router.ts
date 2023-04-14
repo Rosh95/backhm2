@@ -80,6 +80,7 @@ postsRouter.put('/:id',
 postsRouter.post('/:postId/comments',
     authValidationMiddleware,
     CommentContentPostMiddleware,
+    errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const currentPost = await postService.findPostById(req.params.postId);
         if (!currentPost) {

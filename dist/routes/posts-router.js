@@ -62,7 +62,7 @@ exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_valid
         res.sendStatus(404);
     }
 }));
-exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const currentPost = yield post_service_1.postService.findPostById(req.params.postId);
     if (!currentPost) {
         return res.sendStatus(404);

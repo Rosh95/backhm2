@@ -22,7 +22,6 @@ commentsRouter.get('/',
     }
 )
 commentsRouter.get('/:commentId',
-    authValidationMiddleware,
     async (req, res) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
