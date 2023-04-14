@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentsRouter = void 0;
 const express_1 = require("express");
 const comments_service_1 = require("../domain/comments-service");
+const auth_validation_middleware_1 = require("../validation/auth-validation-middleware");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
 const comments_validation_middleware_1 = require("../validation/comments-validation-middleware");
 exports.commentsRouter = (0, express_1.Router)({});
@@ -26,14 +27,14 @@ exports.commentsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, 
     const comments = yield comment_query_repository_1.commentQueryRepository.getAllComments();
     res.send(comments);
 }));
-exports.commentsRouter.get('/:commentId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.commentsRouter.get('/:commentId', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
         return res.send(404);
     }
     return res.send(commentInfo);
 }));
-exports.commentsRouter.delete('/:commentId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.commentsRouter.delete('/:commentId', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
         return res.send(404);

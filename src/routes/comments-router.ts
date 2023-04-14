@@ -22,6 +22,7 @@ commentsRouter.get('/',
     }
 )
 commentsRouter.get('/:commentId',
+    authValidationMiddleware,
     async (req, res) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
@@ -32,6 +33,7 @@ commentsRouter.get('/:commentId',
     }
 )
 commentsRouter.delete('/:commentId',
+    authValidationMiddleware,
     async (req: Request, res: Response) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
