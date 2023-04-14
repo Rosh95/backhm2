@@ -20,7 +20,8 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
 
 
     if (userId) {
-        let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId;
+
+        let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId.toString();
         if (commentUser && isCorrectUser) {
             return res.sendStatus(403)
         }

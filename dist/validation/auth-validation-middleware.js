@@ -26,7 +26,7 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     console.log(commentUser);
     console.log(typeof commentUser);
     if (userId) {
-        let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId);
+        let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId.toString());
         if (commentUser && isCorrectUser) {
             return res.sendStatus(403);
         }
