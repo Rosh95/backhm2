@@ -25,9 +25,9 @@ commentsRouter.get('/:commentId',
     async (req, res) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
-            res.send(404);
+            return res.send(404);
         }
-        res.send(commentInfo);
+        return res.send(commentInfo);
 
     }
 )
@@ -35,13 +35,13 @@ commentsRouter.delete('/:commentId',
     async (req: Request, res: Response) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
-            res.send(404);
+            return res.send(404);
         }
         const isDeleted = await commentsService.deleteCommentById(req.params.commentId)
 
         if (isDeleted) {
-            res.sendStatus(204)
-        } else res.sendStatus(404)
+            return res.sendStatus(204)
+        } else return res.sendStatus(404)
     }
 )
 
@@ -51,14 +51,14 @@ commentsRouter.put('/:commentId',
 
         const commentInfo = await commentsService.getCommentById(req.params!.commentId);
         if (!commentInfo) {
-            res.send(404);
+            return res.send(404);
         }
 
         const updatedComment = await commentsService.updateCommentById(req.params!.commentId, req.body.content);
         if (!updatedComment) {
-            res.send(404);
+            return res.send(404);
         }
-        res.send(204);
+        return res.send(204);
 
     }
 )

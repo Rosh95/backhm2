@@ -29,30 +29,30 @@ exports.commentsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, 
 exports.commentsRouter.get('/:commentId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
-        res.send(404);
+        return res.send(404);
     }
-    res.send(commentInfo);
+    return res.send(commentInfo);
 }));
 exports.commentsRouter.delete('/:commentId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
-        res.send(404);
+        return res.send(404);
     }
     const isDeleted = yield comments_service_1.commentsService.deleteCommentById(req.params.commentId);
     if (isDeleted) {
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
     else
-        res.sendStatus(404);
+        return res.sendStatus(404);
 }));
 exports.commentsRouter.put('/:commentId', comments_validation_middleware_1.CommentContentPostMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
-        res.send(404);
+        return res.send(404);
     }
     const updatedComment = yield comments_service_1.commentsService.updateCommentById(req.params.commentId, req.body.content);
     if (!updatedComment) {
-        res.send(404);
+        return res.send(404);
     }
-    res.send(204);
+    return res.send(204);
 }));
