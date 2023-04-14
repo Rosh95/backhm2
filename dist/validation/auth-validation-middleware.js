@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authValidationMiddleware = void 0;
 const jwt_service_1 = require("../application/jwt-service");
 const users_service_1 = require("../domain/users-service");
+const comments_service_1 = require("../domain/comments-service");
 const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
         res.send(401);
@@ -19,7 +20,15 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     }
     const token = req.headers.authorization.split(' ')[1];
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
+    console.log(userId);
+    console.log(typeof userId);
+    const commentUserId = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+    console.log(commentUserId);
+    console.log(typeof commentUserId);
     if (userId) {
+        // if (userId !== commentUserId){
+        //     return res.sendStatus(403)
+        // }
         req.user = yield users_service_1.userService.findUserById(userId.toString());
         next();
         return;

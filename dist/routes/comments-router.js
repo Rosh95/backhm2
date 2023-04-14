@@ -15,6 +15,7 @@ const comments_service_1 = require("../domain/comments-service");
 const auth_validation_middleware_1 = require("../validation/auth-validation-middleware");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
 const comments_validation_middleware_1 = require("../validation/comments-validation-middleware");
+const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 exports.commentsRouter = (0, express_1.Router)({});
 // commentsRouter.post('/',
 //     authValidationMiddleware,
@@ -46,7 +47,7 @@ exports.commentsRouter.delete('/:commentId', auth_validation_middleware_1.authVa
     else
         return res.sendStatus(404);
 }));
-exports.commentsRouter.put('/:commentId', comments_validation_middleware_1.CommentContentPostMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.commentsRouter.put('/:commentId', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
     if (!commentInfo) {
         return res.send(404);

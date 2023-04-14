@@ -15,7 +15,6 @@ export const commentsService = {
     },
 
     async getCommentById(commentId: string) {
-      //  const newId = new ObjectId(id);
         return await commentRepository.getCommentById(commentId);
     },
 

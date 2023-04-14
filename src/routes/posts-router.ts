@@ -102,7 +102,8 @@ postsRouter.post('/:postId/comments',
 )
 
 postsRouter.get('/:postId/comments',
-    CommentContentPostMiddleware,
+    // CommentContentPostMiddleware,
+    // errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const currentPost = await postService.findPostById(req.params.postId);
         if (!currentPost) {

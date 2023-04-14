@@ -4,6 +4,7 @@ import {authValidationMiddleware} from '../validation/auth-validation-middleware
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {blogService} from '../domain/blog-service';
 import {CommentContentPostMiddleware} from '../validation/comments-validation-middleware';
+import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 
 
 export const commentsRouter = Router({});
@@ -33,6 +34,7 @@ commentsRouter.get('/:commentId',
 )
 commentsRouter.delete('/:commentId',
     authValidationMiddleware,
+
     async (req: Request, res: Response) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
         if (!commentInfo) {
@@ -47,7 +49,9 @@ commentsRouter.delete('/:commentId',
 )
 
 commentsRouter.put('/:commentId',
+    authValidationMiddleware,
     CommentContentPostMiddleware,
+    errorsValidationMiddleware,
     async (req, res) => {
 
         const commentInfo = await commentsService.getCommentById(req.params!.commentId);

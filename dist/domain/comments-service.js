@@ -26,7 +26,6 @@ exports.commentsService = {
     },
     getCommentById(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            //  const newId = new ObjectId(id);
             return yield comment_repository_1.commentRepository.getCommentById(commentId);
         });
     },
