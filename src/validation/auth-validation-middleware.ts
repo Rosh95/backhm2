@@ -14,15 +14,17 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     const userId = await jwtService.getUserIdByToken(token.toString());
     console.log(userId)
     console.log(typeof userId)
-    const commentUserId = await commentsService.getCommentById(req.params.commentId);
-    console.log(commentUserId);
-    console.log(typeof commentUserId);
+    const commentUser = await commentsService.getCommentById(req.params.commentId);
+    console.log(commentUser);
+    console.log(typeof commentUser);
 
 
     if (userId) {
-        if (userId.toString() !== commentUserId!.commentatorInfo.userId) {
+        let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId;
+        if (commentUser && isCorrectUser) {
             return res.sendStatus(403)
         }
+
         req.user = await userService.findUserById(userId.toString())
         next();
         return

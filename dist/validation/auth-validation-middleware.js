@@ -22,13 +22,14 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
     console.log(userId);
     console.log(typeof userId);
-    const commentUserId = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
-    console.log(commentUserId);
-    console.log(typeof commentUserId);
+    const commentUser = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+    console.log(commentUser);
+    console.log(typeof commentUser);
     if (userId) {
-        // if (userId !== commentUserId){
-        //     return res.sendStatus(403)
-        // }
+        let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId);
+        if (commentUser && isCorrectUser) {
+            return res.sendStatus(403);
+        }
         req.user = yield users_service_1.userService.findUserById(userId.toString());
         next();
         return;
