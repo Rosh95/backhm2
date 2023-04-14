@@ -15,12 +15,12 @@ export const commentsRouter = Router({});
 //         res.status(201).send(newComment)
 //     }
 // )
-// commentsRouter.get('/',
-//     async (req, res) => {
-//         const comments = await commentQueryRepository.getAllComments()
-//         res.send(comments);
-//     }
-// )
+commentsRouter.get('/',
+    async (req, res) => {
+        const comments = await commentQueryRepository.getAllComments()
+        res.send(comments);
+    }
+)
 commentsRouter.get('/:commentId',
     async (req, res) => {
         const commentInfo = await commentsService.getCommentById(req.params.commentId);
@@ -33,7 +33,10 @@ commentsRouter.get('/:commentId',
 )
 commentsRouter.delete('/:commentId',
     async (req: Request, res: Response) => {
-
+        const commentInfo = await commentsService.getCommentById(req.params.commentId);
+        if (!commentInfo) {
+            res.send(404);
+        }
         const isDeleted = await commentsService.deleteCommentById(req.params.commentId)
 
         if (isDeleted) {
@@ -45,6 +48,12 @@ commentsRouter.delete('/:commentId',
 commentsRouter.put('/:commentId',
     CommentContentPostMiddleware,
     async (req, res) => {
+
+        const commentInfo = await commentsService.getCommentById(req.params!.commentId);
+        if (!commentInfo) {
+            res.send(404);
+        }
+
         const updatedComment = await commentsService.updateCommentById(req.params!.commentId, req.body.content);
         if (!updatedComment) {
             res.send(404);

@@ -5,10 +5,10 @@ import {ObjectId} from 'mongodb';
 
 
 export const commentRepository = {
-    async getCommentById(id: ObjectId): Promise<CommentsViewModel | null> {
-        const comment = await commentsCollection.findOne({_id: id});
+    async getCommentById(commentId: string): Promise<CommentsViewModel | null> {
+        const comment = await commentsCollection.findOne({_id: new ObjectId(commentId)});
         if (comment) {
-            return commentsMapping(comment!);
+            return commentsMapping(comment);
         }
         return null
     },
@@ -19,6 +19,7 @@ export const commentRepository = {
 
     async deleteCommentById(commentId: string) {
         const result = await commentsCollection.deleteOne({_id: new ObjectId(commentId)});
+        console.log(result)
         return result.deletedCount === 1;
     },
 
