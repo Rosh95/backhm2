@@ -79,7 +79,10 @@ exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authV
         return res.sendStatus(500);
     }
 }));
-exports.postsRouter.get('/:postId/comments', comments_validation_middleware_1.CommentContentPostMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.get('/:postId/comments', 
+// CommentContentPostMiddleware,
+// errorsValidationMiddleware,
+(req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const currentPost = yield post_service_1.postService.findPostById(req.params.postId);
     if (!currentPost) {
         return res.sendStatus(404);
