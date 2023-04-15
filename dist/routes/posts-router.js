@@ -105,7 +105,14 @@ exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authV
         if (!req.user) {
             throw new Error('user doesn`t exist');
         }
-        const newComment = yield comments_service_1.commentsService.createCommentForPost(req.user._id, req.user.login, req.params.postId, req.body.content);
+        const newCommentData = {
+            content: req.body.content,
+            userId: req.user._id,
+            userLogin: req.user.login,
+            postId: req.params.postId
+        };
+        const newComment = yield comments_service_1.commentsService.createCommentForPost(newCommentData);
+        console.log(newComment + ' new comment ');
         return res.status(201).send(newComment);
     }
     catch (e) {

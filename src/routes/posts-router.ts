@@ -13,7 +13,7 @@ import {commentsService} from '../domain/comments-service';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, PostViewModel} from '../types/post-types';
-import {CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
+import {CommentsInputData, CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
 
 export const postsRouter = Router({})
 
@@ -120,7 +120,15 @@ postsRouter.post('/:postId/comments',
                 throw new Error('user doesn`t exist');
             }
 
-            const newComment: CommentsViewModel = await commentsService.createCommentForPost(req.user._id, req.user.login, req.params.postId, req.body.content);
+            const newCommentData: CommentsInputData = {
+                content: req.body.content,
+                userId: req.user._id,
+                userLogin: req.user.login,
+                postId: req.params.postId
+            }
+            const newComment: CommentsViewModel = await commentsService.createCommentForPost(newCommentData);
+            console.log(newComment + ' new comment ')
+
             return res.status(201).send(newComment);
         } catch (e) {
             console.log(e)

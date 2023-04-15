@@ -6,7 +6,7 @@ import {userService} from '../domain/users-service';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {PaginatorUserViewType, UserInputType, UserViewModel} from '../types/user-types';
+import {PaginatorUserViewType, UserInputType, UsersDBType, UserViewModel} from '../types/user-types';
 
 export const usersRouter = Router({})
 
@@ -31,7 +31,7 @@ usersRouter.get('/:userId',
     async (req: Request, res: Response): Promise<e.Response<UserViewModel | null>> => {
 
         try {
-            const user: UserViewModel | null = await userService.findUserById(req.params.userId)
+            const user: UsersDBType | null = await userService.findUserById(req.params.userId)
             return res.send(user)
         } catch (e) {
             console.log(e)

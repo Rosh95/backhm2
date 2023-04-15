@@ -37,7 +37,7 @@ export const userService = {
 
 
     },
-    async findUserById(userId: string): Promise<UserViewModel | null> {
+    async findUserById(userId: string): Promise<UsersDBType | null> {
         return await userRepository.findUserById(userId)
 
     },

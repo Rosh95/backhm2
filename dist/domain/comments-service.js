@@ -34,16 +34,17 @@ exports.commentsService = {
             return yield comment_repository_1.commentRepository.deleteCommentById(commentId);
         });
     },
-    createCommentForPost(userId, userLogin, postId, commentContent) {
+    createCommentForPost(newCommentData) {
         return __awaiter(this, void 0, void 0, function* () {
             const newComment = {
                 _id: new mongodb_1.ObjectId(),
-                content: commentContent,
-                userId: userId,
-                userLogin: userLogin,
-                postId: postId,
+                content: newCommentData.content,
+                userId: newCommentData.userId,
+                userLogin: newCommentData.userLogin,
+                postId: newCommentData.postId,
                 createdAt: new Date()
             };
+            console.log(newComment + 'new comment in service');
             return yield comment_repository_1.commentRepository.createCommentForPost(newComment);
         });
     },

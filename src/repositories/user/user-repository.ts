@@ -17,10 +17,10 @@ export const userRepository = {
         const result = await usersCollection.deleteOne({_id: id});
         return result.deletedCount === 1;
     },
-    async findUserById(userId: string): Promise<UserViewModel | null> {
+    async findUserById(userId: string): Promise<UsersDBType | null> {
         let foundUser = await usersCollection.findOne({_id: new ObjectId(userId)});
         if (foundUser) {
-            return usersMapping(foundUser)
+            return foundUser
         } else {
             return null;
         }

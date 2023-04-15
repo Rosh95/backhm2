@@ -18,10 +18,16 @@ export type CommentsInputType = {
 export type CommentsDBType = {
     _id: ObjectId,
     content: string,
-    userId: string,
+    userId: ObjectId,
     postId: string,
     userLogin: string
     createdAt: Date
+}
+export type CommentsInputData = {
+    content: string,
+    userId: ObjectId,
+    postId: string,
+    userLogin: string
 }
 
 
