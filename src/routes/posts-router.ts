@@ -1,49 +1,57 @@
-import {Request, Response, Router} from 'express';
+import e, {Request, Response, Router} from 'express';
 import {blogIdMiddleware, postValidation} from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {commentsMapping, getDataFromQuery, queryDataType} from '../helpers/helpers';
+import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {postQueryRepository} from '../repositories/post/post-query-repository';
 import {postService} from '../domain/post-service';
 import {queryValidation} from '../validation/query-validation';
 import {blogRepository} from '../repositories/blog/blog-repository';
 import {authValidationMiddleware} from '../validation/auth-validation-middleware';
 import {CommentContentPostMiddleware} from '../validation/comments-validation-middleware';
-import {commentRepository} from '../repositories/comment/comment-repository';
 import {commentsService} from '../domain/comments-service';
-import {CommentsViewModel} from '../types/comments-types';
-import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
+import {BlogViewType} from '../types/blog-types';
+import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, PostViewModel} from '../types/post-types';
+import {CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
 
 export const postsRouter = Router({})
 
 postsRouter.get('/',
     queryValidation,
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response): Promise<e.Response<PaginatorPostViewType>> => {
 
-        let queryData: queryDataType = await getDataFromQuery(req.query)
-        const allPosts = await postQueryRepository.getAllPosts(queryData);
-        return res.send(allPosts)
+        try {
+            let queryData: queryDataType = await getDataFromQuery(req.query)
+            const allPosts: PaginatorPostViewType = await postQueryRepository.getAllPosts(queryData);
+            return res.send(allPosts)
+        } catch (e) {
+            console.log(e)
+            return res.sendStatus(500)
+        }
     })
 
-postsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundPost = await postService.findPostById(req.params.id)
-    if (foundPost) {
-        res.send(foundPost)
-        return;
+postsRouter.get('/:id', async (req: Request, res: Response): Promise<e.Response<PostViewModel>> => {
+    try {
+        let foundPost: PostViewModel | null = await postService.findPostById(req.params.id)
+        if (foundPost) {
+            return res.send(foundPost)
+        }
+        return res.sendStatus(404)
+    } catch (e) {
+        console.log(e)
+        return res.sendStatus(500)
     }
-    res.sendStatus(404)
 })
 
 postsRouter.delete('/:id',
     basicAuthMiddleware,
-    async (req: Request, res: Response) => {
-
-        const isDeleted = await postService.deletePost(req.params.id)
+    async (req: Request, res: Response): Promise<e.Response<boolean>> => {
+        const isDeleted: boolean = await postService.deletePost(req.params.id)
 
         if (isDeleted) {
-            res.sendStatus(204)
-        } else res.sendStatus(404)
+            return res.sendStatus(204)
+        } else return res.sendStatus(404)
     })
 
 postsRouter.post('/',
@@ -51,15 +59,24 @@ postsRouter.post('/',
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-        let foundBlogName = await blogRepository.findBlogById(req.body.blogId)
+    async (req: Request, res: Response): Promise<e.Response<PostViewModel>> => {
+        let foundBlogName: BlogViewType = await blogRepository.findBlogById(req.body.blogId)
         if (!foundBlogName) {
             return res.sendStatus(404);
         }
-
-        const newPost = await postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, foundBlogName);
-
-        return res.status(201).send(newPost)
+        try {
+            let postInputData: postInputDataModel = {
+                title: req.body.title,
+                shortDescription: req.body.shortDescription,
+                content: req.body.content,
+                blogId: req.body.blogId,
+            }
+            const newPost: PostViewModel = await postService.createPost(postInputData, foundBlogName);
+            return res.status(201).send(newPost)
+        } catch (e) {
+            console.log(e)
+            return res.sendStatus(500)
+        }
 
     })
 
@@ -68,21 +85,32 @@ postsRouter.put('/:id',
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-        let updatedPost = await postService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
-        if (updatedPost) {
-            res.sendStatus(204)
-        } else {
-            res.sendStatus(404)
+    async (req: Request, res: Response): Promise<e.Response | Boolean> => {
+        try {
+            let updatedPostData: postInputUpdatedDataModel = {
+                content: req.body.content,
+                title: req.body.title,
+                shortDescription: req.body.shortDescription
+            }
+            let isPostUpdated: boolean = await postService.updatePost(req.params.id, updatedPostData);
+            if (isPostUpdated) {
+                return res.sendStatus(204)
+            } else {
+                return res.sendStatus(404)
+            }
+        } catch (e) {
+            console.log(e)
+            return res.sendStatus(500)
         }
-    })
+    }
+)
 
 postsRouter.post('/:postId/comments',
     authValidationMiddleware,
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-        const currentPost = await postService.findPostById(req.params.postId);
+    async (req: Request, res: Response): Promise<e.Response | CommentsViewModel> => {
+        const currentPost: PostViewModel | null = await postService.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
         }
@@ -92,7 +120,7 @@ postsRouter.post('/:postId/comments',
                 throw new Error('user doesn`t exist');
             }
 
-            const newComment = await commentsService.createCommentForPost(req.user._id, req.user.login, req.params.postId, req.body.content);
+            const newComment: CommentsViewModel = await commentsService.createCommentForPost(req.user._id, req.user.login, req.params.postId, req.body.content);
             return res.status(201).send(newComment);
         } catch (e) {
             console.log(e)
@@ -102,16 +130,15 @@ postsRouter.post('/:postId/comments',
 )
 
 postsRouter.get('/:postId/comments',
-    // CommentContentPostMiddleware,
-    // errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+
+    async (req: Request, res: Response): Promise<e.Response | PaginatorCommentViewType> => {
         const currentPost = await postService.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
         }
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            const comments = await commentQueryRepository.getAllCommentsOfPost(req.params.postId, queryData)
+            const comments: PaginatorCommentViewType = await commentQueryRepository.getAllCommentsOfPost(req.params.postId, queryData)
             return res.send(comments);
         } catch (e) {
             return res.status(500).json(e)

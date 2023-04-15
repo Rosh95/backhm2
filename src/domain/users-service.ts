@@ -1,21 +1,20 @@
-import {UsersDBType, UserViewModel} from '../types/user-types';
+import {UserInputType, UsersDBType, UserViewModel} from '../types/user-types';
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
-import {usersCollection} from '../db/dbMongo';
 
 const bcrypt = require('bcrypt');
 
 export const userService = {
 
-    async createUser(login: string, email: string, password: string): Promise<UserViewModel> {
+    async createUser(userPostInputData: UserInputType): Promise<UserViewModel> {
 
         const passwordSalt = await bcrypt.genSalt(10);
-        const passwordHash = await this._generateHash(password, passwordSalt)
+        const passwordHash = await this._generateHash(userPostInputData.password, passwordSalt)
 
         let newUser: UsersDBType = {
             _id: new ObjectId(),
-            login: login,
-            email: email,
+            login: userPostInputData.login,
+            email: userPostInputData.email,
             passwordHash,
             passwordSalt,
             createdAt: new Date()
@@ -38,14 +37,9 @@ export const userService = {
 
 
     },
-    async findUserById(userId: string) {
+    async findUserById(userId: string): Promise<UserViewModel | null> {
         return await userRepository.findUserById(userId)
-        // let foundUser = await usersCollection.findOne({_id: new ObjectId(userId)});
-        // if (foundUser) {
-        //     return foundUser
-        // } else {
-        //     return null;
-        // }
+
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);

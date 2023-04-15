@@ -28,6 +28,23 @@ export type postInputType = {
     blogName: string,
     createdAt: string
 }
+export type postInputDataModel = {
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string,
+}
+export type postInputDataModelForExistingBlog = {
+    title: string,
+    shortDescription: string,
+    content: string,
+}
+export type postInputUpdatedDataModel = {
+    title: string,
+    shortDescription: string,
+    content: string
+
+}
 
 
 export type PaginatorPostViewType = {

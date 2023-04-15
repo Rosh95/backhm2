@@ -25,41 +25,75 @@ const comments_service_1 = require("../domain/comments-service");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
-    const allPosts = yield post_query_repository_1.postQueryRepository.getAllPosts(queryData);
-    return res.send(allPosts);
+    try {
+        let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
+        const allPosts = yield post_query_repository_1.postQueryRepository.getAllPosts(queryData);
+        return res.send(allPosts);
+    }
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
+    }
 }));
 exports.postsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundPost = yield post_service_1.postService.findPostById(req.params.id);
-    if (foundPost) {
-        res.send(foundPost);
-        return;
+    try {
+        let foundPost = yield post_service_1.postService.findPostById(req.params.id);
+        if (foundPost) {
+            return res.send(foundPost);
+        }
+        return res.sendStatus(404);
     }
-    res.sendStatus(404);
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
+    }
 }));
 exports.postsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const isDeleted = yield post_service_1.postService.deletePost(req.params.id);
     if (isDeleted) {
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
     else
-        res.sendStatus(404);
+        return res.sendStatus(404);
 }));
 exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlogName = yield blog_repository_1.blogRepository.findBlogById(req.body.blogId);
     if (!foundBlogName) {
         return res.sendStatus(404);
     }
-    const newPost = yield post_service_1.postService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId, foundBlogName);
-    return res.status(201).send(newPost);
+    try {
+        let postInputData = {
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+            blogId: req.body.blogId,
+        };
+        const newPost = yield post_service_1.postService.createPost(postInputData, foundBlogName);
+        return res.status(201).send(newPost);
+    }
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
+    }
 }));
 exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let updatedPost = yield post_service_1.postService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
-    if (updatedPost) {
-        res.sendStatus(204);
+    try {
+        let updatedPostData = {
+            content: req.body.content,
+            title: req.body.title,
+            shortDescription: req.body.shortDescription
+        };
+        let isPostUpdated = yield post_service_1.postService.updatePost(req.params.id, updatedPostData);
+        if (isPostUpdated) {
+            return res.sendStatus(204);
+        }
+        else {
+            return res.sendStatus(404);
+        }
     }
-    else {
-        res.sendStatus(404);
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
     }
 }));
 exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -79,10 +113,7 @@ exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authV
         return res.sendStatus(500);
     }
 }));
-exports.postsRouter.get('/:postId/comments', 
-// CommentContentPostMiddleware,
-// errorsValidationMiddleware,
-(req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.get('/:postId/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const currentPost = yield post_service_1.postService.findPostById(req.params.postId);
     if (!currentPost) {
         return res.sendStatus(404);

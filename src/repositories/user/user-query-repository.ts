@@ -20,7 +20,6 @@ export const usersQueryRepository = {
             }]
         }
 
-        console.log(queryData)
         const users = await usersCollection.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)

@@ -35,7 +35,7 @@ exports.userRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             let foundUser = yield dbMongo_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(userId) });
             if (foundUser) {
-                return foundUser;
+                return (0, helpers_1.usersMapping)(foundUser);
             }
             else {
                 return null;

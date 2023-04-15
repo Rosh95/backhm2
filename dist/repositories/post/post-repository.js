@@ -46,27 +46,13 @@ exports.postRepository = {
             };
         });
     },
-    createPostForExistingBlog(newPost) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.postsCollection.insertOne(newPost);
-            return {
-                id: result.insertedId.toString(),
-                title: newPost.title,
-                shortDescription: newPost.shortDescription,
-                content: newPost.content,
-                blogId: newPost.blogId,
-                blogName: newPost.blogName,
-                createdAt: newPost.createdAt.toISOString()
-            };
-        });
-    },
-    updatePost(id, title, shortDescription, content) {
+    updatePost(id, updatedPostData) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
-                    title: title,
-                    shortDescription: shortDescription,
-                    content: content,
+                    title: updatedPostData.title,
+                    shortDescription: updatedPostData.shortDescription,
+                    content: updatedPostData.content
                 }
             });
             return result.matchedCount === 1;

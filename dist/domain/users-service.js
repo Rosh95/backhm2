@@ -14,14 +14,14 @@ const user_repository_1 = require("../repositories/user/user-repository");
 const mongodb_1 = require("mongodb");
 const bcrypt = require('bcrypt');
 exports.userService = {
-    createUser(login, email, password) {
+    createUser(userPostInputData) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordSalt = yield bcrypt.genSalt(10);
-            const passwordHash = yield this._generateHash(password, passwordSalt);
+            const passwordHash = yield this._generateHash(userPostInputData.password, passwordSalt);
             let newUser = {
                 _id: new mongodb_1.ObjectId(),
-                login: login,
-                email: email,
+                login: userPostInputData.login,
+                email: userPostInputData.email,
                 passwordHash,
                 passwordSalt,
                 createdAt: new Date()
@@ -52,12 +52,6 @@ exports.userService = {
     findUserById(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield user_repository_1.userRepository.findUserById(userId);
-            // let foundUser = await usersCollection.findOne({_id: new ObjectId(userId)});
-            // if (foundUser) {
-            //     return foundUser
-            // } else {
-            //     return null;
-            // }
         });
     },
     _generateHash(password, salt) {

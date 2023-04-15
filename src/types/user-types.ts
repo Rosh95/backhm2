@@ -8,7 +8,6 @@ export type UserViewModel = {
 
 }
 export type UserInputType = {
-    id: string
     login: string,
     password: string,
     email: string,

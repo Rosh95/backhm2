@@ -23,9 +23,15 @@ const query_validation_1 = require("../validation/query-validation");
 const post_service_1 = require("../domain/post-service");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
-    const allBlogs = yield blog_query_repository_1.blogQueryRepository.getAllBlogs(queryData);
-    return res.send(allBlogs);
+    try {
+        let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
+        const allBlogs = yield blog_query_repository_1.blogQueryRepository.getAllBlogs(queryData);
+        return res.send(allBlogs);
+    }
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
+    }
 }));
 exports.blogsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let foundBlog = yield blog_service_1.blogService.findBlogById(req.params.id);
@@ -37,22 +43,44 @@ exports.blogsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, 
 exports.blogsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const isDeleted = yield blog_service_1.blogService.deleteBlog(req.params.id);
     if (isDeleted) {
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
     else
-        res.sendStatus(404);
+        return res.sendStatus(404);
 }));
 exports.blogsRouter.post('/', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.blogValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newBlog = yield blog_service_1.blogService.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
-    res.status(201).send(newBlog);
+    try {
+        let BlogInputData = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
+        const newBlog = yield blog_service_1.blogService.createBlog(BlogInputData);
+        return res.status(201).send(newBlog);
+    }
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
+    }
 }));
 exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.blogValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundBlog = yield blog_service_1.blogService.updateBlog(req.params.id, req.body.name, req.body.description, req.body.websiteUrl);
-    if (foundBlog) {
-        res.sendStatus(204);
+    try {
+        let BlogUpdateData = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
+        const isBlogUpdate = yield blog_service_1.blogService.updateBlog(req.params.id, BlogUpdateData);
+        if (isBlogUpdate) {
+            return res.sendStatus(204);
+        }
+        else {
+            return res.sendStatus(404);
+        }
     }
-    else {
-        res.sendStatus(404);
+    catch (e) {
+        console.log(e);
+        return res.sendStatus(500);
     }
 }));
 exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,7 +103,12 @@ exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, post
         return res.sendStatus(404);
     }
     try {
-        const newPost = yield post_service_1.postService.createPostForExistingBlog(req.params.id, req.body.title, req.body.shortDescription, req.body.content);
+        let postInputData = {
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+        };
+        const newPost = yield post_service_1.postService.createPostForExistingBlog(req.params.id, postInputData);
         return res.status(201).send(newPost);
     }
     catch (e) {

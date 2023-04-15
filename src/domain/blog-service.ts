@@ -14,13 +14,13 @@ export const blogService = {
         return await blogRepository.deleteBlog(id);
 
     },
-    async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogViewType> {
+    async createBlog(blogData: BlogInputModel): Promise<BlogViewType> {
 
         let newBlog: BlogDbType = {
             _id: new ObjectId(),
-            name: name,
-            description: description,
-            websiteUrl: websiteUrl,
+            name: blogData.name,
+            description: blogData.description,
+            websiteUrl: blogData.websiteUrl,
             createdAt: new Date(),
             isMembership: false
         }
@@ -28,9 +28,9 @@ export const blogService = {
 
     },
 
-    async updateBlog(id: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
+    async updateBlog(blogId: string, blogUpdateData:BlogInputModel): Promise<boolean> {
 
-        return await blogRepository.updateBlog(id, name, description, websiteUrl)
+        return await blogRepository.updateBlog(blogId, blogUpdateData)
 
     }
 }

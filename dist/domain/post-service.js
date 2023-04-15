@@ -29,38 +29,38 @@ exports.postService = {
             return yield post_repository_1.postRepository.deletePost(id);
         });
     },
-    createPost(title, shortDescription, content, blogId, foundBlogName) {
+    createPost(postInputData, foundBlogName) {
         return __awaiter(this, void 0, void 0, function* () {
             let newPost = {
                 _id: new mongodb_1.ObjectId(),
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
+                title: postInputData.title,
+                shortDescription: postInputData.shortDescription,
+                content: postInputData.content,
+                blogId: postInputData.blogId,
                 blogName: foundBlogName.name,
                 createdAt: new Date()
             };
             return yield post_repository_1.postRepository.createPost(newPost);
         });
     },
-    createPostForExistingBlog(blogId, title, shortDescription, content) {
+    createPostForExistingBlog(blogId, postInputData) {
         return __awaiter(this, void 0, void 0, function* () {
             let foundBlog = yield blog_repository_1.blogRepository.findBlogById(blogId);
             let newPost = {
                 _id: new mongodb_1.ObjectId(),
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
+                title: postInputData.title,
+                shortDescription: postInputData.shortDescription,
+                content: postInputData.content,
                 blogId: blogId,
                 blogName: foundBlog.name,
                 createdAt: new Date()
             };
-            return yield post_repository_1.postRepository.createPostForExistingBlog(newPost);
+            return yield post_repository_1.postRepository.createPost(newPost);
         });
     },
-    updatePost(id, title, shortDescription, content) {
+    updatePost(id, updatedPostData) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.postRepository.updatePost(id, title, shortDescription, content);
+            return yield post_repository_1.postRepository.updatePost(id, updatedPostData);
         });
     }
 };

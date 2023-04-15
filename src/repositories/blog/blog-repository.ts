@@ -36,14 +36,14 @@ export const blogRepository = {
         };
     },
 
-    async updateBlog(id: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
+    async updateBlog(blogId: string, blogUpdateData: BlogInputModel): Promise<boolean> {
 
-        const result = await blogsCollection.updateOne({_id: new ObjectId(id)},
+        const result = await blogsCollection.updateOne({_id: new ObjectId(blogId)},
             {
                 $set: {
-                    name: name,
-                    description: description,
-                    websiteUrl: websiteUrl,
+                    name: blogUpdateData.name,
+                    description: blogUpdateData.description,
+                    websiteUrl: blogUpdateData.websiteUrl,
                 }
             });
         return result.matchedCount === 1;

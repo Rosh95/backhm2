@@ -1,6 +1,12 @@
 import {queryDataType} from '../helpers/helpers';
 import {postRepository} from '../repositories/post/post-repository';
-import {PostDBModel, postInputType, PostViewModel} from '../types/post-types';
+import {
+    PostDBModel,
+    postInputDataModel,
+    postInputDataModelForExistingBlog,
+    postInputUpdatedDataModel,
+    PostViewModel
+} from '../types/post-types';
 import {blogRepository} from '../repositories/blog/blog-repository';
 import {BlogViewType} from '../types/blog-types';
 import {ObjectId} from 'mongodb';
@@ -16,40 +22,40 @@ export const postService = {
     async deletePost(id: string): Promise<boolean> {
         return await postRepository.deletePost(id);
     },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string, foundBlogName: BlogViewType): Promise<PostViewModel | boolean> {
+    async createPost(postInputData: postInputDataModel, foundBlogName: BlogViewType): Promise<PostViewModel> {
 
         let newPost: PostDBModel = {
             _id: new ObjectId(),
-            title: title,
-            shortDescription: shortDescription,
-            content: content,
-            blogId: blogId,
+            title: postInputData.title,
+            shortDescription: postInputData.shortDescription,
+            content: postInputData.content,
+            blogId: postInputData.blogId,
             blogName: foundBlogName.name,
             createdAt: new Date()
         }
 
         return await postRepository.createPost(newPost);
     },
-    async createPostForExistingBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostViewModel | boolean> {
+    async createPostForExistingBlog(blogId: string, postInputData: postInputDataModelForExistingBlog): Promise<PostViewModel | boolean> {
         let foundBlog = await blogRepository.findBlogById(blogId);
 
         let newPost: PostDBModel = {
             _id: new ObjectId(),
-            title: title,
-            shortDescription: shortDescription,
-            content: content,
+            title: postInputData.title,
+            shortDescription: postInputData.shortDescription,
+            content: postInputData.content,
             blogId: blogId,
             blogName: foundBlog!.name,
             createdAt: new Date()
         }
 
-        return await postRepository.createPostForExistingBlog(newPost);
+        return await postRepository.createPost(newPost);
     },
 
 
-    async updatePost(id: string, title: string, shortDescription: string, content: string): Promise<boolean> {
+    async updatePost(id: string, updatedPostData: postInputUpdatedDataModel): Promise<boolean> {
 
-        return await postRepository.updatePost(id, title, shortDescription, content)
+        return await postRepository.updatePost(id, updatedPostData)
 
     }
 }

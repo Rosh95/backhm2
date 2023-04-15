@@ -43,13 +43,13 @@ exports.blogRepository = {
             };
         });
     },
-    updateBlog(id, name, description, websiteUrl) {
+    updateBlog(blogId, blogUpdateData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
+            const result = yield dbMongo_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(blogId) }, {
                 $set: {
-                    name: name,
-                    description: description,
-                    websiteUrl: websiteUrl,
+                    name: blogUpdateData.name,
+                    description: blogUpdateData.description,
+                    websiteUrl: blogUpdateData.websiteUrl,
                 }
             });
             return result.matchedCount === 1;

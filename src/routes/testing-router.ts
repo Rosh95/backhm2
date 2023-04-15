@@ -1,6 +1,5 @@
 import {Request, Response, Router} from 'express';
 import {blogsCollection, commentsCollection, postsCollection, usersCollection} from '../db/dbMongo';
-import {commentsService} from '../domain/comments-service';
 
 export const testRouter = Router({})
 

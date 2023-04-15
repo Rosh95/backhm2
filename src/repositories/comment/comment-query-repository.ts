@@ -1,14 +1,7 @@
 import {CommentsDBType, CommentsViewModel, PaginatorCommentViewType} from '../../types/comments-types';
-import {blogsCollection, commentsCollection} from '../../db/dbMongo';
-import {Filter, FindCursor, WithId} from 'mongodb';
-import {BlogViewType} from '../../types/blog-types';
-import {
-    blogMapping,
-    commentsMapping,
-    countTotalBlogsAndPages,
-    countTotalCommentsAndPages,
-    queryDataType
-} from '../../helpers/helpers';
+import {commentsCollection} from '../../db/dbMongo';
+import {Filter} from 'mongodb';
+import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../helpers/helpers';
 
 
 export const commentQueryRepository = {
@@ -34,7 +27,7 @@ export const commentQueryRepository = {
 
         };
     },
-    async getAllComments() {
+    async getAllComments(): Promise<CommentsViewModel[]> {
         let comments = await commentsCollection.find().toArray();
         return comments.map(comment => commentsMapping(comment))
     },

@@ -1,7 +1,7 @@
 import {postsCollection} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
 import {postMapping} from '../../helpers/helpers';
-import {PostDBModel, postInputType, PostViewModel} from '../../types/post-types';
+import {PostDBModel, postInputUpdatedDataModel, PostViewModel} from '../../types/post-types';
 
 
 export const postRepository = {
@@ -18,7 +18,7 @@ export const postRepository = {
         const result = await postsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
     },
-    async createPost(newPost: PostDBModel): Promise<PostViewModel | boolean> {
+    async createPost(newPost: PostDBModel): Promise<PostViewModel> {
 
         const result = await postsCollection.insertOne(newPost);
 
@@ -34,32 +34,16 @@ export const postRepository = {
         };
 
     },
+    
 
-    async createPostForExistingBlog(newPost: PostDBModel): Promise<PostViewModel | boolean> {
-
-
-        const result = await postsCollection.insertOne(newPost)
-
-        return {
-            id: result.insertedId.toString(),
-            title: newPost.title,
-            shortDescription: newPost.shortDescription,
-            content: newPost.content,
-            blogId: newPost.blogId,
-            blogName: newPost.blogName,
-            createdAt: newPost.createdAt.toISOString()
-        };
-
-    },
-
-    async updatePost(id: string, title: string, shortDescription: string, content: string): Promise<boolean> {
+    async updatePost(id: string, updatedPostData: postInputUpdatedDataModel): Promise<boolean> {
 
         const result = await postsCollection.updateOne({_id: new ObjectId(id)},
             {
                 $set: {
-                    title: title,
-                    shortDescription: shortDescription,
-                    content: content,
+                    title: updatedPostData.title,
+                    shortDescription: updatedPostData.shortDescription,
+                    content: updatedPostData.content
                 }
             });
 

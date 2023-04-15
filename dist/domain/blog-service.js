@@ -26,22 +26,22 @@ exports.blogService = {
             return yield blog_repository_1.blogRepository.deleteBlog(id);
         });
     },
-    createBlog(name, description, websiteUrl) {
+    createBlog(blogData) {
         return __awaiter(this, void 0, void 0, function* () {
             let newBlog = {
                 _id: new mongodb_1.ObjectId(),
-                name: name,
-                description: description,
-                websiteUrl: websiteUrl,
+                name: blogData.name,
+                description: blogData.description,
+                websiteUrl: blogData.websiteUrl,
                 createdAt: new Date(),
                 isMembership: false
             };
             return yield blog_repository_1.blogRepository.createBlog(newBlog);
         });
     },
-    updateBlog(id, name, description, websiteUrl) {
+    updateBlog(blogId, blogUpdateData) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blog_repository_1.blogRepository.updateBlog(id, name, description, websiteUrl);
+            return yield blog_repository_1.blogRepository.updateBlog(blogId, blogUpdateData);
         });
     }
 };
