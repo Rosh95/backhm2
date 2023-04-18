@@ -1,9 +1,9 @@
-import {ObjectId, SortDirection} from 'mongodb';
+import {SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
 import {PostDBModel, PostViewModel} from '../types/post-types';
-import {UsersDBType} from '../types/user-types';
-import {CommentatorInfo, CommentsDBType, CommentsViewModel} from '../types/comments-types';
+import {NewUsersDBType} from '../types/user-types';
+import {CommentsDBType, CommentsViewModel} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogDbType, BlogViewType} from '../types/blog-types';
 
@@ -123,14 +123,18 @@ export function postMapping(post: PostDBModel): PostViewModel {
     }
 }
 
-export function usersMapping(user: UsersDBType) {
-    const userMongoId = user._id.toString();
+export function usersMapping(user: NewUsersDBType) {
 
     return {
-        id: userMongoId,
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt.toISOString()
+        id: user._id.toString(),
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt.toISOString(),
+        emailConfirmation: {
+            confirmationCode: user.emailConfirmation.confirmationCode,
+            emailExpiration: user.emailConfirmation.emailExpiration,
+            isConfirmed: user.emailConfirmation.isConfirmed
+        }
     }
 }
 

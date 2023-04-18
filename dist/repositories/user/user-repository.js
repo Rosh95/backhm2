@@ -42,6 +42,17 @@ exports.userRepository = {
             }
         });
     },
+    findUserByLogin(login) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let foundUser = yield dbMongo_1.usersCollection.findOne({ login: login });
+            if (foundUser) {
+                return foundUser;
+            }
+            else {
+                return null;
+            }
+        });
+    },
     findLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield dbMongo_1.usersCollection.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });

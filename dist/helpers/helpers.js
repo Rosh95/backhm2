@@ -109,12 +109,16 @@ function postMapping(post) {
 }
 exports.postMapping = postMapping;
 function usersMapping(user) {
-    const userMongoId = user._id.toString();
     return {
-        id: userMongoId,
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt.toISOString()
+        id: user._id.toString(),
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt.toISOString(),
+        emailConfirmation: {
+            confirmationCode: user.emailConfirmation.confirmationCode,
+            emailExpiration: user.emailConfirmation.emailExpiration,
+            isConfirmed: user.emailConfirmation.isConfirmed
+        }
     };
 }
 exports.usersMapping = usersMapping;

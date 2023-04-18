@@ -86,7 +86,8 @@ exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_valid
 exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
-        return res.sendStatus(404);
+        res.sendStatus(404);
+        return;
     }
     try {
         let queryData = yield (0, helpers_1.getDataFromQuery)(req.query);
@@ -100,7 +101,8 @@ exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, 
 exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, query_validation_1.queryValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
-        return res.sendStatus(404);
+        res.sendStatus(404);
+        return;
     }
     try {
         let postInputData = {

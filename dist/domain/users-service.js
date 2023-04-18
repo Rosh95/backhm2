@@ -8,10 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const user_repository_1 = require("../repositories/user/user-repository");
 const mongodb_1 = require("mongodb");
+const email_adapter_1 = require("../adapters/email-adapter");
+const add_1 = __importDefault(require("date-fns/add"));
+const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 exports.userService = {
     createUser(userPostInputData) {
@@ -20,13 +26,30 @@ exports.userService = {
             const passwordHash = yield this._generateHash(userPostInputData.password, passwordSalt);
             let newUser = {
                 _id: new mongodb_1.ObjectId(),
-                login: userPostInputData.login,
-                email: userPostInputData.email,
-                passwordHash,
-                passwordSalt,
-                createdAt: new Date()
+                accountData: {
+                    login: userPostInputData.login,
+                    email: userPostInputData.email,
+                    passwordHash,
+                    passwordSalt,
+                    createdAt: new Date()
+                },
+                emailConfirmation: {
+                    confirmationCode: uuid(),
+                    emailExpiration: (0, add_1.default)(new Date(), {
+                        hours: 1,
+                        minutes: 3
+                    }),
+                    isConfirmed: false,
+                }
             };
-            return yield user_repository_1.userRepository.createUser(newUser);
+            const createdUser = yield user_repository_1.userRepository.createUser(newUser);
+            try {
+                yield email_adapter_1.emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email);
+            }
+            catch (e) {
+                return null;
+            }
+            return createdUser;
         });
     },
     deleteUser(id) {
@@ -41,8 +64,8 @@ exports.userService = {
             console.log(user + ' in find');
             if (!user)
                 return false;
-            const passwordHash = yield this._generateHash(password, user.passwordSalt);
-            if (user.passwordHash === passwordHash) {
+            const passwordHash = yield this._generateHash(password, user.accountData.passwordSalt);
+            if (user.accountData.passwordHash === passwordHash) {
                 return user;
             }
             else
@@ -52,6 +75,11 @@ exports.userService = {
     findUserById(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield user_repository_1.userRepository.findUserById(userId);
+        });
+    },
+    findUserByLogin(login) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield user_repository_1.userRepository.findUserByLogin(login);
         });
     },
     _generateHash(password, salt) {

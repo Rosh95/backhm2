@@ -1,12 +1,12 @@
 import {countTotalUsersAndPages, queryDataType, usersMapping} from '../../helpers/helpers';
 import {usersCollection} from '../../db/dbMongo';
-import {PaginatorUserViewType, UsersDBType, UserViewModel} from '../../types/user-types';
+import {NewUsersDBType, PaginatorUserViewType, UserViewModel} from '../../types/user-types';
 import {Filter} from 'mongodb';
 
 export const usersQueryRepository = {
     async getAllUsers(queryData: queryDataType): Promise<PaginatorUserViewType> {
 
-        const filter: Filter<UsersDBType> = {
+        const filter: Filter<NewUsersDBType> = {
             $or: [{
                 email: {
                     $regex: queryData.searchEmailTerm,

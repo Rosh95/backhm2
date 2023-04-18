@@ -33,7 +33,7 @@ exports.commentQueryRepository = {
     },
     getAllComments() {
         return __awaiter(this, void 0, void 0, function* () {
-            let comments = yield dbMongo_1.commentsCollection.find().toArray();
+            let comments = yield dbMongo_1.commentsCollection.find({}).toArray();
             return comments.map(comment => (0, helpers_1.commentsMapping)(comment));
         });
     },

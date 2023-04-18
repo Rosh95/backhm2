@@ -46,7 +46,7 @@ postsRouter.get('/:id', async (req: Request, res: Response): Promise<e.Response<
 
 postsRouter.delete('/:id',
     basicAuthMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<boolean>> => {
+    async (req: Request, res: Response) => {
         const isDeleted: boolean = await postService.deletePost(req.params.id)
 
         if (isDeleted) {
@@ -59,7 +59,7 @@ postsRouter.post('/',
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<PostViewModel>> => {
+    async (req: Request, res: Response) => {
         let foundBlogName: BlogViewType = await blogRepository.findBlogById(req.body.blogId)
         if (!foundBlogName) {
             return res.sendStatus(404);
@@ -85,7 +85,7 @@ postsRouter.put('/:id',
     postValidation,
     blogIdMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response | Boolean> => {
+    async (req: Request, res: Response) => {
         try {
             let updatedPostData: postInputUpdatedDataModel = {
                 content: req.body.content,
@@ -109,7 +109,7 @@ postsRouter.post('/:postId/comments',
     authValidationMiddleware,
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response | CommentsViewModel> => {
+    async (req: Request, res: Response) => {
         const currentPost: PostViewModel | null = await postService.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)

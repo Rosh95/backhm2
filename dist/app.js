@@ -11,6 +11,7 @@ const testing_router_1 = require("./routes/testing-router");
 const users_router_1 = require("./routes/users-router");
 const auth_router_1 = require("./routes/auth-router");
 const comments_router_1 = require("./routes/comments-router");
+const email_router_1 = require("./routes/email-router");
 exports.app = (0, express_1.default)();
 const parserMiddleWare = express_1.default.json();
 exports.app.use(parserMiddleWare);
@@ -19,6 +20,7 @@ exports.app.use('/posts', posts_router_1.postsRouter);
 exports.app.use('/users', users_router_1.usersRouter);
 exports.app.use('/auth', auth_router_1.authRouter);
 exports.app.use('/comments', comments_router_1.commentsRouter);
+exports.app.use('/email', email_router_1.emailRouter);
 exports.app.use('/testing/all-data', testing_router_1.testRouter);
 exports.app.use('/', (req, res) => {
     res.send('Siiiiii');

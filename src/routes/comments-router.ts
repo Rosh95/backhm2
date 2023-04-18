@@ -1,4 +1,4 @@
-import e, {Request, Response, Router} from 'express';
+import {Request, Response, Router} from 'express';
 import {commentsService} from '../domain/comments-service';
 import {authValidationMiddleware} from '../validation/auth-validation-middleware';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
@@ -29,7 +29,7 @@ commentsRouter.get('/:commentId',
 commentsRouter.delete('/:commentId',
     authValidationMiddleware,
 
-    async (req: Request, res: Response): Promise<e.Response> => {
+    async (req: Request, res: Response)=> {
 
         try {
             const commentInfo = await commentsService.getCommentById(req.params.commentId);
@@ -52,7 +52,7 @@ commentsRouter.put('/:commentId',
     authValidationMiddleware,
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
-    async (req, res): Promise<Response | Boolean> => {
+    async (req, res) => {
 
         try {
             const commentInfo = await commentsService.getCommentById(req.params!.commentId);

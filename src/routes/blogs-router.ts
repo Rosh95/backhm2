@@ -1,4 +1,4 @@
-import e, {Request, Response, Router} from 'express';
+import {Request, Response, Router} from 'express';
 import {blogValidation} from '../validation/blogs-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
@@ -16,7 +16,7 @@ export const blogsRouter = Router({})
 
 blogsRouter.get('/',
     queryValidation,
-    async (req: Request, res: Response): Promise<e.Response | PaginatorBlogViewType> => {
+    async (req: Request, res: Response) => {
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
             const allBlogs: PaginatorBlogViewType = await blogQueryRepository.getAllBlogs(queryData);
@@ -27,7 +27,7 @@ blogsRouter.get('/',
         }
     })
 
-blogsRouter.get('/:id', async (req: Request, res: Response): Promise<e.Response | BlogViewType> => {
+blogsRouter.get('/:id', async (req: Request, res: Response) => {
     let foundBlog: BlogViewType = await blogService.findBlogById(req.params.id)
     if (foundBlog) {
         return res.send(foundBlog)
@@ -37,7 +37,7 @@ blogsRouter.get('/:id', async (req: Request, res: Response): Promise<e.Response 
 
 blogsRouter.delete('/:id',
     basicAuthMiddleware,
-    async (req: Request, res: Response): Promise<e.Response> => {
+    async (req: Request, res: Response) => {
         const isDeleted: boolean = await blogService.deleteBlog(req.params.id)
         if (isDeleted) {
             return res.sendStatus(204)
@@ -48,7 +48,7 @@ blogsRouter.post('/',
     basicAuthMiddleware,
     blogValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response | BlogViewType> => {
+    async (req: Request, res: Response) => {
 
         try {
             let BlogInputData: BlogInputModel = {
@@ -70,7 +70,7 @@ blogsRouter.put('/:id',
     basicAuthMiddleware,
     blogValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response | boolean> => {
+    async (req: Request, res: Response) => {
 
         try {
             let BlogUpdateData: BlogInputModel = {
@@ -93,10 +93,11 @@ blogsRouter.put('/:id',
 
 blogsRouter.get('/:id/posts',
     queryValidation,
-    async (req: Request, res: Response): Promise<e.Response | PaginatorPostViewType> => {
+    async (req: Request, res: Response) => {
         let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
-            return res.sendStatus(404)
+            res.sendStatus(404)
+            return;
         }
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
@@ -114,10 +115,11 @@ blogsRouter.post('/:id/posts',
     postValidation,
     queryValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response | PostViewModel> => {
+    async (req: Request, res: Response) => {
         let isExistBlog = await blogRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
-            return res.sendStatus(404)
+            res.sendStatus(404)
+            return;
         }
         try {
             let postInputData: postInputDataModelForExistingBlog = {

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authValidationMiddleware = void 0;
+exports.checkExistUserMiddleware = exports.authValidationMiddleware = void 0;
 const jwt_service_1 = require("../application/jwt-service");
 const users_service_1 = require("../domain/users-service");
 const comments_service_1 = require("../domain/comments-service");
@@ -20,11 +20,7 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     }
     const token = req.headers.authorization.split(' ')[1];
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
-    console.log(userId);
-    console.log(typeof userId);
     const commentUser = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
-    console.log(commentUser);
-    console.log(typeof commentUser);
     if (userId) {
         let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId.toString());
         if (commentUser && isCorrectUser) {
@@ -37,3 +33,12 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     return res.sendStatus(401);
 });
 exports.authValidationMiddleware = authValidationMiddleware;
+const checkExistUserMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundUser = yield users_service_1.userService.findUserByLogin(req.body.login);
+    if (!foundUser) {
+        next();
+        return;
+    }
+    return res.sendStatus(400);
+});
+exports.checkExistUserMiddleware = checkExistUserMiddleware;

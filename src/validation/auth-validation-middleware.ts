@@ -10,17 +10,10 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
         return;
     }
     const token = req.headers.authorization.split(' ')[1];
-
     const userId = await jwtService.getUserIdByToken(token.toString());
-    console.log(userId)
-    console.log(typeof userId)
     const commentUser = await commentsService.getCommentById(req.params.commentId);
-    console.log(commentUser);
-    console.log(typeof commentUser);
-
 
     if (userId) {
-
         let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId.toString();
         if (commentUser && isCorrectUser) {
             return res.sendStatus(403)
@@ -30,9 +23,15 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
         next();
         return
     }
-
-
     return res.sendStatus(401);
+}
 
+export const checkExistUserMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let foundUser = await userService.findUserByLogin(req.body.login);
 
+    if (!foundUser) {
+        next();
+        return
+    }
+    return res.sendStatus(400);
 }

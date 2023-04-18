@@ -28,7 +28,7 @@ export const commentQueryRepository = {
         };
     },
     async getAllComments(): Promise<CommentsViewModel[]> {
-        let comments = await commentsCollection.find().toArray();
+        let comments = await commentsCollection.find({}).toArray();
         return comments.map(comment => commentsMapping(comment))
     },
     async getAllCommentsWithFilter(filter: any) {

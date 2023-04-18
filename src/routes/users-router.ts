@@ -1,4 +1,4 @@
-import e, {Request, Response, Router} from 'express';
+import {Request, Response, Router} from 'express';
 import {queryValidation} from '../validation/query-validation';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
@@ -6,7 +6,7 @@ import {userService} from '../domain/users-service';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {PaginatorUserViewType, UserInputType, UsersDBType, UserViewModel} from '../types/user-types';
+import {NewUsersDBType, PaginatorUserViewType, UserInputType, UserViewModel} from '../types/user-types';
 
 export const usersRouter = Router({})
 
@@ -14,7 +14,7 @@ export const usersRouter = Router({})
 usersRouter.get('/',
     queryValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<PaginatorUserViewType>> => {
+    async (req: Request, res: Response) => {
 
         try {
             const queryData: queryDataType = await getDataFromQuery(req.query)
@@ -28,10 +28,10 @@ usersRouter.get('/',
 usersRouter.get('/:userId',
     queryValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<UserViewModel | null>> => {
+    async (req: Request, res: Response) => {
 
         try {
-            const user: UsersDBType | null = await userService.findUserById(req.params.userId)
+            const user: NewUsersDBType | null = await userService.findUserById(req.params.userId)
             return res.send(user)
         } catch (e) {
             console.log(e)
@@ -42,7 +42,7 @@ usersRouter.get('/:userId',
 usersRouter.delete('/:id',
     basicAuthMiddleware,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<boolean>> => {
+    async (req: Request, res: Response) => {
         try {
             const isDeleted: boolean = await userService.deleteUser(req.params.id)
             if (isDeleted) {
@@ -60,14 +60,14 @@ usersRouter.post('/',
     basicAuthMiddleware,
     userValidation,
     errorsValidationMiddleware,
-    async (req: Request, res: Response): Promise<e.Response<UserViewModel>> => {
+    async (req: Request, res: Response) => {
 
         let userPostInputData: UserInputType = {
             email: req.body.email,
             login: req.body.login,
             password: req.body.password
         }
-        const newUser: UserViewModel = await userService.createUser(userPostInputData);
+        const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
         return res.status(201).send(newUser)
     }
 )

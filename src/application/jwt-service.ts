@@ -1,11 +1,11 @@
-import {UsersDBType} from '../types/user-types';
+import {NewUsersDBType} from '../types/user-types';
 import jwt from 'jsonwebtoken';
 import {settings} from '../settings';
 import {ObjectId} from 'mongodb';
 import {LoginSuccessViewModel} from '../types/auth-types';
 
 export const jwtService = {
-    async createJWT(user: UsersDBType): Promise<LoginSuccessViewModel> {
+    async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
         const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: "1h"})
         return {
             accessToken: token

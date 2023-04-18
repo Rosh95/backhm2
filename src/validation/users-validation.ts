@@ -1,4 +1,5 @@
 import {body} from 'express-validator';
+import {userService} from '../domain/users-service';
 
 export const loginUserMiddleware = body('login').isString().trim().isLength({
     min: 3,
@@ -11,4 +12,13 @@ export const passwordUserMiddleware = body('password').isString().trim().isLengt
 
 export const emailUserMiddleware = body('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
 
-export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware]
+export const checkExistUserMiddleware = body('login').isString().custom(async (value) => {
+
+    let foundUser = await userService.findUserByLogin(value);
+
+    if (foundUser) {
+        throw new Error('This login already exist. Please, choose another one.')
+    }
+    return true;
+})
+export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware, checkExistUserMiddleware]
