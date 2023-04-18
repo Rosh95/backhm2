@@ -14,7 +14,7 @@ export const userService = {
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(userPostInputData.password, passwordSalt)
 
-        let newUser = {
+        let newUser: NewUsersDBType = {
             _id: new ObjectId(),
             accountData: {
                 login: userPostInputData.login,
@@ -32,9 +32,9 @@ export const userService = {
                 isConfirmed: false,
             }
         }
-
+        console.log(newUser)
         const createdUser = await userRepository.createUser(newUser);
-
+        console.log(createdUser)
         try {
             await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
         } catch (e) {

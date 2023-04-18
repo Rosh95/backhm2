@@ -21,11 +21,11 @@ exports.emailAdapter = {
                 service: "gmail",
                 auth: {
                     user: 'azi.rosh95@gmail.com',
-                    pass: process.env['PASSWORD_EMAIL '], // generated ethereal password
+                    pass: 'wkfuoxqawsjdgxkv', // generated ethereal password
                 },
             });
             // send mail with defined transport object
-            yield transporter.sendMail({
+            let info = yield transporter.sendMail({
                 from: `Rosh <azi.rovshan@gmail.com>`,
                 to: email,
                 subject: "Email Confirmation",
@@ -34,6 +34,7 @@ exports.emailAdapter = {
      <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
  </p>`, // html body
             });
+            return info;
         });
     }
 };

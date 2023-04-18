@@ -40,26 +40,16 @@ exports.authRouter.post('/registration',
 // checkExistUserMiddleware,
 // errorsValidationMiddleware,
 (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // let transporter = nodemailer.createTransport({
-    //     service: "gmail",
-    //     auth: {
-    //         user: 'azi.rosh95@gmail.com', // generated ethereal user
-    //         pass: 'rR12345678!', // generated ethereal password
-    //     },
-    // });
-    //
-    // // send mail with defined transport object
-    // let info = await transporter.sendMail({
-    //     from: `Rosh <azi.rosh95@gmail.com>`, // sender address
-    //     to: req.body.email, // list of receivers
-    //     subject: req.body.subject, // Subject line
-    //     html: req.body.message, // html body
-    // });
     let userPostInputData = {
         email: req.body.email,
         login: req.body.login,
         password: req.body.password
     };
     const newUser = yield users_service_1.userService.createUser(userPostInputData);
-    return res.sendStatus(204);
+    if (newUser) {
+        res.sendStatus(204);
+    }
+    else {
+        res.sendStatus(400);
+    }
 }));
