@@ -108,7 +108,7 @@ exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authV
         const newCommentData = {
             content: req.body.content,
             userId: req.user._id,
-            userLogin: req.user.login,
+            userLogin: req.user.accountData.login,
             postId: req.params.postId
         };
         const newComment = yield comments_service_1.commentsService.createCommentForPost(newCommentData);

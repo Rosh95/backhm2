@@ -25,8 +25,8 @@ authRouter.get('/me',
     authValidationMiddleware,
     async (req, res) => {
         const currentUserInfo: CurrentUserInfoType = {
-            login: req.user!.login,
-            email: req.user!.email,
+            login: req.user!.accountData.login,
+            email: req.user!.accountData.email,
             userId: req.user!._id.toString()
         }
         if (req.user) {
@@ -41,21 +41,21 @@ authRouter.post('/registration',
     // errorsValidationMiddleware,
     async (req: Request, res: Response): Promise<e.Response<UserViewModel>> => {
 
-        let transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: 'azi.rosh95@gmail.com', // generated ethereal user
-                pass: 'rR12345678!', // generated ethereal password
-            },
-        });
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: `Rosh <azi.rosh95@gmail.com>`, // sender address
-            to: req.body.email, // list of receivers
-            subject: req.body.subject, // Subject line
-            html: req.body.message, // html body
-        });
+        // let transporter = nodemailer.createTransport({
+        //     service: "gmail",
+        //     auth: {
+        //         user: 'azi.rosh95@gmail.com', // generated ethereal user
+        //         pass: 'rR12345678!', // generated ethereal password
+        //     },
+        // });
+        //
+        // // send mail with defined transport object
+        // let info = await transporter.sendMail({
+        //     from: `Rosh <azi.rosh95@gmail.com>`, // sender address
+        //     to: req.body.email, // list of receivers
+        //     subject: req.body.subject, // Subject line
+        //     html: req.body.message, // html body
+        // });
 
 
         let userPostInputData: UserInputType = {

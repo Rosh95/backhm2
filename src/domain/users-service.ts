@@ -2,9 +2,9 @@ import {NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types'
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
 import {emailAdapter} from '../adapters/email-adapter';
-import add from 'date-fns/add'
+import add from 'date-fns/add';
+import {v4 as uuidv4} from 'uuid';
 
-const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 
 export const userService = {
@@ -24,7 +24,7 @@ export const userService = {
                 createdAt: new Date()
             },
             emailConfirmation: {
-                confirmationCode: uuid(),
+                confirmationCode: uuidv4(),
                 emailExpiration: add(new Date(), {
                     hours: 1,
                     minutes: 3

@@ -123,7 +123,7 @@ postsRouter.post('/:postId/comments',
             const newCommentData: CommentsInputData = {
                 content: req.body.content,
                 userId: req.user._id,
-                userLogin: req.user.login,
+                userLogin: req.user.accountData.login,
                 postId: req.params.postId
             }
             const newComment: CommentsViewModel = await commentsService.createCommentForPost(newCommentData);

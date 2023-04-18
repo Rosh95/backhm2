@@ -17,7 +17,7 @@ const user_repository_1 = require("../repositories/user/user-repository");
 const mongodb_1 = require("mongodb");
 const email_adapter_1 = require("../adapters/email-adapter");
 const add_1 = __importDefault(require("date-fns/add"));
-const uuid = require('uuid');
+const uuid_1 = require("uuid");
 const bcrypt = require('bcrypt');
 exports.userService = {
     createUser(userPostInputData) {
@@ -34,7 +34,7 @@ exports.userService = {
                     createdAt: new Date()
                 },
                 emailConfirmation: {
-                    confirmationCode: uuid(),
+                    confirmationCode: (0, uuid_1.v4)(),
                     emailExpiration: (0, add_1.default)(new Date(), {
                         hours: 1,
                         minutes: 3
