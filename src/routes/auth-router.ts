@@ -59,3 +59,19 @@ authRouter.post('/registration',
         }
     }
 )
+
+authRouter.post('/registration-confirmation',
+
+    async (req: Request, res: Response) => {
+
+        const code = req.body.code;
+
+        const isRegistredConfirmation = await userService.findUserByCode(code);
+        if (isRegistredConfirmation) {
+            res.sendStatus(204)
+
+        } else {
+            res.sendStatus(400)
+        }
+    }
+)

@@ -84,6 +84,16 @@ exports.userService = {
             return yield user_repository_1.userRepository.findUserByLogin(login);
         });
     },
+    findUserByEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield user_repository_1.userRepository.findUserByEmail(email);
+        });
+    },
+    findUserByCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield user_repository_1.userRepository.findUserByCode(code);
+        });
+    },
     _generateHash(password, salt) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield bcrypt.hash(password, salt);

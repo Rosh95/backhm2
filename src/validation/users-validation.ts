@@ -12,13 +12,22 @@ export const passwordUserMiddleware = body('password').isString().trim().isLengt
 
 export const emailUserMiddleware = body('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
 
-export const checkExistUserMiddleware = body('login').isString().custom(async (value) => {
+export const checkExistUserMiddlewareByLogin = body('login').isString().custom(async (value) => {
 
-    let foundUser = await userService.findUserByLogin(value);
+    let foundUserByLogin = await userService.findUserByLogin(value);
 
-    if (foundUser) {
-        throw new Error('This login already exist. Please, choose another one.')
+    if (foundUserByLogin) {
+        throw new Error('This login  already exist. Please, choose another one.')
     }
     return true;
 })
-export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware, checkExistUserMiddleware]
+export const checkExistUserMiddlewareByEmail = body('email').isString().custom(async (value) => {
+
+    let foundUserByEmail = await userService.findUserByEmail(value);
+
+    if (foundUserByEmail) {
+        throw new Error('This  email already exist. Please, choose another one.')
+    }
+    return true;
+})
+export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware, checkExistUserMiddlewareByLogin, checkExistUserMiddlewareByEmail]

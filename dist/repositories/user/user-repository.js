@@ -53,6 +53,28 @@ exports.userRepository = {
             }
         });
     },
+    findUserByEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let foundUser = yield dbMongo_1.usersCollection.findOne({ "accountData.email": email });
+            if (foundUser) {
+                return foundUser;
+            }
+            else {
+                return null;
+            }
+        });
+    },
+    findUserByCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let foundUser = yield dbMongo_1.usersCollection.findOne({ "emailConfirmation.confirmationCode": code });
+            if (foundUser) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        });
+    },
     findLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield dbMongo_1.usersCollection.findOne({ $or: [{ "accountData.email": loginOrEmail }, { "accountData.login": loginOrEmail }] });

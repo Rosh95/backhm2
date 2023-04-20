@@ -60,11 +60,15 @@ export const userService = {
     },
     async findUserById(userId: string): Promise<NewUsersDBType | null> {
         return await userRepository.findUserById(userId)
-
     },
     async findUserByLogin(login: string): Promise<NewUsersDBType | null> {
         return await userRepository.findUserByLogin(login)
-
+    },
+    async findUserByEmail(email: string): Promise<NewUsersDBType | null> {
+        return await userRepository.findUserByEmail(email)
+    },
+    async findUserByCode(code: string): Promise<Boolean> {
+        return await userRepository.findUserByCode(code)
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);

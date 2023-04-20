@@ -33,6 +33,22 @@ export const userRepository = {
             return null;
         }
     },
+    async findUserByEmail(email: string): Promise<NewUsersDBType | null> {
+        let foundUser = await usersCollection.findOne({"accountData.email": email});
+        if (foundUser) {
+            return foundUser
+        } else {
+            return null;
+        }
+    },
+    async findUserByCode(code: string): Promise<Boolean> {
+        let foundUser = await usersCollection.findOne({"emailConfirmation.confirmationCode": code});
+        if (foundUser) {
+            return true
+        } else {
+            return false;
+        }
+    },
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
         return await usersCollection.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
     }

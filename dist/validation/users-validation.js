@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userValidation = exports.checkExistUserMiddleware = exports.emailUserMiddleware = exports.passwordUserMiddleware = exports.loginUserMiddleware = void 0;
+exports.userValidation = exports.checkExistUserMiddlewareByEmail = exports.checkExistUserMiddlewareByLogin = exports.emailUserMiddleware = exports.passwordUserMiddleware = exports.loginUserMiddleware = void 0;
 const express_validator_1 = require("express-validator");
 const users_service_1 = require("../domain/users-service");
 exports.loginUserMiddleware = (0, express_validator_1.body)('login').isString().trim().isLength({
@@ -21,11 +21,18 @@ exports.passwordUserMiddleware = (0, express_validator_1.body)('password').isStr
     max: 20
 }).withMessage('password should be between 6 and 20 symbols string');
 exports.emailUserMiddleware = (0, express_validator_1.body)('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
-exports.checkExistUserMiddleware = (0, express_validator_1.body)('login').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundUser = yield users_service_1.userService.findUserByLogin(value);
-    if (foundUser) {
-        throw new Error('This login already exist. Please, choose another one.');
+exports.checkExistUserMiddlewareByLogin = (0, express_validator_1.body)('login').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundUserByLogin = yield users_service_1.userService.findUserByLogin(value);
+    if (foundUserByLogin) {
+        throw new Error('This login  already exist. Please, choose another one.');
     }
     return true;
 }));
-exports.userValidation = [exports.loginUserMiddleware, exports.passwordUserMiddleware, exports.emailUserMiddleware, exports.checkExistUserMiddleware];
+exports.checkExistUserMiddlewareByEmail = (0, express_validator_1.body)('email').isString().custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundUserByEmail = yield users_service_1.userService.findUserByEmail(value);
+    if (foundUserByEmail) {
+        throw new Error('This  email already exist. Please, choose another one.');
+    }
+    return true;
+}));
+exports.userValidation = [exports.loginUserMiddleware, exports.passwordUserMiddleware, exports.emailUserMiddleware, exports.checkExistUserMiddlewareByLogin, exports.checkExistUserMiddlewareByEmail];

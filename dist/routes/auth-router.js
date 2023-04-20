@@ -55,3 +55,13 @@ users_validation_1.userValidation, error_validation_middleware_1.errorsValidatio
         res.sendStatus(400);
     }
 }));
+exports.authRouter.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const code = req.body.code;
+    const isRegistredConfirmation = yield users_service_1.userService.findUserByCode(code);
+    if (isRegistredConfirmation) {
+        res.sendStatus(204);
+    }
+    else {
+        res.sendStatus(400);
+    }
+}));
