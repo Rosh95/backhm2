@@ -4,6 +4,8 @@ import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, UserInputType, UserViewModel} from '../types/user-types';
 import {authValidationMiddleware} from '../validation/auth-validation-middleware';
 import nodemailer from 'nodemailer';
+import {userValidation} from '../validation/users-validation';
+import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 
 
 export const authRouter = Router({})
@@ -39,6 +41,8 @@ authRouter.get('/me',
 authRouter.post('/registration',
     // checkExistUserMiddleware,
     // errorsValidationMiddleware,
+    userValidation,
+    errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
         let userPostInputData: UserInputType = {

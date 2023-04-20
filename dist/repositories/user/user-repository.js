@@ -44,7 +44,7 @@ exports.userRepository = {
     },
     findUserByLogin(login) {
         return __awaiter(this, void 0, void 0, function* () {
-            let foundUser = yield dbMongo_1.usersCollection.findOne({ login: login });
+            let foundUser = yield dbMongo_1.usersCollection.findOne({ "accountData.login": login });
             if (foundUser) {
                 return foundUser;
             }
@@ -55,7 +55,7 @@ exports.userRepository = {
     },
     findLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield dbMongo_1.usersCollection.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
+            return yield dbMongo_1.usersCollection.findOne({ $or: [{ "accountData.email": loginOrEmail }, { "accountData.login": loginOrEmail }] });
         });
     }
 };

@@ -13,7 +13,7 @@ export const emailAdapter = {
 
         // send mail with defined transport object
         let info = await transporter.sendMail({
-            from: `Rosh <azi.rovshan@gmail.com>`, // sender address
+            from: `Rosh <azi.rosh95@gmail.com>`, // sender address
             to: email, // list of receivers
             subject: "Email Confirmation", // Subject line
             html: ` <h1>Thank for your registration</h1>

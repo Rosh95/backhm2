@@ -26,7 +26,7 @@ exports.emailAdapter = {
             });
             // send mail with defined transport object
             let info = yield transporter.sendMail({
-                from: `Rosh <azi.rovshan@gmail.com>`,
+                from: `Rosh <azi.rosh95@gmail.com>`,
                 to: email,
                 subject: "Email Confirmation",
                 html: ` <h1>Thank for your registration</h1>

@@ -14,6 +14,8 @@ const express_1 = require("express");
 const users_service_1 = require("../domain/users-service");
 const jwt_service_1 = require("../application/jwt-service");
 const auth_validation_middleware_1 = require("../validation/auth-validation-middleware");
+const users_validation_1 = require("../validation/users-validation");
+const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post('/login', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = yield users_service_1.userService.checkCredential(req.body.loginOrEmail, req.body.password);
@@ -39,7 +41,7 @@ exports.authRouter.get('/me', auth_validation_middleware_1.authValidationMiddlew
 exports.authRouter.post('/registration', 
 // checkExistUserMiddleware,
 // errorsValidationMiddleware,
-(req, res) => __awaiter(void 0, void 0, void 0, function* () {
+users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userPostInputData = {
         email: req.body.email,
         login: req.body.login,
