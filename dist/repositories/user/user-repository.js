@@ -68,10 +68,10 @@ exports.userRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             let foundUser = yield dbMongo_1.usersCollection.findOne({ "emailConfirmation.confirmationCode": code });
             if (foundUser) {
-                return true;
+                return foundUser;
             }
             else {
-                return false;
+                return null;
             }
         });
     },

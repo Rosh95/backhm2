@@ -16,11 +16,9 @@ exports.blogService = {
     // async findBlogs(queryData: queryDataType): Promise<BlogViewType[]> {
     //     return await blogRepository.findBlogs(queryData);
     // },
-    findBlogById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield blog_repository_1.blogRepository.findBlogById(id);
-        });
-    },
+    // async findBlogById(id: string): Promise<BlogViewType> {
+    //     return await blogRepository.findBlogById(id)
+    // },
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield blog_repository_1.blogRepository.deleteBlog(id);

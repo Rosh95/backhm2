@@ -10,15 +10,16 @@ import {
 import {blogRepository} from '../repositories/blog/blog-repository';
 import {BlogViewType} from '../types/blog-types';
 import {ObjectId} from 'mongodb';
+import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
 
 export const postService = {
     async findPosts(queryData: queryDataType): Promise<PostViewModel[]> {
         return await postRepository.findPosts();
     },
 
-    async findPostById(id: string): Promise<PostViewModel | null> {
-        return await postRepository.findPostById(id)
-    },
+    // async findPostById(id: string): Promise<PostViewModel | null> {
+    //     return await postRepository.findPostById(id)
+    // },
     async deletePost(id: string): Promise<boolean> {
         return await postRepository.deletePost(id);
     },
@@ -37,7 +38,7 @@ export const postService = {
         return await postRepository.createPost(newPost);
     },
     async createPostForExistingBlog(blogId: string, postInputData: postInputDataModelForExistingBlog): Promise<PostViewModel | boolean> {
-        let foundBlog = await blogRepository.findBlogById(blogId);
+        let foundBlog = await blogQueryRepository.findBlogById(blogId);
 
         let newPost: PostDBModel = {
             _id: new ObjectId(),

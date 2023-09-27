@@ -18,11 +18,11 @@ const helpers_1 = require("../helpers/helpers");
 const post_query_repository_1 = require("../repositories/post/post-query-repository");
 const post_service_1 = require("../domain/post-service");
 const query_validation_1 = require("../validation/query-validation");
-const blog_repository_1 = require("../repositories/blog/blog-repository");
 const auth_validation_middleware_1 = require("../validation/auth-validation-middleware");
 const comments_validation_middleware_1 = require("../validation/comments-validation-middleware");
 const comments_service_1 = require("../domain/comments-service");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
+const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter.get('/', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -37,7 +37,7 @@ exports.postsRouter.get('/', query_validation_1.queryValidation, (req, res) => _
 }));
 exports.postsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let foundPost = yield post_service_1.postService.findPostById(req.params.id);
+        let foundPost = yield post_query_repository_1.postQueryRepository.findPostById(req.params.id);
         if (foundPost) {
             return res.send(foundPost);
         }
@@ -56,8 +56,8 @@ exports.postsRouter.delete('/:id', authorization_1.basicAuthMiddleware, (req, re
     else
         return res.sendStatus(404);
 }));
-exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundBlogName = yield blog_repository_1.blogRepository.findBlogById(req.body.blogId);
+exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundBlogName = yield blog_query_repository_1.blogQueryRepository.findBlogById(req.body.blogId);
     if (!foundBlogName) {
         return res.sendStatus(404);
     }
@@ -76,7 +76,7 @@ exports.postsRouter.post('/', authorization_1.basicAuthMiddleware, posts_validat
         return res.sendStatus(500);
     }
 }));
-exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, posts_validation_middleware_1.blogIdMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let updatedPostData = {
             content: req.body.content,
@@ -97,7 +97,7 @@ exports.postsRouter.put('/:id', authorization_1.basicAuthMiddleware, posts_valid
     }
 }));
 exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const currentPost = yield post_service_1.postService.findPostById(req.params.postId);
+    const currentPost = yield post_query_repository_1.postQueryRepository.findPostById(req.params.postId);
     if (!currentPost) {
         return res.sendStatus(404);
     }
@@ -121,7 +121,7 @@ exports.postsRouter.post('/:postId/comments', auth_validation_middleware_1.authV
     }
 }));
 exports.postsRouter.get('/:postId/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const currentPost = yield post_service_1.postService.findPostById(req.params.postId);
+    const currentPost = yield post_query_repository_1.postQueryRepository.findPostById(req.params.postId);
     if (!currentPost) {
         return res.sendStatus(404);
     }

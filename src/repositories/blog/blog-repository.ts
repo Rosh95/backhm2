@@ -14,10 +14,10 @@ function blogMapping(blog: any) {
 
 export const blogRepository = {
 
-    async findBlogById(id: string): Promise<BlogViewType> {
-        const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
-        return foundBlog ? blogMapping(foundBlog) : null;
-    },
+    // async findBlogById(id: string): Promise<BlogViewType> {
+    //     const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+    //     return foundBlog ? blogMapping(foundBlog) : null;
+    // },
     async deleteBlog(id: string): Promise<boolean> {
         const result = await blogsCollection.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;

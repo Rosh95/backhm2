@@ -24,11 +24,9 @@ exports.commentsService = {
             return comment_query_repository_1.commentQueryRepository.getAllComments();
         });
     },
-    getCommentById(commentId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield comment_repository_1.commentRepository.getCommentById(commentId);
-        });
-    },
+    // async getCommentById(commentId: string) {
+    //     return await commentRepository.getCommentById(commentId);
+    // },
     deleteCommentById(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield comment_repository_1.commentRepository.deleteCommentById(commentId);

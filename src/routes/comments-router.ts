@@ -18,7 +18,7 @@ commentsRouter.get('/',
 )
 commentsRouter.get('/:commentId',
     async (req, res) => {
-        const commentInfo: CommentsViewModel | null = await commentsService.getCommentById(req.params.commentId);
+        const commentInfo: CommentsViewModel | null = await commentQueryRepository.getCommentById(req.params.commentId);
         if (!commentInfo) {
             return res.send(404);
         }
@@ -29,10 +29,10 @@ commentsRouter.get('/:commentId',
 commentsRouter.delete('/:commentId',
     authValidationMiddleware,
 
-    async (req: Request, res: Response)=> {
+    async (req: Request, res: Response) => {
 
         try {
-            const commentInfo = await commentsService.getCommentById(req.params.commentId);
+            const commentInfo = await commentQueryRepository.getCommentById(req.params.commentId);
             if (!commentInfo) {
                 return res.send(404);
             }
@@ -55,7 +55,7 @@ commentsRouter.put('/:commentId',
     async (req, res) => {
 
         try {
-            const commentInfo = await commentsService.getCommentById(req.params!.commentId);
+            const commentInfo = await commentQueryRepository.getCommentById(req.params!.commentId);
             if (!commentInfo) {
                 return res.send(404);
             }

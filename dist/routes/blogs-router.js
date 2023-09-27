@@ -15,7 +15,6 @@ const blogs_validation_middleware_1 = require("../validation/blogs-validation-mi
 const authorization_1 = require("../validation/authorization");
 const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 const blog_service_1 = require("../domain/blog-service");
-const blog_repository_1 = require("../repositories/blog/blog-repository");
 const posts_validation_middleware_1 = require("../validation/posts-validation-middleware");
 const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
 const helpers_1 = require("../helpers/helpers");
@@ -34,7 +33,7 @@ exports.blogsRouter.get('/', query_validation_1.queryValidation, (req, res) => _
     }
 }));
 exports.blogsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundBlog = yield blog_service_1.blogService.findBlogById(req.params.id);
+    let foundBlog = yield blog_query_repository_1.blogQueryRepository.findBlogById(req.params.id);
     if (foundBlog) {
         return res.send(foundBlog);
     }
@@ -64,6 +63,11 @@ exports.blogsRouter.post('/', authorization_1.basicAuthMiddleware, blogs_validat
     }
 }));
 exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_validation_middleware_1.blogValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let isExistBlog = yield blog_query_repository_1.blogQueryRepository.findBlogById(req.params.id);
+    if (!isExistBlog) {
+        res.sendStatus(404);
+        return;
+    }
     try {
         let BlogUpdateData = {
             name: req.body.name,
@@ -84,7 +88,7 @@ exports.blogsRouter.put('/:id', authorization_1.basicAuthMiddleware, blogs_valid
     }
 }));
 exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
+    let isExistBlog = yield blog_query_repository_1.blogQueryRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
         res.sendStatus(404);
         return;
@@ -99,7 +103,7 @@ exports.blogsRouter.get('/:id/posts', query_validation_1.queryValidation, (req, 
     }
 }));
 exports.blogsRouter.post('/:id/posts', authorization_1.basicAuthMiddleware, posts_validation_middleware_1.postValidation, query_validation_1.queryValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let isExistBlog = yield blog_repository_1.blogRepository.findBlogById(req.params.id);
+    let isExistBlog = yield blog_query_repository_1.blogQueryRepository.findBlogById(req.params.id);
     if (!isExistBlog) {
         res.sendStatus(404);
         return;

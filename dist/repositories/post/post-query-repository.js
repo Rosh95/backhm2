@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postQueryRepository = void 0;
 const helpers_1 = require("../../helpers/helpers");
 const dbMongo_1 = require("../../db/dbMongo");
+const mongodb_1 = require("mongodb");
 exports.postQueryRepository = {
     getAllPosts(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,6 +29,12 @@ exports.postQueryRepository = {
                 totalCount: pagesCount.postsTotalCount,
                 items: postViewArray
             };
+        });
+    },
+    findPostById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const foundPost = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return foundPost ? (0, helpers_1.postMapping)(foundPost) : null;
         });
     },
 };

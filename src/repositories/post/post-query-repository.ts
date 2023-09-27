@@ -1,6 +1,7 @@
 import {countTotalPostsAndPages, postMapping, queryDataType} from '../../helpers/helpers';
 import {postsCollection} from '../../db/dbMongo';
-import {PaginatorPostViewType, PostViewModel} from '../../types/post-types';
+import {PaginatorPostViewType, PostDBModel, PostViewModel} from '../../types/post-types';
+import {ObjectId} from "mongodb";
 
 export const postQueryRepository = {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
@@ -19,5 +20,9 @@ export const postQueryRepository = {
             totalCount: pagesCount.postsTotalCount,
             items: postViewArray
         };
+    },
+    async findPostById(id: string): Promise<PostViewModel | null> {
+        const foundPost: PostDBModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
+        return foundPost ? postMapping(foundPost) : null;
     },
 }

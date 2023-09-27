@@ -11,19 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postService = void 0;
 const post_repository_1 = require("../repositories/post/post-repository");
-const blog_repository_1 = require("../repositories/blog/blog-repository");
 const mongodb_1 = require("mongodb");
+const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
 exports.postService = {
     findPosts(queryData) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield post_repository_1.postRepository.findPosts();
         });
     },
-    findPostById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.postRepository.findPostById(id);
-        });
-    },
+    // async findPostById(id: string): Promise<PostViewModel | null> {
+    //     return await postRepository.findPostById(id)
+    // },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield post_repository_1.postRepository.deletePost(id);
@@ -45,7 +43,7 @@ exports.postService = {
     },
     createPostForExistingBlog(blogId, postInputData) {
         return __awaiter(this, void 0, void 0, function* () {
-            let foundBlog = yield blog_repository_1.blogRepository.findBlogById(blogId);
+            let foundBlog = yield blog_query_repository_1.blogQueryRepository.findBlogById(blogId);
             let newPost = {
                 _id: new mongodb_1.ObjectId(),
                 title: postInputData.title,

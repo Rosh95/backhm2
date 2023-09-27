@@ -1,5 +1,5 @@
 import {blogsCollection, postsCollection} from '../../db/dbMongo';
-import {Filter} from 'mongodb';
+import {Filter, ObjectId} from 'mongodb';
 import {
     blogMapping,
     countTotalBlogsAndPages,
@@ -20,7 +20,6 @@ export const blogQueryRepository = {
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).toArray();
 
-
         let blogViewArray = blogs.map(blog => blogMapping(blog))
         let pagesCount = await countTotalBlogsAndPages(queryData, filter);
 
@@ -35,6 +34,12 @@ export const blogQueryRepository = {
         };
 
     },
+
+    async findBlogById(id: string): Promise<BlogViewType | null> {
+        const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+        return foundBlog ? blogMapping(foundBlog) : null;
+    },
+
     async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<PaginatorPostViewType> {
 
         let posts = await postsCollection.find({blogId})

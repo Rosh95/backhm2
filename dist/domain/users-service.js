@@ -42,9 +42,9 @@ exports.userService = {
                     isConfirmed: false,
                 }
             };
-            console.log(newUser);
+            //       console.log(newUser)
             const createdUser = yield user_repository_1.userRepository.createUser(newUser);
-            console.log(createdUser);
+            //      console.log(createdUser)
             try {
                 yield email_adapter_1.emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email);
             }

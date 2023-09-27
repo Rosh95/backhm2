@@ -1,6 +1,6 @@
 import {CommentsDBType, CommentsViewModel, PaginatorCommentViewType} from '../../types/comments-types';
 import {commentsCollection} from '../../db/dbMongo';
-import {Filter} from 'mongodb';
+import {Filter, ObjectId} from 'mongodb';
 import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../helpers/helpers';
 
 
@@ -26,6 +26,13 @@ export const commentQueryRepository = {
             items: commentViewArray
 
         };
+    },
+    async getCommentById(commentId: string): Promise<CommentsViewModel | null> {
+        const comment = await commentsCollection.findOne({_id: new ObjectId(commentId)});
+        if (comment) {
+            return commentsMapping(comment);
+        }
+        return null
     },
     async getAllComments(): Promise<CommentsViewModel[]> {
         let comments = await commentsCollection.find({}).toArray();

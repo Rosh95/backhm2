@@ -1,8 +1,8 @@
 import request from 'supertest'
 import {app} from '../../src/app';
-import {postRepository} from '../../src/repositories/post/post-repository';
 import {BlogInputModel} from '../../src/types/blog-types';
 import {postInputType} from '../../src/types/post-types';
+import {postQueryRepository} from "../../src/repositories/post/post-query-repository";
 
 
 export const addNewBlog = async (blog: BlogInputModel) => {
@@ -346,7 +346,7 @@ describe('Posts router', () => {
             expect(resp.status).toBe(204)
 
 
-            let getUpdatePost = await postRepository.findPostById(post.id)
+            let getUpdatePost = await postQueryRepository.findPostById(post.id)
             console.log(getUpdatePost + '  input data here!!')
             await request(app)
                 .get('/posts')

@@ -3,7 +3,6 @@ import {blogValidation} from '../validation/blogs-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {blogService} from '../domain/blog-service';
-import {blogRepository} from '../repositories/blog/blog-repository';
 import {postValidation} from '../validation/posts-validation-middleware';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
@@ -28,7 +27,7 @@ blogsRouter.get('/',
     })
 
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundBlog: BlogViewType = await blogService.findBlogById(req.params.id)
+    let foundBlog: BlogViewType | null = await blogQueryRepository.findBlogById(req.params.id)
     if (foundBlog) {
         return res.send(foundBlog)
     }
@@ -49,7 +48,6 @@ blogsRouter.post('/',
     blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-
         try {
             let BlogInputData: BlogInputModel = {
                 name: req.body.name,
@@ -71,7 +69,11 @@ blogsRouter.put('/:id',
     blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-
+        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
+        if (!isExistBlog) {
+            res.sendStatus(404)
+            return;
+        }
         try {
             let BlogUpdateData: BlogInputModel = {
                 name: req.body.name,
@@ -94,7 +96,7 @@ blogsRouter.put('/:id',
 blogsRouter.get('/:id/posts',
     queryValidation,
     async (req: Request, res: Response) => {
-        let isExistBlog = await blogRepository.findBlogById(req.params.id);
+        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             res.sendStatus(404)
             return;
@@ -116,7 +118,7 @@ blogsRouter.post('/:id/posts',
     queryValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        let isExistBlog = await blogRepository.findBlogById(req.params.id);
+        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             res.sendStatus(404)
             return;

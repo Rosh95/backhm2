@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogQueryRepository = void 0;
 const dbMongo_1 = require("../../db/dbMongo");
+const mongodb_1 = require("mongodb");
 const helpers_1 = require("../../helpers/helpers");
 exports.blogQueryRepository = {
     getAllBlogs(queryData) {
@@ -29,6 +30,12 @@ exports.blogQueryRepository = {
                 totalCount: pagesCount.blogsTotalCount,
                 items: blogViewArray
             };
+        });
+    },
+    findBlogById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const foundBlog = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return foundBlog ? (0, helpers_1.blogMapping)(foundBlog) : null;
         });
     },
     getAllPostOfBlog(blogId, queryData) {

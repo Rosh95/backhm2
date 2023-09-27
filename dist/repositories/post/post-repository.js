@@ -20,12 +20,10 @@ exports.postRepository = {
             return posts.map(post => (0, helpers_1.postMapping)(post));
         });
     },
-    findPostById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const foundPost = yield dbMongo_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            return foundPost ? (0, helpers_1.postMapping)(foundPost) : null;
-        });
-    },
+    // async findPostById(id: string): Promise<PostViewModel | null> {
+    //     const foundPost: PostDBModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
+    //     return foundPost ? postMapping(foundPost) : null;
+    // },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });

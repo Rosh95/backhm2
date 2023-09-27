@@ -18,12 +18,10 @@ function blogMapping(blog) {
     return Object.assign({ id: blogMongoId }, blog);
 }
 exports.blogRepository = {
-    findBlogById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const foundBlog = yield dbMongo_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            return foundBlog ? blogMapping(foundBlog) : null;
-        });
-    },
+    // async findBlogById(id: string): Promise<BlogViewType> {
+    //     const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+    //     return foundBlog ? blogMapping(foundBlog) : null;
+    // },
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield dbMongo_1.blogsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });

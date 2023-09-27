@@ -22,7 +22,7 @@ exports.commentsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, 
     return res.send(comments);
 }));
 exports.commentsRouter.get('/:commentId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+    const commentInfo = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
     if (!commentInfo) {
         return res.send(404);
     }
@@ -30,7 +30,7 @@ exports.commentsRouter.get('/:commentId', (req, res) => __awaiter(void 0, void 0
 }));
 exports.commentsRouter.delete('/:commentId', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+        const commentInfo = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
         if (!commentInfo) {
             return res.send(404);
         }
@@ -48,7 +48,7 @@ exports.commentsRouter.delete('/:commentId', auth_validation_middleware_1.authVa
 }));
 exports.commentsRouter.put('/:commentId', auth_validation_middleware_1.authValidationMiddleware, comments_validation_middleware_1.CommentContentPostMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const commentInfo = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+        const commentInfo = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
         if (!commentInfo) {
             return res.send(404);
         }

@@ -12,9 +12,9 @@ export const commentsService = {
         return commentQueryRepository.getAllComments();
     },
 
-    async getCommentById(commentId: string) {
-        return await commentRepository.getCommentById(commentId);
-    },
+    // async getCommentById(commentId: string) {
+    //     return await commentRepository.getCommentById(commentId);
+    // },
 
     async deleteCommentById(commentId: string) {
         return await commentRepository.deleteCommentById(commentId);

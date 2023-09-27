@@ -7,9 +7,9 @@ export const blogService = {
     //     return await blogRepository.findBlogs(queryData);
     // },
 
-    async findBlogById(id: string): Promise<BlogViewType> {
-        return await blogRepository.findBlogById(id)
-    },
+    // async findBlogById(id: string): Promise<BlogViewType> {
+    //     return await blogRepository.findBlogById(id)
+    // },
     async deleteBlog(id: string): Promise<boolean> {
         return await blogRepository.deleteBlog(id);
 

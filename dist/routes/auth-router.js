@@ -16,8 +16,12 @@ const jwt_service_1 = require("../application/jwt-service");
 const auth_validation_middleware_1 = require("../validation/auth-validation-middleware");
 const users_validation_1 = require("../validation/users-validation");
 const error_validation_middleware_1 = require("../validation/error-validation-middleware");
+const email_adapter_1 = require("../adapters/email-adapter");
+const auth_service_1 = require("../domain/auth-service");
 exports.authRouter = (0, express_1.Router)({});
-exports.authRouter.post('/login', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/login', 
+//   authValidationMiddleware,
+(req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = yield users_service_1.userService.checkCredential(req.body.loginOrEmail, req.body.password);
     if (user) {
         const token = yield jwt_service_1.jwtService.createJWT(user);
@@ -38,10 +42,7 @@ exports.authRouter.get('/me', auth_validation_middleware_1.authValidationMiddlew
     }
     return res.sendStatus(404);
 }));
-exports.authRouter.post('/registration', 
-// checkExistUserMiddleware,
-// errorsValidationMiddleware,
-users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration', auth_validation_middleware_1.checkExistUserMiddleware, users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userPostInputData = {
         email: req.body.email,
         login: req.body.login,
@@ -55,13 +56,27 @@ users_validation_1.userValidation, error_validation_middleware_1.errorsValidatio
         res.sendStatus(400);
     }
 }));
-exports.authRouter.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.checkEmailConfirmationMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;
-    const isRegistredConfirmation = yield users_service_1.userService.findUserByCode(code);
-    if (isRegistredConfirmation) {
+    const result = yield auth_service_1.authService.confirmEmail(code);
+    if (result) {
         res.sendStatus(204);
     }
     else {
         res.sendStatus(400);
     }
+}));
+exports.authRouter.post('/registration-email-resending', users_validation_1.emailUserMiddleware, auth_validation_middleware_1.checkEmailConfirmationMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.body.email;
+    const currentUser = yield users_service_1.userService.findUserByEmail(email);
+    if (currentUser) {
+        try {
+            yield email_adapter_1.emailAdapter.sendConfirmationEmail(currentUser.emailConfirmation.confirmationCode, email);
+        }
+        catch (e) {
+            return null;
+        }
+        res.sendStatus(204);
+    }
+    return res.sendStatus(400);
 }));

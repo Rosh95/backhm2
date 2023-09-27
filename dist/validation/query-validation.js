@@ -12,6 +12,4 @@ const sortByValidation = (0, express_validator_1.query)('sortBy').optional().cus
     v === req.query.sortBy ? (req.query.sortBy).toString() : 'createdAt';
     return true;
 });
-// const pageNumberValidation = query('pageNumber').optional().isInt({}).default(1)
-// const pageNumberValidation = query('pageNumber').optional().isInt({}).default(1)
 exports.queryValidation = [pageNumberValidation, sortDirectionValidation, pageSizeValidation, sortByValidation];

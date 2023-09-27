@@ -3,7 +3,7 @@ import {usersCollection} from '../../db/dbMongo';
 import {usersMapping} from '../../helpers/helpers';
 import {ObjectId} from 'mongodb';
 
-export const userRepository = {
+export const authRepository = {
 
     async getAllUsers() {
         return await usersCollection.find().sort({'createdAt': -1}).toArray();
@@ -51,5 +51,14 @@ export const userRepository = {
     },
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
         return await usersCollection.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
+    },
+
+    async updateEmailConfimation(userId: ObjectId): Promise<boolean> {
+        const result = await usersCollection.updateOne({_id: new ObjectId(userId)}, {
+            $set: {
+                "emailConfirmation.isConfirmed": true
+            }
+        })
+        return result.matchedCount === 1;
     }
 }

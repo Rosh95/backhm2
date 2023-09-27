@@ -51,4 +51,4 @@ exports.blogIdMiddlewareInParams = (0, express_validator_1.param)('id').isString
     }
     return true;
 })).withMessage('Please, write exist blogId');
-exports.postValidation = [exports.titlePostMiddleware, exports.shortDescriptionPostMiddleware, exports.contentPostMiddleware];
+exports.postValidation = [exports.titlePostMiddleware, exports.shortDescriptionPostMiddleware, exports.contentPostMiddleware, exports.blogIdMiddleware];

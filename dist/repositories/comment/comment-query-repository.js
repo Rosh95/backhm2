@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentQueryRepository = void 0;
 const dbMongo_1 = require("../../db/dbMongo");
+const mongodb_1 = require("mongodb");
 const helpers_1 = require("../../helpers/helpers");
 exports.commentQueryRepository = {
     getAllCommentsOfPost(postId, queryData) {
@@ -29,6 +30,15 @@ exports.commentQueryRepository = {
                 totalCount: pagesCount.commentsTotalCount,
                 items: commentViewArray
             };
+        });
+    },
+    getCommentById(commentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const comment = yield dbMongo_1.commentsCollection.findOne({ _id: new mongodb_1.ObjectId(commentId) });
+            if (comment) {
+                return (0, helpers_1.commentsMapping)(comment);
+            }
+            return null;
         });
     },
     getAllComments() {

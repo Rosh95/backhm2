@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkExistUserMiddleware = exports.authValidationMiddleware = void 0;
+exports.checkEmailConfirmationMiddleware = exports.checkExistUserMiddleware = exports.authValidationMiddleware = void 0;
 const jwt_service_1 = require("../application/jwt-service");
 const users_service_1 = require("../domain/users-service");
-const comments_service_1 = require("../domain/comments-service");
+const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
+const user_repository_1 = require("../repositories/user/user-repository");
 const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
         res.send(401);
@@ -20,7 +21,7 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     }
     const token = req.headers.authorization.split(' ')[1];
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
-    const commentUser = yield comments_service_1.commentsService.getCommentById(req.params.commentId);
+    const commentUser = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
     if (userId) {
         let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId.toString());
         if (commentUser && isCorrectUser) {
@@ -42,3 +43,12 @@ const checkExistUserMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     return res.sendStatus(400);
 });
 exports.checkExistUserMiddleware = checkExistUserMiddleware;
+const checkEmailConfirmationMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundUser = yield user_repository_1.userRepository.findUserByCode(req.body.code);
+    if (foundUser && !foundUser.emailConfirmation.isConfirmed) {
+        next();
+        return;
+    }
+    return res.sendStatus(400);
+});
+exports.checkEmailConfirmationMiddleware = checkEmailConfirmationMiddleware;

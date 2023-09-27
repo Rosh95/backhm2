@@ -1,7 +1,8 @@
 import {NextFunction, Request, Response} from 'express';
 import {jwtService} from '../application/jwt-service';
 import {userService} from '../domain/users-service';
-import {commentsService} from '../domain/comments-service';
+import {commentQueryRepository} from "../repositories/comment/comment-query-repository";
+import {userRepository} from "../repositories/user/user-repository";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,7 +12,7 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     }
     const token = req.headers.authorization.split(' ')[1];
     const userId = await jwtService.getUserIdByToken(token.toString());
-    const commentUser = await commentsService.getCommentById(req.params.commentId);
+    const commentUser = await commentQueryRepository.getCommentById(req.params.commentId);
 
     if (userId) {
         let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId.toString();
@@ -30,6 +31,16 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
     let foundUser = await userService.findUserByLogin(req.body.login);
 
     if (!foundUser) {
+        next();
+        return
+    }
+    return res.sendStatus(400);
+}
+
+export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let foundUser = await userRepository.findUserByCode(req.body.code);
+
+    if (foundUser && !foundUser.emailConfirmation.isConfirmed) {
         next();
         return
     }

@@ -1,12 +1,11 @@
 import e, {Request, Response, Router} from 'express';
-import {blogIdMiddleware, postValidation} from '../validation/posts-validation-middleware';
+import {postValidation} from '../validation/posts-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {postQueryRepository} from '../repositories/post/post-query-repository';
 import {postService} from '../domain/post-service';
 import {queryValidation} from '../validation/query-validation';
-import {blogRepository} from '../repositories/blog/blog-repository';
 import {authValidationMiddleware} from '../validation/auth-validation-middleware';
 import {CommentContentPostMiddleware} from '../validation/comments-validation-middleware';
 import {commentsService} from '../domain/comments-service';
@@ -14,6 +13,7 @@ import {commentQueryRepository} from '../repositories/comment/comment-query-repo
 import {BlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, PostViewModel} from '../types/post-types';
 import {CommentsInputData, CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
+import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
 
 export const postsRouter = Router({})
 
@@ -33,7 +33,7 @@ postsRouter.get('/',
 
 postsRouter.get('/:id', async (req: Request, res: Response): Promise<e.Response<PostViewModel>> => {
     try {
-        let foundPost: PostViewModel | null = await postService.findPostById(req.params.id)
+        let foundPost: PostViewModel | null = await postQueryRepository.findPostById(req.params.id)
         if (foundPost) {
             return res.send(foundPost)
         }
@@ -57,10 +57,9 @@ postsRouter.delete('/:id',
 postsRouter.post('/',
     basicAuthMiddleware,
     postValidation,
-    blogIdMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        let foundBlogName: BlogViewType = await blogRepository.findBlogById(req.body.blogId)
+        let foundBlogName: BlogViewType | null = await blogQueryRepository.findBlogById(req.body.blogId)
         if (!foundBlogName) {
             return res.sendStatus(404);
         }
@@ -83,7 +82,6 @@ postsRouter.post('/',
 postsRouter.put('/:id',
     basicAuthMiddleware,
     postValidation,
-    blogIdMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         try {
@@ -110,7 +108,7 @@ postsRouter.post('/:postId/comments',
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        const currentPost: PostViewModel | null = await postService.findPostById(req.params.postId);
+        const currentPost: PostViewModel | null = await postQueryRepository.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
         }
@@ -140,7 +138,7 @@ postsRouter.post('/:postId/comments',
 postsRouter.get('/:postId/comments',
 
     async (req: Request, res: Response): Promise<e.Response | PaginatorCommentViewType> => {
-        const currentPost = await postService.findPostById(req.params.postId);
+        const currentPost = await postQueryRepository.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
         }

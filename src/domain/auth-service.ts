@@ -4,10 +4,11 @@ import {ObjectId} from 'mongodb';
 import {emailAdapter} from '../adapters/email-adapter';
 import add from 'date-fns/add';
 import {v4 as uuidv4} from 'uuid';
+import {authRepository} from "../repositories/auth/auth-repository";
 
 const bcrypt = require('bcrypt');
 
-export const userService = {
+export const authService = {
 
     async createUser(userPostInputData: UserInputType): Promise<UserViewModel | null> {
 
@@ -32,9 +33,9 @@ export const userService = {
                 isConfirmed: false,
             }
         }
-        //       console.log(newUser)
+        console.log(newUser)
         const createdUser = await userRepository.createUser(newUser);
-        //      console.log(createdUser)
+        console.log(createdUser)
         try {
             await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
         } catch (e) {
@@ -72,5 +73,12 @@ export const userService = {
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);
-    }
+    },
+    async confirmEmail(code: string): Promise<boolean> {
+        const findUser = await userRepository.findUserByCode(code)
+        if (!findUser) return false;
+        return await authRepository.updateEmailConfimation(findUser!._id)
+
+    },
+
 }
