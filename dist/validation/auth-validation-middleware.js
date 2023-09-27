@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkEmailConfirmationMiddleware = exports.checkExistUserMiddleware = exports.authValidationMiddleware = void 0;
+exports.isEmailConfirmatedMiddleware = exports.checkEmailConfirmationMiddleware = exports.checkExistUserMiddleware = exports.authValidationMiddleware = void 0;
 const jwt_service_1 = require("../application/jwt-service");
 const users_service_1 = require("../domain/users-service");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
@@ -45,10 +45,20 @@ const checkExistUserMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
 exports.checkExistUserMiddleware = checkExistUserMiddleware;
 const checkEmailConfirmationMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let foundUser = yield user_repository_1.userRepository.findUserByCode(req.body.code);
-    if (foundUser && !foundUser.emailConfirmation.isConfirmed) {
+    if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
         next();
         return;
     }
     return res.sendStatus(400);
 });
 exports.checkEmailConfirmationMiddleware = checkEmailConfirmationMiddleware;
+const isEmailConfirmatedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let foundUser = yield user_repository_1.userRepository.findUserByCode(req.body.code);
+    if (foundUser.emailConfirmation.isConfirmed === true) {
+        throw new Error('This email has confirmed.');
+    }
+    next();
+    return;
+    //return res.sendStatus(400);
+});
+exports.isEmailConfirmatedMiddleware = isEmailConfirmatedMiddleware;

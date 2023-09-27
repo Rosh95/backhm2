@@ -8,13 +8,13 @@ export const usersQueryRepository = {
 
         const filter: Filter<NewUsersDBType> = {
             $or: [{
-                email: {
-                    $regex: queryData.searchEmailTerm,
+                'accountData.email': {
+                    $regex: queryData.searchEmailTerm ?? '',
                     $options: 'i'
                 }
             }, {
-                login: {
-                    $regex: queryData.searchLoginTerm,
+                'accountData.login': {
+                    $regex: queryData.searchLoginTerm ?? '',
                     $options: 'i'
                 }
             }]

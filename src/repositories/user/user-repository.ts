@@ -9,8 +9,7 @@ export const userRepository = {
         return await usersCollection.find().sort({'createdAt': -1}).toArray();
     },
     async createUser(newUser: NewUsersDBType): Promise<UserViewModel> {
-
-        const result = await usersCollection.insertOne(newUser);
+        await usersCollection.insertOne(newUser);
         return usersMapping(newUser);
     },
     async deleteUser(id: ObjectId): Promise<boolean> {

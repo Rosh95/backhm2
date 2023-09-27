@@ -21,7 +21,7 @@ exports.userRepository = {
     },
     createUser(newUser) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield dbMongo_1.usersCollection.insertOne(newUser);
+            yield dbMongo_1.usersCollection.insertOne(newUser);
             return (0, helpers_1.usersMapping)(newUser);
         });
     },

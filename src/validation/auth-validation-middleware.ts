@@ -40,9 +40,21 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
 export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let foundUser = await userRepository.findUserByCode(req.body.code);
 
-    if (foundUser && !foundUser.emailConfirmation.isConfirmed) {
+    if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
         next();
-        return
+        return;
     }
     return res.sendStatus(400);
+}
+export const isEmailConfirmatedMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let foundUser = await userRepository.findUserByCode(req.body.code);
+
+    if (foundUser!.emailConfirmation.isConfirmed === true) {
+
+        throw new Error('This email has confirmed.')
+    }
+    next();
+    return
+
+    //return res.sendStatus(400);
 }

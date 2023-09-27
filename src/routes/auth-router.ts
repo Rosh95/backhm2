@@ -5,7 +5,7 @@ import {CurrentUserInfoType, UserInputType, UserViewModel} from '../types/user-t
 import {
     authValidationMiddleware,
     checkEmailConfirmationMiddleware,
-    checkExistUserMiddleware
+    checkExistUserMiddleware, isEmailConfirmatedMiddleware
 } from '../validation/auth-validation-middleware';
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
@@ -44,7 +44,7 @@ authRouter.get('/me',
 )
 
 authRouter.post('/registration',
-    checkExistUserMiddleware,
+    //  checkExistUserMiddleware,
     userValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -66,6 +66,7 @@ authRouter.post('/registration',
 
 authRouter.post('/registration-confirmation',
     checkEmailConfirmationMiddleware,
+    isEmailConfirmatedMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 

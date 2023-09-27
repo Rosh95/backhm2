@@ -14,16 +14,17 @@ const helpers_1 = require("../../helpers/helpers");
 const dbMongo_1 = require("../../db/dbMongo");
 exports.usersQueryRepository = {
     getAllUsers(queryData) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {
                 $or: [{
-                        email: {
-                            $regex: queryData.searchEmailTerm,
+                        'accountData.email': {
+                            $regex: (_a = queryData.searchEmailTerm) !== null && _a !== void 0 ? _a : '',
                             $options: 'i'
                         }
                     }, {
-                        login: {
-                            $regex: queryData.searchLoginTerm,
+                        'accountData.login': {
+                            $regex: (_b = queryData.searchLoginTerm) !== null && _b !== void 0 ? _b : '',
                             $options: 'i'
                         }
                     }]

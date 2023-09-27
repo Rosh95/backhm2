@@ -42,7 +42,9 @@ exports.authRouter.get('/me', auth_validation_middleware_1.authValidationMiddlew
     }
     return res.sendStatus(404);
 }));
-exports.authRouter.post('/registration', auth_validation_middleware_1.checkExistUserMiddleware, users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration', 
+//  checkExistUserMiddleware,
+users_validation_1.userValidation, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userPostInputData = {
         email: req.body.email,
         login: req.body.login,
@@ -56,7 +58,7 @@ exports.authRouter.post('/registration', auth_validation_middleware_1.checkExist
         res.sendStatus(400);
     }
 }));
-exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.checkEmailConfirmationMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.checkEmailConfirmationMiddleware, auth_validation_middleware_1.isEmailConfirmatedMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;
     const result = yield auth_service_1.authService.confirmEmail(code);
     if (result) {
