@@ -3,6 +3,9 @@ import {jwtService} from '../application/jwt-service';
 import {userService} from '../domain/users-service';
 import {commentQueryRepository} from "../repositories/comment/comment-query-repository";
 import {userRepository} from "../repositories/user/user-repository";
+import {body, param} from "express-validator";
+import {blogsCollection} from "../db/dbMongo";
+import {ObjectId} from "mongodb";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -37,24 +40,24 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
     return res.sendStatus(400);
 }
 
-export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    let foundUser = await userRepository.findUserByCode(req.body.code);
+// export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+//     let foundUser = await userRepository.findUserByCode(req.body.code);
+//
+//     if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
+//         next();
+//         return;
+//     }
+//     return res.sendStatus(400);
+// }
 
-    if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
-        next();
-        return;
-    }
-    return res.sendStatus(400);
-}
-export const isEmailConfirmatedMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    let foundUser = await userRepository.findUserByCode(req.body.code);
+export const isEmailConfirmatedMiddleware = body('code').custom(async (value) => {
+    let foundUser = await userRepository.findUserByCode(value);    //   console.log(`${blogsIdArray} exists blogID`)
 
     if (foundUser!.emailConfirmation.isConfirmed === true) {
 
         throw new Error('This email has confirmed.')
     }
-    next();
-    return
 
-    //return res.sendStatus(400);
-}
+    return true;
+
+}).withMessage('This email has confirmed');
