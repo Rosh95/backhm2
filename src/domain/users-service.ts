@@ -29,18 +29,15 @@ export const userService = {
                     hours: 1,
                     minutes: 3
                 }),
-                isConfirmed: false,
+                isConfirmed: true,
             }
         }
-        //       console.log(newUser)
         const createdUser = await userRepository.createUser(newUser);
-        //      console.log(createdUser)
-        try {
-            await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
-        } catch (e) {
-            return null
-        }
-
+        // try {
+        //     await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
+        // } catch (e) {
+        //     return null
+        // }
         return createdUser
     },
     async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
@@ -50,13 +47,11 @@ export const userService = {
         if (currentUser) {
             try {
                 await userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
-
             } catch (e) {
                 console.log(e)
                 return null
             }
         }
-
         return await userRepository.findUserByEmail(email);
 
     },
@@ -67,7 +62,6 @@ export const userService = {
     },
     async checkCredential(loginOrEmail: string, password: string) {
         const user = await userRepository.findLoginOrEmail(loginOrEmail);
-        console.log(user + ' in find')
         if (!user) return false;
         const passwordHash = await this._generateHash(password, user.accountData.passwordSalt)
         if (user.accountData.passwordHash === passwordHash) {

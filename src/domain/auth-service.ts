@@ -33,15 +33,12 @@ export const authService = {
                 isConfirmed: false,
             }
         }
-        console.log(newUser)
         const createdUser = await userRepository.createUser(newUser);
-        console.log(createdUser)
         try {
             await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
         } catch (e) {
             return null
         }
-
         return createdUser
     },
     async deleteUser(id: string): Promise<boolean> {
@@ -80,5 +77,19 @@ export const authService = {
         return await authRepository.updateEmailConfimation(findUser._id)
 
     },
+    async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
 
+        const currentUser = await this.findUserByEmail(email);
+        const newConfirmationCode = uuidv4();
+        if (currentUser) {
+            try {
+                await userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
+            } catch (e) {
+                console.log(e)
+                return null
+            }
+        }
+        return await userRepository.findUserByEmail(email);
+
+    },
 }

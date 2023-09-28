@@ -1,10 +1,10 @@
 import {Request, Response, Router} from 'express';
-import {userService} from '../domain/users-service';
 import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, UserInputType, UserViewModel} from '../types/user-types';
 import {
     authValidationMiddleware,
-    isEmailConfirmatedMiddlewareByCode, isEmailConfirmatedMiddlewareByEmail,
+    isEmailConfirmatedMiddlewareByCode,
+    isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
@@ -15,15 +15,14 @@ import {authService} from "../domain/auth-service";
 export const authRouter = Router({})
 
 authRouter.post('/login',
-    //   authValidationMiddleware,
     async (req: Request, res: Response) => {
 
-        let user = await userService.checkCredential(req.body.loginOrEmail, req.body.password);
+        let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
         if (user) {
             const token = await jwtService.createJWT(user)
-            res.status(200).send(token)
+            return res.status(200).send(token)
         } else {
-            res.sendStatus(401)
+            return res.sendStatus(401)
         }
     }
 )
@@ -53,7 +52,7 @@ authRouter.post('/registration',
             login: req.body.login,
             password: req.body.password
         }
-        const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
+        const newUser: UserViewModel | null = await authService.createUser(userPostInputData);
         if (newUser) {
             res.sendStatus(204)
 
@@ -89,7 +88,7 @@ authRouter.post('/registration-email-resending',
 
         const email = req.body.email;
 
-        const currentUser = await userService.changeUserConfirmationcode(email);
+        const currentUser = await authService.changeUserConfirmationcode(email);
         if (currentUser) {
             try {
                 await emailAdapter.sendConfirmationEmail(currentUser.emailConfirmation.confirmationCode, email)
