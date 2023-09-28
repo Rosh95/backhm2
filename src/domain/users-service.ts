@@ -43,6 +43,18 @@ export const userService = {
 
         return createdUser
     },
+    async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
+
+        const currentUser = await userService.findUserByEmail(email);
+        const newConfirmationCode = uuidv4();
+        if (currentUser) {
+            await userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
+        }
+
+        return await userService.findUserByEmail(email);
+
+    },
+
     async deleteUser(id: string): Promise<boolean> {
         let idInMongo = new ObjectId(id)
         return await userRepository.deleteUser(idInMongo);
@@ -58,6 +70,7 @@ export const userService = {
 
 
     },
+
     async findUserById(userId: string): Promise<NewUsersDBType | null> {
         return await userRepository.findUserById(userId)
     },

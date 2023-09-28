@@ -50,5 +50,14 @@ export const userRepository = {
     },
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
         return await usersCollection.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
+    },
+    async updateConfirmationCode(userId: ObjectId, code: string): Promise<boolean> {
+        const result = await usersCollection.updateOne({_id: new ObjectId(userId)}, {
+            $set: {
+                "emailConfirmation.confirmationCode": code
+            }
+        })
+        return result.matchedCount === 1;
     }
+
 }

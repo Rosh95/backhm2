@@ -58,7 +58,7 @@ users_validation_1.userValidation, error_validation_middleware_1.errorsValidatio
         res.sendStatus(400);
     }
 }));
-exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.isEmailConfirmatedMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.isEmailConfirmatedMiddlewareByCode, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;
     const result = yield auth_service_1.authService.confirmEmail(code);
     if (result) {
@@ -68,7 +68,7 @@ exports.authRouter.post('/registration-confirmation', auth_validation_middleware
         res.sendStatus(400);
     }
 }));
-exports.authRouter.post('/registration-email-resending', users_validation_1.emailUserMiddleware, auth_validation_middleware_1.isEmailConfirmatedMiddleware, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/registration-email-resending', users_validation_1.emailUserMiddleware, auth_validation_middleware_1.isEmailConfirmatedMiddlewareByEmail, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.body.email;
     const currentUser = yield users_service_1.userService.findUserByEmail(email);
     if (currentUser) {

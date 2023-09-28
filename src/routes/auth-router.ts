@@ -2,7 +2,10 @@ import {Request, Response, Router} from 'express';
 import {userService} from '../domain/users-service';
 import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, UserInputType, UserViewModel} from '../types/user-types';
-import {authValidationMiddleware, isEmailConfirmatedMiddleware} from '../validation/auth-validation-middleware';
+import {
+    authValidationMiddleware,
+    isEmailConfirmatedMiddlewareByCode, isEmailConfirmatedMiddlewareByEmail,
+} from '../validation/auth-validation-middleware';
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
@@ -61,7 +64,7 @@ authRouter.post('/registration',
 )
 
 authRouter.post('/registration-confirmation',
-    isEmailConfirmatedMiddleware,
+    isEmailConfirmatedMiddlewareByCode,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
@@ -81,13 +84,13 @@ authRouter.post('/registration-confirmation',
 
 authRouter.post('/registration-email-resending',
     emailUserMiddleware,
-    isEmailConfirmatedMiddleware,
+    isEmailConfirmatedMiddlewareByEmail,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
 
         const email = req.body.email;
 
-        const currentUser = await userService.findUserByEmail(email);
+        const currentUser = await userService.changeUserConfirmationcode(email);
 
         if (currentUser) {
             try {
