@@ -63,10 +63,10 @@ export const isEmailConfirmatedMiddlewareByEmail = body('email').custom(async (v
     let foundUser = await userRepository.findUserByEmail(value);
 
     if (foundUser!.emailConfirmation.isConfirmed) {
-
+        console.log(foundUser)
         throw new Error('This email has confirmed.')
     }
 
     return true;
 
-}).withMessage('This email has confired');
+}).withMessage('This email has confired or we couldn`t find user');

@@ -55,15 +55,16 @@ exports.checkExistUserMiddleware = checkExistUserMiddleware;
 // }
 exports.isEmailConfirmatedMiddlewareByCode = (0, express_validator_1.body)('code').custom((value) => __awaiter(void 0, void 0, void 0, function* () {
     let foundUser = yield user_repository_1.userRepository.findUserByCode(value); //   console.log(`${blogsIdArray} exists blogID`)
-    if (foundUser.emailConfirmation.isConfirmed === true) {
+    if (foundUser.emailConfirmation.isConfirmed) {
         throw new Error('This email has confirmed.');
     }
     return true;
 })).withMessage('This email has confirmed');
 exports.isEmailConfirmatedMiddlewareByEmail = (0, express_validator_1.body)('email').custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-    let foundUser = yield user_repository_1.userRepository.findUserByEmail(value); //   console.log(`${blogsIdArray} exists blogID`)
-    if (foundUser.emailConfirmation.isConfirmed === true) {
+    let foundUser = yield user_repository_1.userRepository.findUserByEmail(value);
+    if (foundUser.emailConfirmation.isConfirmed) {
+        console.log(foundUser);
         throw new Error('This email has confirmed.');
     }
     return true;
-})).withMessage('This email has confired');
+})).withMessage('This email has confired or we couldn`t find user');

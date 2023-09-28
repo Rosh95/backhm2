@@ -54,6 +54,22 @@ exports.userService = {
             return createdUser;
         });
     },
+    changeUserConfirmationcode(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const currentUser = yield exports.userService.findUserByEmail(email);
+            const newConfirmationCode = (0, uuid_1.v4)();
+            if (currentUser) {
+                try {
+                    yield user_repository_1.userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
+                }
+                catch (e) {
+                    console.log(e);
+                    return null;
+                }
+            }
+            return yield user_repository_1.userRepository.findUserByEmail(email);
+        });
+    },
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             let idInMongo = new mongodb_1.ObjectId(id);

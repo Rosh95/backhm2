@@ -62,15 +62,13 @@ exports.authRouter.post('/registration-confirmation', auth_validation_middleware
     const code = req.body.code;
     const result = yield auth_service_1.authService.confirmEmail(code);
     if (result) {
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
-    else {
-        res.sendStatus(400);
-    }
+    return res.sendStatus(400);
 }));
 exports.authRouter.post('/registration-email-resending', users_validation_1.emailUserMiddleware, auth_validation_middleware_1.isEmailConfirmatedMiddlewareByEmail, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.body.email;
-    const currentUser = yield users_service_1.userService.findUserByEmail(email);
+    const currentUser = yield users_service_1.userService.changeUserConfirmationcode(email);
     if (currentUser) {
         try {
             yield email_adapter_1.emailAdapter.sendConfirmationEmail(currentUser.emailConfirmation.confirmationCode, email);
@@ -78,7 +76,7 @@ exports.authRouter.post('/registration-email-resending', users_validation_1.emai
         catch (e) {
             return null;
         }
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
     return res.sendStatus(400);
 }));

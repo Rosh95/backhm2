@@ -74,11 +74,10 @@ authRouter.post('/registration-confirmation',
 
 
         if (result) {
-            res.sendStatus(204)
-
-        } else {
-            res.sendStatus(400)
+            return res.sendStatus(204)
         }
+        return res.sendStatus(400)
+
     }
 )
 
@@ -91,14 +90,14 @@ authRouter.post('/registration-email-resending',
         const email = req.body.email;
 
         const currentUser = await userService.changeUserConfirmationcode(email);
-
         if (currentUser) {
             try {
                 await emailAdapter.sendConfirmationEmail(currentUser.emailConfirmation.confirmationCode, email)
             } catch (e) {
                 return null
             }
-            res.sendStatus(204)
+            return res.sendStatus(204)
+
         }
         return res.sendStatus(400)
     }

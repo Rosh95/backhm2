@@ -48,10 +48,16 @@ export const userService = {
         const currentUser = await userService.findUserByEmail(email);
         const newConfirmationCode = uuidv4();
         if (currentUser) {
-            await userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
+            try {
+                await userRepository.updateConfirmationCode(currentUser._id, newConfirmationCode);
+
+            } catch (e) {
+                console.log(e)
+                return null
+            }
         }
 
-        return await userService.findUserByEmail(email);
+        return await userRepository.findUserByEmail(email);
 
     },
 

@@ -79,5 +79,15 @@ exports.userRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             return yield dbMongo_1.usersCollection.findOne({ $or: [{ "accountData.email": loginOrEmail }, { "accountData.login": loginOrEmail }] });
         });
+    },
+    updateConfirmationCode(userId, code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield dbMongo_1.usersCollection.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {
+                $set: {
+                    "emailConfirmation.confirmationCode": code
+                }
+            });
+            return result.matchedCount === 1;
+        });
     }
 };
