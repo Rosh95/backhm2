@@ -10,7 +10,12 @@ export type UserViewModel = {
         emailExpiration: Date,
         isConfirmed: boolean,
     }
-
+}
+export type getUserViewModel = {
+    id: string,
+    login: string,
+    email: string,
+    createdAt: string
 }
 export type UserInputType = {
     login: string,
@@ -53,5 +58,5 @@ export type PaginatorUserViewType = {
     page: number,
     pageSize: number,
     totalCount: number,
-    items: UserViewModel[]
+    items: getUserViewModel[]
 }

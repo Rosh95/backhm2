@@ -61,5 +61,6 @@ exports.usersRouter.post('/', authorization_1.basicAuthMiddleware, users_validat
         password: req.body.password
     };
     const newUser = yield users_service_1.userService.createUser(userPostInputData);
-    return res.status(201).send(newUser);
+    yield users_service_1.userService.createUser(userPostInputData);
+    return res.sendStatus(201);
 }));

@@ -2,7 +2,7 @@ import {SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
 import {PostDBModel, PostViewModel} from '../types/post-types';
-import {NewUsersDBType, UserViewModel} from '../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserViewModel} from '../types/user-types';
 import {CommentsDBType, CommentsViewModel} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogDbType, BlogViewType} from '../types/blog-types';
@@ -135,6 +135,16 @@ export function usersMapping(user: NewUsersDBType): UserViewModel {
             emailExpiration: user.emailConfirmation.emailExpiration,
             isConfirmed: user.emailConfirmation.isConfirmed
         }
+    }
+}
+
+export function getUsersMapping(user: NewUsersDBType): getUserViewModel {
+
+    return {
+        id: user._id.toString(),
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt.toISOString(),
     }
 }
 

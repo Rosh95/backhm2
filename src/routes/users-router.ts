@@ -67,7 +67,7 @@ usersRouter.post('/',
             login: req.body.login,
             password: req.body.password
         }
-        //const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
+        const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
         await userService.createUser(userPostInputData);
         return res.sendStatus(201)
     }

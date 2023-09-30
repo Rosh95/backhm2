@@ -34,7 +34,7 @@ exports.usersQueryRepository = {
                 .skip(queryData.skippedPages)
                 .limit(queryData.pageSize)
                 .toArray();
-            let usersViewArray = users.map(user => (0, helpers_1.usersMapping)(user));
+            let usersViewArray = users.map(user => (0, helpers_1.getUsersMapping)(user));
             let pagesCount = yield (0, helpers_1.countTotalUsersAndPages)(queryData, filter);
             return {
                 pagesCount: pagesCount.usersPagesCount,

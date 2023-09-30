@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentsMapping = exports.usersMapping = exports.postMapping = exports.countTotalUsersAndPages = exports.countTotalPostsAndPages = exports.countTotalCommentsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
+exports.commentsMapping = exports.getUsersMapping = exports.usersMapping = exports.postMapping = exports.countTotalUsersAndPages = exports.countTotalPostsAndPages = exports.countTotalCommentsAndPages = exports.countTotalBlogsAndPages = exports.countTotalPostsAndPagesOfBlog = exports.skipPages = exports.blogMapping = exports.getDataFromQuery = void 0;
 const blog_query_repository_1 = require("../repositories/blog/blog-query-repository");
 const user_query_repository_1 = require("../repositories/user/user-query-repository");
 const comment_query_repository_1 = require("../repositories/comment/comment-query-repository");
@@ -122,6 +122,15 @@ function usersMapping(user) {
     };
 }
 exports.usersMapping = usersMapping;
+function getUsersMapping(user) {
+    return {
+        id: user._id.toString(),
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt.toISOString(),
+    };
+}
+exports.getUsersMapping = getUsersMapping;
 function commentsMapping(comment) {
     const commentMongoId = comment._id.toString();
     return {

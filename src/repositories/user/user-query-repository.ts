@@ -1,6 +1,6 @@
-import {countTotalUsersAndPages, queryDataType, usersMapping} from '../../helpers/helpers';
+import {countTotalUsersAndPages, getUsersMapping, queryDataType, usersMapping} from '../../helpers/helpers';
 import {usersCollection} from '../../db/dbMongo';
-import {NewUsersDBType, PaginatorUserViewType, UserViewModel} from '../../types/user-types';
+import {getUserViewModel, NewUsersDBType, PaginatorUserViewType, UserViewModel} from '../../types/user-types';
 import {Filter} from 'mongodb';
 
 export const usersQueryRepository = {
@@ -26,7 +26,7 @@ export const usersQueryRepository = {
             .limit(queryData.pageSize)
             .toArray();
 
-        let usersViewArray: UserViewModel[] = users.map(user => usersMapping(user))
+        let usersViewArray: getUserViewModel[] = users.map(user => getUsersMapping(user))
         let pagesCount = await countTotalUsersAndPages(queryData, filter);
 
         return {
