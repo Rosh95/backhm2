@@ -69,6 +69,6 @@ usersRouter.post('/',
         }
         const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
         await userService.createUser(userPostInputData);
-        return res.sendStatus(201)
+        return res.status(201).send()
     }
 )

@@ -1,6 +1,6 @@
-import {NewUsersDBType, UserViewModel} from '../../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserViewModel} from '../../types/user-types';
 import {usersCollection} from '../../db/dbMongo';
-import {usersMapping} from '../../helpers/helpers';
+import {getUsersMapping, usersMapping} from '../../helpers/helpers';
 import {ObjectId} from 'mongodb';
 
 export const userRepository = {
@@ -8,9 +8,9 @@ export const userRepository = {
     async getAllUsers() {
         return await usersCollection.find().sort({'createdAt': -1}).toArray();
     },
-    async createUser(newUser: NewUsersDBType): Promise<UserViewModel> {
+    async createUser(newUser: NewUsersDBType): Promise<getUserViewModel> {
         await usersCollection.insertOne(newUser);
-        return usersMapping(newUser);
+        return getUsersMapping(newUser);
     },
     async deleteUser(id: ObjectId): Promise<boolean> {
         const result = await usersCollection.deleteOne({_id: id});

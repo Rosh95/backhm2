@@ -22,7 +22,7 @@ exports.userRepository = {
     createUser(newUser) {
         return __awaiter(this, void 0, void 0, function* () {
             yield dbMongo_1.usersCollection.insertOne(newUser);
-            return (0, helpers_1.usersMapping)(newUser);
+            return (0, helpers_1.getUsersMapping)(newUser);
         });
     },
     deleteUser(id) {
