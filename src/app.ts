@@ -6,12 +6,14 @@ import {usersRouter} from './routes/users-router';
 import {authRouter} from './routes/auth-router';
 import {commentsRouter} from './routes/comments-router';
 import {emailRouter} from './routes/email-router';
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
 
 const parserMiddleWare = express.json()
 app.use(parserMiddleWare)
+app.use(cookieParser())
 
 
 app.use('/blogs', blogsRouter);

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const user_repository_1 = require("../repositories/user/user-repository");
 const mongodb_1 = require("mongodb");
-const email_adapter_1 = require("../adapters/email-adapter");
 const add_1 = __importDefault(require("date-fns/add"));
 const uuid_1 = require("uuid");
 const bcrypt = require('bcrypt');
@@ -39,18 +38,15 @@ exports.userService = {
                         hours: 1,
                         minutes: 3
                     }),
-                    isConfirmed: false,
+                    isConfirmed: true,
                 }
             };
-            //       console.log(newUser)
             const createdUser = yield user_repository_1.userRepository.createUser(newUser);
-            //      console.log(createdUser)
-            try {
-                yield email_adapter_1.emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email);
-            }
-            catch (e) {
-                return null;
-            }
+            // try {
+            //     await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
+            // } catch (e) {
+            //     return null
+            // }
             return createdUser;
         });
     },
@@ -79,7 +75,6 @@ exports.userService = {
     checkCredential(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_repository_1.userRepository.findLoginOrEmail(loginOrEmail);
-            console.log(user + ' in find');
             if (!user)
                 return false;
             const passwordHash = yield this._generateHash(password, user.accountData.passwordSalt);
