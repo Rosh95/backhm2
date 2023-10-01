@@ -53,6 +53,31 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
     return
 
 }
+export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) {
+        res.send(401)
+        return;
+    }
+    const accessToken = req.headers.authorization.split(' ')[1];
+
+
+    jwt.verify(accessToken, settings.JWT_SECRET, (err: any, decoded: any) => {
+        if (err instanceof TokenExpiredError) {
+            return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
+        }
+        if (err instanceof NotBeforeError) {
+            return res.status(401).send({success: false, message: 'jwt not active'});
+        }
+        if (err instanceof JsonWebTokenError) {
+            return res.status(401).send({success: false, message: 'jwt malformed'});
+        }
+        return
+    })
+
+    next()
+    return
+
+}
 
 export const checkExistUserMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let foundUser = await userService.findUserByLogin(req.body.login);

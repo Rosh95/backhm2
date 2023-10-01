@@ -2,7 +2,7 @@ import {Request, Response, Router} from 'express';
 import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, getUserViewModel, UserInputType, UserViewModel} from '../types/user-types';
 import {
-    authValidationMiddleware, checkRefreshTokenMiddleware,
+    authValidationMiddleware, checkAccessTokenMiddleware, checkRefreshTokenMiddleware,
     isEmailConfirmatedMiddlewareByCode,
     isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
@@ -33,7 +33,7 @@ authRouter.post('/login',
 )
 authRouter.post('/refresh-token',
     checkRefreshTokenMiddleware,
-    authValidationMiddleware,
+    checkAccessTokenMiddleware,
     async (req: Request, res: Response) => {
         //   const refreshToken = req.cookies.refreshToken;
         const accessToken = req.headers.authorization!.split(' ')[1];
@@ -62,6 +62,7 @@ authRouter.post('/logout',
 
 
 authRouter.get('/me',
+    checkAccessTokenMiddleware,
     authValidationMiddleware,
     async (req, res) => {
         const currentUserInfo: CurrentUserInfoType = {
