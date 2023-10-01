@@ -30,51 +30,54 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     return res.sendStatus(401);
 }
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    
+    debugger
     const refreshToken = req.cookies.refreshToken;
-
+    debugger
     if (!refreshToken) {
         res.send(401)
         return;
     }
-
+    debugger
 
     jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
+        console.log(err, decoded)
+
         if (err instanceof TokenExpiredError) {
-            return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
+            return res.status(401).send({success: false, message: 'Unauthorized! ref Access Token was expired!'});
         }
         if (err instanceof NotBeforeError) {
-            return res.status(401).send({success: false, message: 'jwt not active'});
+            return res.status(401).send({success: false, message: 'jwt refresh not active'});
         }
         if (err instanceof JsonWebTokenError) {
-            return res.status(401).send({success: false, message: 'jwt malformed'});
+            return res.status(401).send({success: false, message: 'jwt refresh malformed'});
         }
         return
     })
-
+    debugger
     next()
     return
 
 }
 export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
+    debugger
     if (!req.headers.authorization) {
         res.sendStatus(401)
         return;
     }
-
+    debugger
     const accessToken = req.headers.authorization.split(' ')[1];
 
-
-    jwt.verify(accessToken, settings.JWT_SECRET, (err: any) => {
+    debugger
+    jwt.verify(accessToken, settings.JWT_SECRET, (err: any, decoded: any) => {
+        console.log(err, decoded)
         if (err instanceof TokenExpiredError) {
             return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
         }
         if (err instanceof NotBeforeError) {
-            return res.status(401).send({success: false, message: 'jwt not active'});
+            return res.status(401).send({success: false, message: 'jwt access not active'});
         }
         if (err instanceof JsonWebTokenError) {
-            return res.status(401).send({success: false, message: 'jwt malformed'});
+            return res.status(401).send({success: false, message: 'jwt access malformed'});
         }
         return true;
     })

@@ -1,8 +1,10 @@
 import {Request, Response, Router} from 'express';
 import {jwtService} from '../application/jwt-service';
-import {CurrentUserInfoType, getUserViewModel, UserInputType, UserViewModel} from '../types/user-types';
+import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/user-types';
 import {
-    authValidationMiddleware, checkAccessTokenMiddleware, checkRefreshTokenMiddleware,
+    authValidationMiddleware,
+    checkAccessTokenMiddleware,
+    checkRefreshTokenMiddleware,
     isEmailConfirmatedMiddlewareByCode,
     isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
@@ -10,7 +12,6 @@ import {emailUserMiddleware, userValidation} from '../validation/users-validatio
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
-import {userRepository} from "../repositories/user/user-repository";
 import {userService} from "../domain/users-service";
 
 
@@ -32,20 +33,22 @@ authRouter.post('/login',
     }
 )
 authRouter.post('/refresh-token',
-    checkRefreshTokenMiddleware,
+checkRefreshTokenMiddleware,
     checkAccessTokenMiddleware,
     async (req: Request, res: Response) => {
-
+        debugger
         //   const refreshToken = req.cookies.refreshToken;
         const accessToken = req.headers.authorization!.split(' ')[1];
         const currentUserId = await jwtService.getUserIdByToken(accessToken.toString());
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
+        debugger
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
             res.clearCookie('refreshToken');
             res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
-            res.setHeader('accessToken', newAccesstoken.accessToken)
+            res.set('accessToken', newAccesstoken.accessToken)
+            debugger
             return res.status(200).send(newAccesstoken)
         } else {
             return res.sendStatus(401)

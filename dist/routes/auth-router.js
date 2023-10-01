@@ -33,16 +33,19 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
     }
 }));
 exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefreshTokenMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    debugger;
     //   const refreshToken = req.cookies.refreshToken;
     const accessToken = req.headers.authorization.split(' ')[1];
     const currentUserId = yield jwt_service_1.jwtService.getUserIdByToken(accessToken.toString());
     const currentUser = currentUserId ? yield users_service_1.userService.findUserById(currentUserId.toString()) : null;
+    debugger;
     if (currentUser) {
         const newAccesstoken = yield jwt_service_1.jwtService.createJWT(currentUser);
         const newRefreshToken = yield jwt_service_1.jwtService.createRefreshJWT(currentUser);
         res.clearCookie('refreshToken');
         res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true });
-        res.setHeader('accessToken', newAccesstoken.accessToken);
+        res.set('accessToken', newAccesstoken.accessToken);
+        debugger;
         return res.status(200).send(newAccesstoken);
     }
     else {

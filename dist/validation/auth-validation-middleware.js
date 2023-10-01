@@ -61,42 +61,51 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
 });
 exports.authValidationMiddleware = authValidationMiddleware;
 const checkRefreshTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    debugger;
     const refreshToken = req.cookies.refreshToken;
+    debugger;
     if (!refreshToken) {
         res.send(401);
         return;
     }
+    debugger;
     jsonwebtoken_1.default.verify(refreshToken, settings_1.settings.JWT_REFRESH_SECRET, (err, decoded) => {
+        console.log(err, decoded);
         if (err instanceof jsonwebtoken_1.TokenExpiredError) {
-            return res.status(401).send({ success: false, message: 'Unauthorized! Access Token was expired!' });
+            return res.status(401).send({ success: false, message: 'Unauthorized! ref Access Token was expired!' });
         }
         if (err instanceof jsonwebtoken_1.NotBeforeError) {
-            return res.status(401).send({ success: false, message: 'jwt not active' });
+            return res.status(401).send({ success: false, message: 'jwt refresh not active' });
         }
         if (err instanceof jsonwebtoken_1.JsonWebTokenError) {
-            return res.status(401).send({ success: false, message: 'jwt malformed' });
+            return res.status(401).send({ success: false, message: 'jwt refresh malformed' });
         }
         return;
     });
+    debugger;
     next();
     return;
 });
 exports.checkRefreshTokenMiddleware = checkRefreshTokenMiddleware;
 const checkAccessTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    debugger;
     if (!req.headers.authorization) {
         res.sendStatus(401);
         return;
     }
+    debugger;
     const accessToken = req.headers.authorization.split(' ')[1];
-    jsonwebtoken_1.default.verify(accessToken, settings_1.settings.JWT_SECRET, (err) => {
+    debugger;
+    jsonwebtoken_1.default.verify(accessToken, settings_1.settings.JWT_SECRET, (err, decoded) => {
+        console.log(err, decoded);
         if (err instanceof jsonwebtoken_1.TokenExpiredError) {
             return res.status(401).send({ success: false, message: 'Unauthorized! Access Token was expired!' });
         }
         if (err instanceof jsonwebtoken_1.NotBeforeError) {
-            return res.status(401).send({ success: false, message: 'jwt not active' });
+            return res.status(401).send({ success: false, message: 'jwt access not active' });
         }
         if (err instanceof jsonwebtoken_1.JsonWebTokenError) {
-            return res.status(401).send({ success: false, message: 'jwt malformed' });
+            return res.status(401).send({ success: false, message: 'jwt access malformed' });
         }
         return true;
     });
