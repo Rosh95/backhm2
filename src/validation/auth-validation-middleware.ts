@@ -30,11 +30,14 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     return res.sendStatus(401);
 }
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const refreshToken = req.cookies.accessToken;
+    
+    const refreshToken = req.cookies.refreshToken;
+
     if (!refreshToken) {
         res.send(401)
         return;
     }
+
 
     jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
         if (err instanceof TokenExpiredError) {
@@ -54,14 +57,16 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
 
 }
 export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+
     if (!req.headers.authorization) {
-        res.send(401)
+        res.sendStatus(401)
         return;
     }
+
     const accessToken = req.headers.authorization.split(' ')[1];
 
 
-    jwt.verify(accessToken, settings.JWT_SECRET, (err: any, decoded: any) => {
+    jwt.verify(accessToken, settings.JWT_SECRET, (err: any) => {
         if (err instanceof TokenExpiredError) {
             return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
         }
@@ -71,7 +76,7 @@ export const checkAccessTokenMiddleware = async (req: Request, res: Response, ne
         if (err instanceof JsonWebTokenError) {
             return res.status(401).send({success: false, message: 'jwt malformed'});
         }
-        return
+        return true;
     })
 
     next()

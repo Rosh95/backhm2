@@ -17,6 +17,7 @@ const users_validation_1 = require("../validation/users-validation");
 const error_validation_middleware_1 = require("../validation/error-validation-middleware");
 const email_adapter_1 = require("../adapters/email-adapter");
 const auth_service_1 = require("../domain/auth-service");
+const users_service_1 = require("../domain/users-service");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = yield auth_service_1.authService.checkCredential(req.body.loginOrEmail, req.body.password);
@@ -24,13 +25,35 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
         const token = yield jwt_service_1.jwtService.createJWT(user);
         const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+        res.header('accessToken', token.accessToken);
         return res.status(200).send(token);
     }
     else {
         return res.sendStatus(401);
     }
 }));
-exports.authRouter.get('/me', auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefreshTokenMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //   const refreshToken = req.cookies.refreshToken;
+    const accessToken = req.headers.authorization.split(' ')[1];
+    const currentUserId = yield jwt_service_1.jwtService.getUserIdByToken(accessToken.toString());
+    const currentUser = currentUserId ? yield users_service_1.userService.findUserById(currentUserId.toString()) : null;
+    if (currentUser) {
+        const newAccesstoken = yield jwt_service_1.jwtService.createJWT(currentUser);
+        const newRefreshToken = yield jwt_service_1.jwtService.createRefreshJWT(currentUser);
+        res.clearCookie('refreshToken');
+        res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true });
+        res.setHeader('accessToken', newAccesstoken.accessToken);
+        return res.status(200).send(newAccesstoken);
+    }
+    else {
+        return res.sendStatus(401);
+    }
+}));
+exports.authRouter.post('/logout', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie('refreshToken');
+    return res.sendStatus(200);
+}));
+exports.authRouter.get('/me', auth_validation_middleware_1.checkAccessTokenMiddleware, auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const currentUserInfo = {
         login: req.user.accountData.login,
         email: req.user.accountData.email,
