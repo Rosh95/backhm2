@@ -1,8 +1,8 @@
 import {Request, Response, Router} from 'express';
 import {jwtService} from '../application/jwt-service';
-import {CurrentUserInfoType, UserInputType, UserViewModel} from '../types/user-types';
+import {CurrentUserInfoType, getUserViewModel, UserInputType, UserViewModel} from '../types/user-types';
 import {
-    authValidationMiddleware,
+    authValidationMiddleware, checkRefreshTokenMiddleware,
     isEmailConfirmatedMiddlewareByCode,
     isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
@@ -10,6 +10,8 @@ import {emailUserMiddleware, userValidation} from '../validation/users-validatio
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
+import {userRepository} from "../repositories/user/user-repository";
+import {userService} from "../domain/users-service";
 
 
 export const authRouter = Router({})
@@ -22,12 +24,43 @@ authRouter.post('/login',
             const token = await jwtService.createJWT(user)
             const refreshToken = await jwtService.createRefreshJWT(user)
             res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
+            res.header('accessToken', token.accessToken)
             return res.status(200).send(token)
         } else {
             return res.sendStatus(401)
         }
     }
 )
+authRouter.post('/refresh-token',
+    checkRefreshTokenMiddleware,
+    authValidationMiddleware,
+    async (req: Request, res: Response) => {
+        //   const refreshToken = req.cookies.refreshToken;
+        const accessToken = req.headers.authorization!.split(' ')[1];
+        const currentUserId = await jwtService.getUserIdByToken(accessToken.toString());
+        const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
+
+        if (currentUser) {
+            const newAccesstoken = await jwtService.createJWT(currentUser)
+            const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
+            res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
+            res.header('accessToken', newAccesstoken.accessToken)
+            return res.status(200).send(newAccesstoken)
+        } else {
+            return res.sendStatus(401)
+        }
+    }
+)
+
+authRouter.post('/logout',
+    checkRefreshTokenMiddleware,
+    async (req: Request, res: Response) => {
+        res.clearCookie('refreshToken');
+        return res.sendStatus(200)
+    }
+)
+
+
 authRouter.get('/me',
     authValidationMiddleware,
     async (req, res) => {
@@ -54,7 +87,7 @@ authRouter.post('/registration',
             login: req.body.login,
             password: req.body.password
         }
-        const newUser: UserViewModel | null = await authService.createUser(userPostInputData);
+        const newUser: getUserViewModel | null = await authService.createUser(userPostInputData);
         if (newUser) {
             res.sendStatus(204)
 

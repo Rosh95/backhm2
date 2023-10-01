@@ -4,6 +4,8 @@ import {userService} from '../domain/users-service';
 import {commentQueryRepository} from "../repositories/comment/comment-query-repository";
 import {userRepository} from "../repositories/user/user-repository";
 import {body} from "express-validator";
+import jwt, {JsonWebTokenError, NotBeforeError, TokenExpiredError} from "jsonwebtoken";
+import {settings} from "../settings";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +28,30 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
         return
     }
     return res.sendStatus(401);
+}
+export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.accessToken;
+    if (!refreshToken) {
+        res.send(401)
+        return;
+    }
+
+    jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
+        if (err instanceof TokenExpiredError) {
+            return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
+        }
+        if (err instanceof NotBeforeError) {
+            return res.status(401).send({success: false, message: 'jwt not active'});
+        }
+        if (err instanceof JsonWebTokenError) {
+            return res.status(401).send({success: false, message: 'jwt malformed'});
+        }
+        return
+    })
+
+    next()
+    return
+
 }
 
 export const checkExistUserMiddleware = async (req: Request, res: Response, next: NextFunction) => {

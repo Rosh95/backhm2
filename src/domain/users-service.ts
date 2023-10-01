@@ -1,4 +1,4 @@
-import {NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
 import {emailAdapter} from '../adapters/email-adapter';
@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 
 export const userService = {
 
-    async createUser(userPostInputData: UserInputType): Promise<UserViewModel | null> {
+    async createUser(userPostInputData: UserInputType): Promise<getUserViewModel | null> {
 
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(userPostInputData.password, passwordSalt)

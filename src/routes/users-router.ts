@@ -6,7 +6,13 @@ import {userService} from '../domain/users-service';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {NewUsersDBType, PaginatorUserViewType, UserInputType, UserViewModel} from '../types/user-types';
+import {
+    getUserViewModel,
+    NewUsersDBType,
+    PaginatorUserViewType,
+    UserInputType,
+    UserViewModel
+} from '../types/user-types';
 
 export const usersRouter = Router({})
 
@@ -67,7 +73,7 @@ usersRouter.post('/',
             login: req.body.login,
             password: req.body.password
         }
-        const newUser: UserViewModel | null = await userService.createUser(userPostInputData);
+        const newUser: getUserViewModel | null = await userService.createUser(userPostInputData);
         // await userService.createUser(userPostInputData);
         return res.status(201).send(newUser)
     }

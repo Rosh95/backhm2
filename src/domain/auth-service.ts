@@ -1,16 +1,17 @@
-import {NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
 import {emailAdapter} from '../adapters/email-adapter';
 import add from 'date-fns/add';
 import {v4 as uuidv4} from 'uuid';
 import {authRepository} from "../repositories/auth/auth-repository";
+import {usersMapping} from "../helpers/helpers";
 
 const bcrypt = require('bcrypt');
 
 export const authService = {
 
-    async createUser(userPostInputData: UserInputType): Promise<UserViewModel | null> {
+    async createUser(userPostInputData: UserInputType): Promise<getUserViewModel | null> {
 
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(userPostInputData.password, passwordSalt)
@@ -34,8 +35,9 @@ export const authService = {
             }
         }
         const createdUser = await userRepository.createUser(newUser);
+        const createdUserFullInformation = usersMapping(newUser)
         try {
-            await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
+            await emailAdapter.sendConfirmationEmail(createdUserFullInformation.emailConfirmation.confirmationCode, createdUser.email)
         } catch (e) {
             return null
         }
