@@ -30,14 +30,14 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     return res.sendStatus(401);
 }
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    debugger
+   // debugger
     const refreshToken = req.cookies.refreshToken;
-    debugger
+   // debugger
     if (!refreshToken) {
         res.send(401)
         return;
     }
-    debugger
+ //   debugger
 
     jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
         console.log(err, decoded)
@@ -48,18 +48,18 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
         if (err instanceof NotBeforeError) {
             return res.status(401).send({success: false, message: 'jwt refresh not active'});
         }
-        if (err instanceof JsonWebTokenError) {
-            return res.status(401).send({success: false, message: 'jwt refresh malformed'});
-        }
+        // if (err instanceof JsonWebTokenError) {
+        //     return res.status(401).send({success: false, message: 'jwt refresh malformed'});
+        // }
         return
     })
-    debugger
+ //   debugger
     next()
     return
 
 }
 export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    debugger
+ //   debugger
     if (!req.headers.authorization) {
         res.sendStatus(401)
         return;
@@ -67,7 +67,7 @@ export const checkAccessTokenMiddleware = async (req: Request, res: Response, ne
     debugger
     const accessToken = req.headers.authorization.split(' ')[1];
 
-    debugger
+  //  debugger
     jwt.verify(accessToken, settings.JWT_SECRET, (err: any, decoded: any) => {
         console.log(err, decoded)
         if (err instanceof TokenExpiredError) {

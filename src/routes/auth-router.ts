@@ -33,26 +33,24 @@ authRouter.post('/login',
     }
 )
 authRouter.post('/refresh-token',
-checkRefreshTokenMiddleware,
+    checkRefreshTokenMiddleware,
     checkAccessTokenMiddleware,
     async (req: Request, res: Response) => {
-        debugger
         //   const refreshToken = req.cookies.refreshToken;
         const accessToken = req.headers.authorization!.split(' ')[1];
         const currentUserId = await jwtService.getUserIdByToken(accessToken.toString());
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
-        debugger
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
-            res.clearCookie('refreshToken');
+         //   res.clearCookie('refreshToken');
             res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
-            res.set('accessToken', newAccesstoken.accessToken)
-            debugger
+            res.header('accessToken', newAccesstoken.accessToken)
             return res.status(200).send(newAccesstoken)
         } else {
             return res.sendStatus(401)
         }
+        return
     }
 )
 
