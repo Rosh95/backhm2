@@ -26,7 +26,7 @@ const authValidationMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
         return;
     }
     const token = req.headers.authorization.split(' ')[1];
-    const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
+    const userId = yield jwt_service_1.jwtService.getUserIdByAccessToken(token.toString());
     const commentUser = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
     if (userId) {
         let isCorrectUser = userId.toString() !== (commentUser === null || commentUser === void 0 ? void 0 : commentUser.commentatorInfo.userId.toString());
@@ -46,13 +46,8 @@ const authValidationINfoMiddleware = (req, res, next) => __awaiter(void 0, void 
         return;
     }
     const token = req.headers.authorization.split(' ')[1];
-    const userId = yield jwt_service_1.jwtService.getUserIdByToken(token.toString());
-    const commentUser = yield comment_query_repository_1.commentQueryRepository.getCommentById(req.params.commentId);
+    const userId = yield jwt_service_1.jwtService.getUserIdByAccessToken(token.toString());
     if (userId) {
-        // let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId.toString();
-        // if (commentUser && isCorrectUser) {
-        //     return res.sendStatus(403)
-        // }
         req.user = yield users_service_1.userService.findUserById(userId.toString());
         next();
         return;
@@ -63,32 +58,21 @@ exports.authValidationINfoMiddleware = authValidationINfoMiddleware;
 const checkRefreshTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-        res.send(401);
+        res.sendStatus(401);
         return;
     }
-    const result = yield jsonwebtoken_1.default.verify(refreshToken, settings_1.settings.JWT_REFRESH_SECRET);
-    // console.log(result.exp)
-    console.log({ result });
-    jsonwebtoken_1.default.verify(refreshToken, settings_1.settings.JWT_REFRESH_SECRET, (err, decoded) => {
-        //   console.log(err, decoded)
-        if (!err) {
+    try {
+        const result = yield jsonwebtoken_1.default.verify(refreshToken, settings_1.settings.JWT_REFRESH_SECRET);
+        if (result.userID && result.iat < result.exp) {
+            console.log(result);
             next();
             return;
         }
-        // if (err instanceof TokenExpiredError) {
-        //     return res.status(401).send({success: false, message: 'Unauthorized! ref Access Token was expired!'});
-        // }
-        // if (err instanceof NotBeforeError) {
-        //     return res.status(401).send({success: false, message: 'jwt refresh not active'});
-        // }
-        // // if (err instanceof JsonWebTokenError) {
-        // //     return res.status(401).send({success: false, message: 'jwt refresh malformed'});
-        // // }
-        res.sendStatus(401);
-        return;
-    });
-    next();
-    return;
+        return res.sendStatus(401);
+    }
+    catch (e) {
+        return res.sendStatus(401);
+    }
 });
 exports.checkRefreshTokenMiddleware = checkRefreshTokenMiddleware;
 const checkAccessTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -97,21 +81,13 @@ const checkAccessTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0,
         return;
     }
     const accessToken = req.headers.authorization.split(' ')[1];
-    jsonwebtoken_1.default.verify(accessToken, settings_1.settings.JWT_SECRET, (err, decoded) => {
-        if (!err) {
-            next();
-            return;
-        }
-        // if (err instanceof TokenExpiredError) {
-        //     return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
-        // }
-        // if (err instanceof NotBeforeError) {
-        //     return res.status(401).send({success: false, message: 'jwt access not active'});
-        // }
-        res.sendStatus(401);
+    const result = jsonwebtoken_1.default.verify(accessToken, settings_1.settings.JWT_SECRET);
+    if (result.userID && result.iat < result.exp) {
+        console.log(result);
+        next();
         return;
-    });
-    next();
+    }
+    res.sendStatus(401);
     return;
 });
 exports.checkAccessTokenMiddleware = checkAccessTokenMiddleware;

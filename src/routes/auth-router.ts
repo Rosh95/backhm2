@@ -25,7 +25,7 @@ authRouter.post('/login',
         if (user) {
             const token = await jwtService.createJWT(user)
             const refreshToken = await jwtService.createRefreshJWT(user)
-            res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
+            res.cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
             res.header('accessToken', token.accessToken)
             return res.status(200).send(token)
         } else {
@@ -35,19 +35,19 @@ authRouter.post('/login',
 )
 authRouter.post('/refresh-token',
     checkRefreshTokenMiddleware,
-    checkAccessTokenMiddleware,
     async (req: Request, res: Response) => {
-        //   const refreshToken = req.cookies.refreshToken;
-        const accessToken = req.headers.authorization!.split(' ')[1];
-        const currentUserId = await jwtService.getUserIdByToken(accessToken.toString());
+        const refreshToken = req.cookies.refreshToken;
+        // const accessToken = req.headers.authorization!.split(' ')[1];
+        const currentUserId = await jwtService.getUserIdByRefreshToken(refreshToken);
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
             //   res.clearCookie('refreshToken');
-            res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
-            res.header('accessToken', newAccesstoken.accessToken)
-            return res.status(200).send(newAccesstoken)
+            return res
+                .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
+                .header('accessToken', newAccesstoken.accessToken)
+                .status(200).send(newAccesstoken)
         }
         return res.sendStatus(401)
 
@@ -95,9 +95,9 @@ authRouter.post('/registration',
         if (newUser) {
             res.sendStatus(204)
 
-        } else {
-            res.sendStatus(400)
         }
+        return res.sendStatus(400)
+
     }
 )
 
@@ -135,7 +135,6 @@ authRouter.post('/registration-email-resending',
                 return null
             }
             return res.sendStatus(204)
-
         }
         return res.sendStatus(400)
     }

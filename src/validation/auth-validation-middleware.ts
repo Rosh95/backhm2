@@ -14,7 +14,7 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
         return;
     }
     const token = req.headers.authorization.split(' ')[1];
-    const userId = await jwtService.getUserIdByToken(token.toString());
+    const userId = await jwtService.getUserIdByAccessToken(token.toString());
     const commentUser = await commentQueryRepository.getCommentById(req.params.commentId);
 
     if (userId) {
@@ -35,13 +35,8 @@ export const authValidationINfoMiddleware = async (req: Request, res: Response, 
         return;
     }
     const token = req.headers.authorization.split(' ')[1];
-    const userId = await jwtService.getUserIdByToken(token.toString());
-    const commentUser = await commentQueryRepository.getCommentById(req.params.commentId);
+    const userId = await jwtService.getUserIdByAccessToken(token.toString());
     if (userId) {
-        // let isCorrectUser = userId.toString() !== commentUser?.commentatorInfo.userId.toString();
-        // if (commentUser && isCorrectUser) {
-        //     return res.sendStatus(403)
-        // }
 
         req.user = await userService.findUserById(userId.toString())
         next();
@@ -51,36 +46,28 @@ export const authValidationINfoMiddleware = async (req: Request, res: Response, 
 }
 
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-        res.send(401)
+        res.sendStatus(401)
         return;
     }
-    const result: any = await jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET) as { userId: string, exp: number };
-    // console.log(result.exp)
-    console.log({result})
-    jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
-        //   console.log(err, decoded)
-        if (!err) {
+
+    try {
+        const result = await jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET) as {
+            userID: string,
+            exp: number,
+            iat: number
+        };
+        if (result.userID && result.iat < result.exp) {
+            console.log(result);
             next()
             return
         }
+        return res.sendStatus(401)
+    } catch (e) {
+        return res.sendStatus(401)
 
-        // if (err instanceof TokenExpiredError) {
-        //     return res.status(401).send({success: false, message: 'Unauthorized! ref Access Token was expired!'});
-        // }
-        // if (err instanceof NotBeforeError) {
-        //     return res.status(401).send({success: false, message: 'jwt refresh not active'});
-        // }
-        // // if (err instanceof JsonWebTokenError) {
-        // //     return res.status(401).send({success: false, message: 'jwt refresh malformed'});
-        // // }
-        res.sendStatus(401)
-        return
-    })
-    next()
-    return
+    }
 
 }
 export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -92,23 +79,18 @@ export const checkAccessTokenMiddleware = async (req: Request, res: Response, ne
     const accessToken = req.headers.authorization.split(' ')[1];
 
 
-    jwt.verify(accessToken, settings.JWT_SECRET, (err: any, decoded: any) => {
-        if (!err) {
-            next()
-            return
-        }
-        // if (err instanceof TokenExpiredError) {
-        //     return res.status(401).send({success: false, message: 'Unauthorized! Access Token was expired!'});
-        // }
-        // if (err instanceof NotBeforeError) {
-        //     return res.status(401).send({success: false, message: 'jwt access not active'});
-        // }
-
-        res.sendStatus(401)
+    const result = jwt.verify(accessToken, settings.JWT_SECRET) as {
+        userID: string,
+        exp: number,
+        iat: number
+    };
+    if (result.userID && result.iat < result.exp) {
+        console.log(result);
+        next()
         return
-    })
+    }
 
-    next()
+    res.sendStatus(401)
     return
 
 }

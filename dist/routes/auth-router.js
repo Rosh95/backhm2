@@ -24,7 +24,7 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
     if (user) {
         const token = yield jwt_service_1.jwtService.createJWT(user);
         const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+        res.cookie('refreshToken', refreshToken.refreshToken, { httpOnly: true, secure: true });
         res.header('accessToken', token.accessToken);
         return res.status(200).send(token);
     }
@@ -32,18 +32,19 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
         return res.sendStatus(401);
     }
 }));
-exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefreshTokenMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //   const refreshToken = req.cookies.refreshToken;
-    const accessToken = req.headers.authorization.split(' ')[1];
-    const currentUserId = yield jwt_service_1.jwtService.getUserIdByToken(accessToken.toString());
+exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    // const accessToken = req.headers.authorization!.split(' ')[1];
+    const currentUserId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(refreshToken);
     const currentUser = currentUserId ? yield users_service_1.userService.findUserById(currentUserId.toString()) : null;
     if (currentUser) {
         const newAccesstoken = yield jwt_service_1.jwtService.createJWT(currentUser);
         const newRefreshToken = yield jwt_service_1.jwtService.createRefreshJWT(currentUser);
         //   res.clearCookie('refreshToken');
-        res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true });
-        res.header('accessToken', newAccesstoken.accessToken);
-        return res.status(200).send(newAccesstoken);
+        return res
+            .cookie('refreshToken', newRefreshToken.refreshToken, { httpOnly: true, secure: true })
+            .header('accessToken', newAccesstoken.accessToken)
+            .status(200).send(newAccesstoken);
     }
     return res.sendStatus(401);
 }));
@@ -76,9 +77,7 @@ users_validation_1.userValidation, error_validation_middleware_1.errorsValidatio
     if (newUser) {
         res.sendStatus(204);
     }
-    else {
-        res.sendStatus(400);
-    }
+    return res.sendStatus(400);
 }));
 exports.authRouter.post('/registration-confirmation', auth_validation_middleware_1.isEmailConfirmatedMiddlewareByCode, error_validation_middleware_1.errorsValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;

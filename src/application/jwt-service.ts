@@ -6,21 +6,29 @@ import {LoginSuccessViewModel, LoginSuccessViewModelForRefresh} from '../types/a
 
 export const jwtService = {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
-        const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: '10s'})
+        const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: '100000s'})
         return {
             accessToken: token
         }
     },
     async createRefreshJWT(user: NewUsersDBType): Promise<LoginSuccessViewModelForRefresh> {
-        const token = jwt.sign({userID: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '20s'})
+        const token = jwt.sign({userID: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '20000s'})
         return {
             refreshToken: token
         }
     },
 
-    async getUserIdByToken(token: string): Promise<ObjectId | null> {
+    async getUserIdByAccessToken(token: string): Promise<ObjectId | null> {
         try {
             const result = jwt.verify(token, settings.JWT_SECRET) as { userID: string };
+            return new ObjectId(result.userID)
+        } catch (error) {
+            return null
+        }
+    },
+    async getUserIdByRefreshToken(token: string): Promise<ObjectId | null> {
+        try {
+            const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as { userID: string };
             return new ObjectId(result.userID)
         } catch (error) {
             return null
