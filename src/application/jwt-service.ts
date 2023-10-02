@@ -6,13 +6,13 @@ import {LoginSuccessViewModel, LoginSuccessViewModelForRefresh} from '../types/a
 
 export const jwtService = {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
-        const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: 10000})
+        const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: '1h'})
         return {
             accessToken: token
         }
     },
     async createRefreshJWT(user: NewUsersDBType): Promise<LoginSuccessViewModelForRefresh> {
-        const token = jwt.sign({userID: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: 20000})
+        const token = jwt.sign({userID: user._id}, settings.JWT_REFRESH_SECRET, {expiresIn: '2h'})
         return {
             refreshToken: token
         }

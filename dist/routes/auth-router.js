@@ -45,23 +45,22 @@ exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefr
         res.header('accessToken', newAccesstoken.accessToken);
         return res.status(200).send(newAccesstoken);
     }
-    else {
-        return res.sendStatus(401);
-    }
-    return;
+    return res.sendStatus(401);
 }));
 exports.authRouter.post('/logout', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.clearCookie('refreshToken');
     return res.sendStatus(200);
 }));
-exports.authRouter.get('/me', auth_validation_middleware_1.checkAccessTokenMiddleware, auth_validation_middleware_1.authValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.get('/me', auth_validation_middleware_1.authValidationINfoMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, 
+//    authValidationMiddleware,
+(req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const currentUserInfo = {
         login: req.user.accountData.login,
         email: req.user.accountData.email,
         userId: req.user._id.toString()
     };
     if (req.user) {
-        return res.send(currentUserInfo);
+        return res.status(200).send(currentUserInfo);
     }
     return res.sendStatus(404);
 }));

@@ -2,6 +2,7 @@ import {Request, Response, Router} from 'express';
 import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/user-types';
 import {
+    authValidationINfoMiddleware,
     authValidationMiddleware,
     checkAccessTokenMiddleware,
     checkRefreshTokenMiddleware,
@@ -43,14 +44,13 @@ authRouter.post('/refresh-token',
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
-         //   res.clearCookie('refreshToken');
+            //   res.clearCookie('refreshToken');
             res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
             res.header('accessToken', newAccesstoken.accessToken)
             return res.status(200).send(newAccesstoken)
-        } else {
-            return res.sendStatus(401)
         }
-        return
+        return res.sendStatus(401)
+
     }
 )
 
@@ -64,8 +64,9 @@ authRouter.post('/logout',
 
 
 authRouter.get('/me',
+    authValidationINfoMiddleware,
     checkAccessTokenMiddleware,
-    authValidationMiddleware,
+//    authValidationMiddleware,
     async (req, res) => {
         const currentUserInfo: CurrentUserInfoType = {
             login: req.user!.accountData.login,
@@ -73,7 +74,7 @@ authRouter.get('/me',
             userId: req.user!._id.toString()
         }
         if (req.user) {
-            return res.send(currentUserInfo)
+            return res.status(200).send(currentUserInfo)
         }
         return res.sendStatus(404)
     }
