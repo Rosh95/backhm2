@@ -58,7 +58,12 @@ exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefr
     return res.sendStatus(401);
 }));
 exports.authRouter.post('/logout', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken !== whiteList.refreshToken) {
+        return res.status(401).send({ message: 'it isn`t valid refresh token' });
+    }
     whiteList.refreshToken = '';
+    whiteList.accessToken = '';
     return res
         .clearCookie('refreshToken')
         .sendStatus(204);

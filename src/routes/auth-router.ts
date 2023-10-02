@@ -69,7 +69,14 @@ authRouter.post('/refresh-token',
 authRouter.post('/logout',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+        if (refreshToken !== whiteList.refreshToken) {
+            return res.status(401).send(
+                {message: 'it isn`t valid refresh token'}
+            )
+        }
         whiteList.refreshToken = ''
+        whiteList.accessToken = ''
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)
