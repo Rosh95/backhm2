@@ -73,6 +73,9 @@ export const authService = {
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt);
     },
+    async addInvalidAccessToken(password: string, salt: string) {
+        return await bcrypt.hash(password, salt);
+    },
     async confirmEmail(code: string): Promise<boolean> {
         const findUser = await userRepository.findUserByCode(code)
         if (!findUser) return false;

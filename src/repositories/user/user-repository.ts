@@ -1,6 +1,6 @@
-import {getUserViewModel, NewUsersDBType, UserViewModel} from '../../types/user-types';
+import {getUserViewModel, NewUsersDBType} from '../../types/user-types';
 import {usersCollection} from '../../db/dbMongo';
-import {getUsersMapping, usersMapping} from '../../helpers/helpers';
+import {getUsersMapping} from '../../helpers/helpers';
 import {ObjectId} from 'mongodb';
 
 export const userRepository = {

@@ -8,10 +8,9 @@ import {CommentsDBType} from '../types/comments-types';
 dotenv.config()
 
 
-
 const url = process.env.MONGO_URL;
 //const mongoURI = process.env.mongoURI || url;
-if(!url){
+if (!url) {
     throw new Error('Url doesn`t found')
 }
 const client = new MongoClient(url);
@@ -21,6 +20,7 @@ export const blogsCollection = db.collection<BlogDbType>('blogs');
 export const postsCollection = db.collection<PostDBModel>('posts');
 export const usersCollection = db.collection<NewUsersDBType>('users');
 export const commentsCollection = db.collection<CommentsDBType>('comments');
+
 export async function runDb() {
     try {
         await client.connect();

@@ -42,11 +42,6 @@ exports.userService = {
                 }
             };
             const createdUser = yield user_repository_1.userRepository.createUser(newUser);
-            // try {
-            //     await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
-            // } catch (e) {
-            //     return null
-            // }
             return createdUser;
         });
     },

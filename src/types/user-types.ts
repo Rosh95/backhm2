@@ -42,7 +42,8 @@ export type NewUsersDBType = {
         email: string,
         passwordHash: string,
         passwordSalt: string,
-        createdAt: Date
+        createdAt: Date,
+
     },
     emailConfirmation: {
         confirmationCode: string,

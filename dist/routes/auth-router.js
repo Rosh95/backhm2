@@ -19,11 +19,17 @@ const email_adapter_1 = require("../adapters/email-adapter");
 const auth_service_1 = require("../domain/auth-service");
 const users_service_1 = require("../domain/users-service");
 exports.authRouter = (0, express_1.Router)({});
+const whiteList = {
+    accessToken: '',
+    refreshToken: ''
+};
 exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = yield auth_service_1.authService.checkCredential(req.body.loginOrEmail, req.body.password);
     if (user) {
         const token = yield jwt_service_1.jwtService.createJWT(user);
         const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
+        whiteList.accessToken = token.accessToken;
+        whiteList.refreshToken = refreshToken.refreshToken;
         res.cookie('refreshToken', refreshToken.refreshToken, { httpOnly: true, secure: true });
         res.header('accessToken', token.accessToken);
         return res.status(200).send(token);
@@ -34,13 +40,16 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
 }));
 exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = req.cookies.refreshToken;
-    // const accessToken = req.headers.authorization!.split(' ')[1];
+    if (refreshToken !== whiteList.refreshToken) {
+        return res.status(401).send({ message: 'it isn`t valid refresh token' });
+    }
     const currentUserId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(refreshToken);
     const currentUser = currentUserId ? yield users_service_1.userService.findUserById(currentUserId.toString()) : null;
     if (currentUser) {
         const newAccesstoken = yield jwt_service_1.jwtService.createJWT(currentUser);
         const newRefreshToken = yield jwt_service_1.jwtService.createRefreshJWT(currentUser);
-        //   res.clearCookie('refreshToken');
+        whiteList.accessToken = newAccesstoken.accessToken;
+        whiteList.refreshToken = newRefreshToken.refreshToken;
         return res
             .cookie('refreshToken', newRefreshToken.refreshToken, { httpOnly: true, secure: true })
             .header('accessToken', newAccesstoken.accessToken)
@@ -49,12 +58,20 @@ exports.authRouter.post('/refresh-token', auth_validation_middleware_1.checkRefr
     return res.sendStatus(401);
 }));
 exports.authRouter.post('/logout', auth_validation_middleware_1.checkRefreshTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.clearCookie('refreshToken');
-    return res.sendStatus(200);
+    whiteList.refreshToken = '';
+    return res
+        .clearCookie('refreshToken')
+        .sendStatus(204);
 }));
-exports.authRouter.get('/me', auth_validation_middleware_1.authValidationINfoMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, 
-//    authValidationMiddleware,
-(req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.get('/me', auth_validation_middleware_1.authValidationINfoMiddleware, auth_validation_middleware_1.checkAccessTokenMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.headers.authorization) {
+        res.sendStatus(401);
+        return;
+    }
+    const accessToken = req.headers.authorization.split(' ')[1];
+    if (accessToken !== whiteList.accessToken) {
+        return res.status(401).send({ message: 'it isn`t valid access token' });
+    }
     const currentUserInfo = {
         login: req.user.accountData.login,
         email: req.user.accountData.email,

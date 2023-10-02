@@ -33,11 +33,7 @@ export const userService = {
             }
         }
         const createdUser = await userRepository.createUser(newUser);
-        // try {
-        //     await emailAdapter.sendConfirmationEmail(createdUser.emailConfirmation.confirmationCode, createdUser.email)
-        // } catch (e) {
-        //     return null
-        // }
+
         return createdUser
     },
     async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {

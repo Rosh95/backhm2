@@ -18,6 +18,10 @@ import {userService} from "../domain/users-service";
 
 export const authRouter = Router({})
 
+const whiteList: { accessToken: string, refreshToken: string } = {
+    accessToken: '',
+    refreshToken: ''
+}
 authRouter.post('/login',
     async (req: Request, res: Response) => {
 
@@ -25,6 +29,8 @@ authRouter.post('/login',
         if (user) {
             const token = await jwtService.createJWT(user)
             const refreshToken = await jwtService.createRefreshJWT(user)
+            whiteList.accessToken = token.accessToken;
+            whiteList.refreshToken = refreshToken.refreshToken
             res.cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
             res.header('accessToken', token.accessToken)
             return res.status(200).send(token)
@@ -37,13 +43,19 @@ authRouter.post('/refresh-token',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
-        // const accessToken = req.headers.authorization!.split(' ')[1];
+        if (refreshToken !== whiteList.refreshToken) {
+            return res.status(401).send(
+                {message: 'it isn`t valid refresh token'}
+            )
+        }
+
         const currentUserId = await jwtService.getUserIdByRefreshToken(refreshToken);
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
-            //   res.clearCookie('refreshToken');
+            whiteList.accessToken = newAccesstoken.accessToken;
+            whiteList.refreshToken = newRefreshToken.refreshToken
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
                 .header('accessToken', newAccesstoken.accessToken)
@@ -57,8 +69,10 @@ authRouter.post('/refresh-token',
 authRouter.post('/logout',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
-        res.clearCookie('refreshToken');
-        return res.sendStatus(200)
+        whiteList.refreshToken = ''
+        return res
+            .clearCookie('refreshToken')
+            .sendStatus(204)
     }
 )
 
@@ -66,8 +80,17 @@ authRouter.post('/logout',
 authRouter.get('/me',
     authValidationINfoMiddleware,
     checkAccessTokenMiddleware,
-//    authValidationMiddleware,
     async (req, res) => {
+        if (!req.headers.authorization) {
+            res.sendStatus(401)
+            return;
+        }
+        const accessToken = req.headers.authorization.split(' ')[1];
+        if (accessToken !== whiteList.accessToken) {
+            return res.status(401).send(
+                {message: 'it isn`t valid access token'}
+            )
+        }
         const currentUserInfo: CurrentUserInfoType = {
             login: req.user!.accountData.login,
             email: req.user!.accountData.email,
