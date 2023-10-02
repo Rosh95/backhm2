@@ -19,7 +19,7 @@ const mongodb_1 = require("mongodb");
 exports.jwtService = {
     createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jsonwebtoken_1.default.sign({ userID: user._id }, settings_1.settings.JWT_SECRET, { expiresIn: '1000s' });
+            const token = jsonwebtoken_1.default.sign({ userID: user._id }, settings_1.settings.JWT_SECRET, { expiresIn: '10s' });
             return {
                 accessToken: token
             };
@@ -27,7 +27,7 @@ exports.jwtService = {
     },
     createRefreshJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jsonwebtoken_1.default.sign({ userID: user._id }, settings_1.settings.JWT_REFRESH_SECRET, { expiresIn: '2000s' });
+            const token = jsonwebtoken_1.default.sign({ userID: user._id }, settings_1.settings.JWT_REFRESH_SECRET, { expiresIn: '20s' });
             return {
                 refreshToken: token
             };
