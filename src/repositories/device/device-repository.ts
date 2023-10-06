@@ -8,7 +8,7 @@ export const deviceRepository = {
                 $and: [{userId: userId}, {deviceId: {$ne: currentDeviceId}}]
             }
         )
-        return result.deletedCount === 1;
+        return result.deletedCount >= 1;
     },
     async deleteUserDeviceById(deviceId: string): Promise<boolean> {
         const result = await devicesCollection.deleteOne({deviceId: deviceId});
