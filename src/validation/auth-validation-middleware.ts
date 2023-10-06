@@ -6,6 +6,7 @@ import {userRepository} from "../repositories/user/user-repository";
 import {body} from "express-validator";
 import jwt from "jsonwebtoken";
 import {settings} from "../settings";
+import {devicesCollection} from "../db/dbMongo";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -51,14 +52,14 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
         res.sendStatus(401)
         return;
     }
-
     try {
         const result = await jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET) as {
             userID: string,
             exp: number,
             iat: number
         };
-        if (result.userID && result.iat < result.exp) {
+        const findUserTokenInfo = await devicesCollection.findOne({userId: result.userID})
+        if (findUserTokenInfo && result.iat === findUserTokenInfo.issuedAt && result.exp === findUserTokenInfo.expirationAt) {
             console.log(result);
             next()
             return
@@ -68,8 +69,9 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
         return res.sendStatus(401)
 
     }
-
 }
+
+
 export const checkAccessTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!req.headers.authorization) {
@@ -77,22 +79,21 @@ export const checkAccessTokenMiddleware = async (req: Request, res: Response, ne
         return;
     }
     const accessToken = req.headers.authorization.split(' ')[1];
+    try {
+        const result = await jwt.verify(accessToken, settings.JWT_SECRET) as {
+            userID: string,
+            exp: number,
+            iat: number
+        };
+        if (result.userID && result.exp * 1000 > Date.now()) {
+            next()
+            return
+        }
+        return res.sendStatus(401)
+    } catch (e) {
+        return res.sendStatus(401)
 
-
-    const result = jwt.verify(accessToken, settings.JWT_SECRET) as {
-        userID: string,
-        exp: number,
-        iat: number
-    };
-    if (result.userID && result.iat < result.exp) {
-        console.log(result);
-        next()
-        return
     }
-
-    res.sendStatus(401)
-    return
-
 }
 
 export const checkExistUserMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -106,7 +107,7 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
 }
 
 // export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-//     let foundUser = await userRepository.findUserByCode(req.body.code);
+//     let foundUser = await deviceRepository.findUserByCode(req.body.code);
 //
 //     if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
 //         next();

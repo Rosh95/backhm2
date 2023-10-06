@@ -1,7 +1,8 @@
 import {NewUsersDBType, UserViewModel} from '../../types/user-types';
-import {usersCollection} from '../../db/dbMongo';
+import {devicesCollection, usersCollection} from '../../db/dbMongo';
 import {usersMapping} from '../../helpers/helpers';
 import {ObjectId} from 'mongodb';
+import {DeviceDBModel} from "../../types/auth-types";
 
 export const authRepository = {
 
@@ -52,7 +53,6 @@ export const authRepository = {
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
         return await usersCollection.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
     },
-
     async updateEmailConfimation(userId: ObjectId): Promise<boolean> {
         const result = await usersCollection.updateOne({_id: new ObjectId(userId)}, {
             $set: {
@@ -60,5 +60,31 @@ export const authRepository = {
             }
         })
         return result.matchedCount === 1;
+    },
+    async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<any> {
+        const findUserInRefreshCollection = await devicesCollection.findOne({userId: refreshTokenInfo.userId})
+        if (findUserInRefreshCollection) {
+            const newRefreshToken = await devicesCollection.updateOne({userId: refreshTokenInfo.userId}, {
+                $set: {
+                    userId: refreshTokenInfo.userId,
+                    issuedAt: refreshTokenInfo.issuedAt,
+                    expirationAt: refreshTokenInfo.expirationAt,
+                    deviceId: refreshTokenInfo.deviceId,
+                    ip: refreshTokenInfo.ip,
+                    deviceName: refreshTokenInfo.deviceName,
+                }
+            })
+            return newRefreshToken.matchedCount === 1;
+        } else {
+            try {
+                const result = await devicesCollection.insertOne(refreshTokenInfo);
+                return true;
+            } catch (e) {
+                return false;
+            }
+
+        }
     }
+
+
 }

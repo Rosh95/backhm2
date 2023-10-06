@@ -43,14 +43,13 @@ export type NewUsersDBType = {
         passwordHash: string,
         passwordSalt: string,
         createdAt: Date,
-
     },
     emailConfirmation: {
         confirmationCode: string,
         emailExpiration: Date,
         isConfirmed: boolean,
     }
-
+    
 }
 
 

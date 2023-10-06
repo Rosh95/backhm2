@@ -1,9 +1,9 @@
 import {Request, Response, Router} from 'express';
 import {jwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/user-types';
+import {v4 as uuidv4} from 'uuid';
 import {
     authValidationINfoMiddleware,
-    authValidationMiddleware,
     checkAccessTokenMiddleware,
     checkRefreshTokenMiddleware,
     isEmailConfirmatedMiddlewareByCode,
@@ -14,26 +14,40 @@ import {errorsValidationMiddleware} from '../validation/error-validation-middlew
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
 import {userService} from "../domain/users-service";
+import {whiteList} from "../settings";
+import {deviceInputValue} from "../types/auth-types";
 
 
 export const authRouter = Router({})
 
-const whiteList: { accessToken: string, refreshToken: string } = {
-    accessToken: '',
-    refreshToken: ''
-}
+
 authRouter.post('/login',
     async (req: Request, res: Response) => {
 
         let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
+
         if (user) {
-            const token = await jwtService.createJWT(user)
-            const refreshToken = await jwtService.createRefreshJWT(user)
-            whiteList.accessToken = token.accessToken;
-            whiteList.refreshToken = refreshToken.refreshToken
+            const accessToken = await jwtService.createJWT(user)
+            const deviceId = uuidv4();
+            const refreshToken = await jwtService.createRefreshJWT(user, deviceId)
+            const deviceInfo: deviceInputValue = {
+                userId: user._id.toString(),
+                deviceId: deviceId,
+                refreshToken: refreshToken.refreshToken,
+                deviceName: req.headers['user-agent'] ? req.headers['user-agent'].toString() : 'unknown',
+                ip: req.ip
+            }
+            console.log(deviceInfo)
+            try {
+                await authService.addDeviceInfoToDB(deviceInfo);
+                console.log(deviceInfo)
+            } catch (e) {
+                return false
+            }
+
             res.cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
-            res.header('accessToken', token.accessToken)
-            return res.status(200).send(token)
+            res.header('accessToken', accessToken.accessToken)
+            return res.status(200).send(accessToken)
         } else {
             return res.sendStatus(401)
         }
@@ -43,19 +57,12 @@ authRouter.post('/refresh-token',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
-        if (refreshToken !== whiteList.refreshToken) {
-            return res.status(401).send(
-                {message: 'it isn`t valid refresh token'}
-            )
-        }
-
         const currentUserId = await jwtService.getUserIdByRefreshToken(refreshToken);
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
-            const newRefreshToken = await jwtService.createRefreshJWT(currentUser)
-            whiteList.accessToken = newAccesstoken.accessToken;
-            whiteList.refreshToken = newRefreshToken.refreshToken
+            const deviceId = uuidv4();
+            const newRefreshToken = await jwtService.createRefreshJWT(currentUser, deviceId)
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
                 .header('accessToken', newAccesstoken.accessToken)
@@ -69,12 +76,6 @@ authRouter.post('/refresh-token',
 authRouter.post('/logout',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
-        const refreshToken = req.cookies.refreshToken;
-        if (refreshToken !== whiteList.refreshToken) {
-            return res.status(401).send(
-                {message: 'it isn`t valid refresh token'}
-            )
-        }
         whiteList.refreshToken = ''
         whiteList.accessToken = ''
         return res
@@ -92,12 +93,7 @@ authRouter.get('/me',
             res.sendStatus(401)
             return;
         }
-        const accessToken = req.headers.authorization.split(' ')[1];
-        if (accessToken !== whiteList.accessToken) {
-            return res.status(401).send(
-                {message: 'it isn`t valid access token'}
-            )
-        }
+
         const currentUserInfo: CurrentUserInfoType = {
             login: req.user!.accountData.login,
             email: req.user!.accountData.email,

@@ -3,7 +3,8 @@ import dotenv from 'dotenv'
 import {BlogDbType} from '../types/blog-types';
 import {PostDBModel} from '../types/post-types';
 import {NewUsersDBType} from '../types/user-types';
-import {CommentsDBType} from '../types/comments-types';
+import {CommentsDBType} from "../types/comments-types";
+import {DeviceDBModel} from "../types/auth-types";
 
 dotenv.config()
 
@@ -20,6 +21,9 @@ export const blogsCollection = db.collection<BlogDbType>('blogs');
 export const postsCollection = db.collection<PostDBModel>('posts');
 export const usersCollection = db.collection<NewUsersDBType>('users');
 export const commentsCollection = db.collection<CommentsDBType>('comments');
+//export const deviceCollection = db.collection<DeviceDBModel>('devices');
+export const devicesCollection = db.collection<DeviceDBModel>('devices');
+
 
 export async function runDb() {
     try {

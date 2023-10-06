@@ -5,3 +5,7 @@ export const settings = {
     EMAILPASS: 'aqjnpnwnyienhrvz'
 
 }
+export const whiteList: { accessToken: string, refreshToken: string } = {
+    accessToken: '',
+    refreshToken: ''
+}

@@ -6,6 +6,7 @@ import {getUserViewModel, NewUsersDBType, UserViewModel} from '../types/user-typ
 import {CommentsDBType, CommentsViewModel} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogDbType, BlogViewType} from '../types/blog-types';
+import {DeviceDBModel, DeviceViewModel} from "../types/auth-types";
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -145,6 +146,16 @@ export function getUsersMapping(user: NewUsersDBType): getUserViewModel {
         login: user.accountData.login,
         email: user.accountData.email,
         createdAt: user.accountData.createdAt.toISOString(),
+    }
+}
+
+export function getSessionsMapping(device: DeviceDBModel): DeviceViewModel {
+
+    return {
+        ip: device.ip,
+        title: device.deviceName,
+        lastActiveDate: device.issuedAt,
+        deviceId: device.deviceId
     }
 }
 

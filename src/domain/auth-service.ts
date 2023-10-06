@@ -1,4 +1,4 @@
-import {getUserViewModel, NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserInputType} from '../types/user-types';
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
 import {emailAdapter} from '../adapters/email-adapter';
@@ -6,6 +6,8 @@ import add from 'date-fns/add';
 import {v4 as uuidv4} from 'uuid';
 import {authRepository} from "../repositories/auth/auth-repository";
 import {usersMapping} from "../helpers/helpers";
+import {DeviceDBModel, deviceInputValue} from "../types/auth-types";
+import {jwtService} from "../application/jwt-service";
 
 const bcrypt = require('bcrypt');
 
@@ -97,4 +99,17 @@ export const authService = {
         return await userRepository.findUserByEmail(email);
 
     },
+    async addDeviceInfoToDB(deviceInfo: deviceInputValue): Promise<any> {
+        let getInfoFromRefreshToken = await jwtService.getTokenInfoByRefreshToken(deviceInfo.refreshToken);
+        let result: DeviceDBModel = {
+            userId: deviceInfo.userId,
+            issuedAt: getInfoFromRefreshToken.iat,
+            expirationAt: getInfoFromRefreshToken.exp,
+            deviceId: deviceInfo.deviceId,
+            ip: deviceInfo.ip,
+            deviceName: deviceInfo.deviceName,
+        }
+        await authRepository.createOrUpdateRefreshToken(result);
+
+    }
 }

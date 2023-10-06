@@ -7,6 +7,7 @@ import {authRouter} from './routes/auth-router';
 import {commentsRouter} from './routes/comments-router';
 import {emailRouter} from './routes/email-router';
 import cookieParser from "cookie-parser";
+import {deviceRouter} from "./routes/device-router";
 
 export const app = express();
 
@@ -22,6 +23,7 @@ app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/comments', commentsRouter);
 app.use('/email', emailRouter);
+app.use('/security/devices', deviceRouter);
 app.use('/testing/all-data', testRouter);
 
 app.use('/', (req: Request, res: Response) => {
