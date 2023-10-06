@@ -37,10 +37,8 @@ authRouter.post('/login',
                 deviceName: req.headers['user-agent'] ? req.headers['user-agent'].toString() : 'unknown',
                 ip: req.ip
             }
-            console.log(deviceInfo)
             try {
                 await authService.addDeviceInfoToDB(deviceInfo);
-                console.log(deviceInfo)
             } catch (e) {
                 return false
             }
