@@ -28,6 +28,9 @@ deviceRouter.get('/',
 deviceRouter.delete('/:deviceId ',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
+        if (!req.params.deviceId) {
+            return res.sendStatus(404)
+        }
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
         const findUserIdByDeviceId = await deviceQueryRepository.findUserIdByDeviceId(req.params.deviceId)
@@ -51,5 +54,24 @@ deviceRouter.delete('/:deviceId ',
             }
         }
         return res.sendStatus(404)
-
+    })
+deviceRouter.delete('/ ',
+    checkRefreshTokenMiddleware,
+    async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+        const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        if (currentUserInfo) {
+            const currentDeviceId = currentUserInfo.deviceID;
+            const currentUserId = currentUserInfo.userID;
+            try {
+                const isDeleted: boolean = await deviceRepository.deleteOtherUserDevice(currentUserId, currentDeviceId);
+                if (isDeleted) {
+                    return res.sendStatus(204)
+                }
+                return res.sendStatus(404)
+            } catch (e) {
+                return res.sendStatus(404)
+            }
+        }
+        return res.sendStatus(404)
     })
