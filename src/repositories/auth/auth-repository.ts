@@ -87,7 +87,6 @@ export const authRepository = {
             } catch (e) {
                 return false;
             }
-
         }
     }
 
