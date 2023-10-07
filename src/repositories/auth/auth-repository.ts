@@ -1,7 +1,7 @@
 import {NewUsersDBType, UserViewModel} from '../../types/user-types';
 import {devicesCollection, usersCollection} from '../../db/dbMongo';
 import {usersMapping} from '../../helpers/helpers';
-import {ObjectId} from 'mongodb';
+import {Filter, ObjectId} from 'mongodb';
 import {DeviceDBModel} from "../../types/auth-types";
 
 export const authRepository = {
@@ -62,9 +62,14 @@ export const authRepository = {
         return result.matchedCount === 1;
     },
     async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<any> {
-        const findUserInRefreshCollection = await devicesCollection.findOne({userId: refreshTokenInfo.userId})
+        const filter: Filter<DeviceDBModel> = {
+            userId: refreshTokenInfo.userId,
+            deviceName: refreshTokenInfo.deviceName
+        }
+        const findUserInRefreshCollection = await devicesCollection.findOne(filter)
+
         if (findUserInRefreshCollection) {
-            const newRefreshToken = await devicesCollection.updateOne({userId: refreshTokenInfo.userId}, {
+            const newRefreshToken = await devicesCollection.updateOne(filter, {
                 $set: {
                     userId: refreshTokenInfo.userId,
                     issuedAt: refreshTokenInfo.issuedAt,

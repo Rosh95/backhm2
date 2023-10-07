@@ -15,6 +15,7 @@ export const app = express();
 const parserMiddleWare = express.json()
 app.use(parserMiddleWare)
 app.use(cookieParser())
+app.set('trust proxy', true)
 
 
 app.use('/blogs', blogsRouter);
@@ -29,3 +30,5 @@ app.use('/testing/all-data', testRouter);
 app.use('/', (req: Request, res: Response) => {
     res.send('Siiiiii')
 })
+
+// cronJob (scheduler) => delete old connections in array
