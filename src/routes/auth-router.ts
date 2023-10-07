@@ -16,6 +16,8 @@ import {authService} from "../domain/auth-service";
 import {userService} from "../domain/users-service";
 import {whiteList} from "../settings";
 import {deviceInputValue} from "../types/auth-types";
+import {deviceService} from "../domain/device-service";
+import {deviceRepository} from "../repositories/device/device-repository";
 
 
 export const authRouter = Router({})
@@ -56,13 +58,14 @@ authRouter.post('/refresh-token',
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
-        const currentUserId = currentUserInfo.userId;
-        const currentDeviceId = currentUserInfo.deviceId;
+        const currentUserId: string = currentUserInfo.userId;
+        const currentDeviceId: string = currentUserInfo.deviceId;
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
-            ////const deviceId = uuidv4();
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
+            await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
+            //поменять в базе данных дату обновления
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
                 .header('accessToken', newAccesstoken.accessToken)
@@ -76,6 +79,12 @@ authRouter.post('/refresh-token',
 authRouter.post('/logout',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
+        //убрать лишнюю инфу в базе данных ( обнулить дату создания )
+        const refreshToken = req.cookies.refreshToken;
+        const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        const currentUserId: string = currentUserInfo.userId;
+        const currentDeviceId: string = currentUserInfo.deviceId;
+        await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)
