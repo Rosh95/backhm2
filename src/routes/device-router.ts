@@ -50,7 +50,10 @@ deviceRouter.delete('/',
 deviceRouter.delete('/:deviceId',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
+        if (!req.params.deviceId) {
+            return res.sendStatus(404)
 
+        }
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
         const findUserIdByDeviceId = await deviceQueryRepository.findUserIdByDeviceId(req.params.deviceId)

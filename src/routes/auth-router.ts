@@ -55,12 +55,14 @@ authRouter.post('/refresh-token',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
-        const currentUserId = await jwtService.getUserIdByRefreshToken(refreshToken);
+        const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        const currentUserId = currentUserInfo.userId;
+        const currentDeviceId = currentUserInfo.deviceId;
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
-            const deviceId = uuidv4();
-            const newRefreshToken = await jwtService.createRefreshJWT(currentUser, deviceId)
+            ////const deviceId = uuidv4();
+            const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
                 .header('accessToken', newAccesstoken.accessToken)
@@ -74,8 +76,6 @@ authRouter.post('/refresh-token',
 authRouter.post('/logout',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
-        whiteList.refreshToken = ''
-        whiteList.accessToken = ''
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)
