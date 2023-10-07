@@ -6,16 +6,16 @@ import {LoginSuccessViewModel, LoginSuccessViewModelForRefresh} from '../types/a
 
 export const jwtService = {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
-        const token = jwt.sign({userID: user._id}, settings.JWT_SECRET, {expiresIn: '10s'})
+        const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '1000s'})
         return {
             accessToken: token
         }
     },
     async createRefreshJWT(user: NewUsersDBType, deviceId: string): Promise<LoginSuccessViewModelForRefresh> {
         const token = jwt.sign({
-            userID: user._id,
-            deviceID: deviceId
-        }, settings.JWT_REFRESH_SECRET, {expiresIn: '20s'})
+            userId: user._id,
+            deviceId: deviceId
+        }, settings.JWT_REFRESH_SECRET, {expiresIn: '2000s'})
         return {
             refreshToken: token
         }
@@ -24,19 +24,19 @@ export const jwtService = {
 
     async getUserIdByAccessToken(token: string): Promise<ObjectId | null> {
         try {
-            const result = jwt.verify(token, settings.JWT_SECRET) as { userID: string };
+            const result = jwt.verify(token, settings.JWT_SECRET) as { userId: string };
             console.log(result)
-            return new ObjectId(result.userID)
+            return new ObjectId(result.userId)
         } catch (error) {
             return null
         }
     },
     async getUserIdByRefreshToken(token: string): Promise<ObjectId | null> {
         try {
-            const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as { userID: string };
+            const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as { userId: string };
             console.log(result)
 
-            return new ObjectId(result.userID)
+            return new ObjectId(result.userId)
         } catch (error) {
             return null
         }
@@ -45,7 +45,7 @@ export const jwtService = {
     async getTokenInfoByRefreshToken(token: string): Promise<any | null> {
         try {
             const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as {
-                userID: string,
+                userId: string,
                 deviceId: string,
                 iat: number,
                 exp: number

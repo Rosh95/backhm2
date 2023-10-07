@@ -31,8 +31,8 @@ deviceRouter.delete('/',
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
         if (currentUserInfo) {
-            const currentDeviceId = currentUserInfo.deviceID;
-            const currentUserId = currentUserInfo.userID;
+            const currentDeviceId = currentUserInfo.deviceId;
+            const currentUserId = currentUserInfo.userId;
 
             try {
                 const isDeleted: boolean = await deviceRepository.deleteOtherUserDevice(currentUserId, currentDeviceId);
@@ -58,9 +58,9 @@ deviceRouter.delete('/:deviceId',
             return res.sendStatus(400)
         }
         if (currentUserInfo) {
-            const currentDeviceId = currentUserInfo.deviceID;
-            const currentUserId = currentUserInfo.userID;
-            if (req.params.deviceId === currentUserInfo.deviceID) {
+            const currentDeviceId = currentUserInfo.deviceId;
+            const currentUserId = currentUserInfo.userId;
+            if (req.params.deviceId === currentUserInfo.deviceId) {
                 return res.status(400).send('couldn`t delete current session')
             }
             if (findUserIdByDeviceId !== currentUserId) {

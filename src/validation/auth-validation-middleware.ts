@@ -55,12 +55,12 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
     }
     try {
         const result = await jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET) as {
-            userID: string,
-            deviceID: string,
+            userId: string,
+            deviceId: string,
             exp: number,
             iat: number
         };
-        const findUserTokenInfo = await devicesCollection.findOne({userId: result.userID, deviceId: result.deviceID})
+        const findUserTokenInfo = await devicesCollection.findOne({userId: result.userId, deviceId: result.deviceId})
         if (findUserTokenInfo && result.iat === findUserTokenInfo.issuedAt && result.exp === findUserTokenInfo.expirationAt) {
             console.log(result);
             next()
@@ -83,11 +83,11 @@ export const checkAccessTokenMiddleware = async (req: Request, res: Response, ne
     const accessToken = req.headers.authorization.split(' ')[1];
     try {
         const result = await jwt.verify(accessToken, settings.JWT_SECRET) as {
-            userID: string,
+            userId: string,
             exp: number,
             iat: number
         };
-        if (result.userID && result.exp * 1000 > Date.now()) {
+        if (result.userId && result.exp * 1000 > Date.now()) {
             next()
             return
         }
@@ -119,7 +119,7 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
 // }
 
 export const isEmailConfirmatedMiddlewareByCode = body('code').custom(async (value) => {
-    let foundUser = await userRepository.findUserByCode(value);    //   console.log(`${blogsIdArray} exists blogID`)
+    let foundUser = await userRepository.findUserByCode(value);
 
     if (foundUser!.emailConfirmation.isConfirmed) {
 

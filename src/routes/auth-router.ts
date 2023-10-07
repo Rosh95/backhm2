@@ -16,7 +16,6 @@ import {authService} from "../domain/auth-service";
 import {userService} from "../domain/users-service";
 import {whiteList} from "../settings";
 import {deviceInputValue} from "../types/auth-types";
-import {devicesCollection} from "../db/dbMongo";
 
 
 export const authRouter = Router({})
@@ -44,7 +43,6 @@ authRouter.post('/login',
             } catch (e) {
                 return false
             }
-            console.log(await devicesCollection.find({userId: user._id.toString()}).toArray())
             res.cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
             res.header('accessToken', accessToken.accessToken)
             return res.status(200).send(accessToken)
