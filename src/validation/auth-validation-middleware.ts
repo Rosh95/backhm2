@@ -56,10 +56,11 @@ export const checkRefreshTokenMiddleware = async (req: Request, res: Response, n
     try {
         const result = await jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET) as {
             userID: string,
+            deviceID: string,
             exp: number,
             iat: number
         };
-        const findUserTokenInfo = await devicesCollection.findOne({userId: result.userID})
+        const findUserTokenInfo = await devicesCollection.findOne({userId: result.userID, deviceId: result.deviceID})
         if (findUserTokenInfo && result.iat === findUserTokenInfo.issuedAt && result.exp === findUserTokenInfo.expirationAt) {
             console.log(result);
             next()

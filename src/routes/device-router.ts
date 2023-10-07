@@ -3,6 +3,7 @@ import {deviceQueryRepository} from "../repositories/device/device-query-reposit
 import {jwtService} from "../application/jwt-service";
 import {checkRefreshTokenMiddleware} from "../validation/auth-validation-middleware";
 import {deviceRepository} from "../repositories/device/device-repository";
+import {devicesCollection} from "../db/dbMongo";
 
 
 export const deviceRouter = Router({});
@@ -10,11 +11,13 @@ export const deviceRouter = Router({});
 deviceRouter.get('/',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
+        console.log('popal v router')
         const refreshToken = req.cookies.refreshToken;
         const currentUserId = await jwtService.getUserIdByRefreshToken(refreshToken);
         if (currentUserId) {
             try {
                 const currentSessions = await deviceQueryRepository.getAllDeviceSessions(currentUserId.toString());
+                console.log(await devicesCollection.find({userId: currentUserId.toString()}).toArray(), 'in dev router')
                 return res.status(200).send(currentSessions)
             } catch (e) {
                 return res.sendStatus(400)
