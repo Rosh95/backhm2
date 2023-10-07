@@ -41,7 +41,6 @@ authRouter.post('/login',
             }
             try {
                 await authService.addDeviceInfoToDB(deviceInfo);
-
             } catch (e) {
                 return false
             }
@@ -64,8 +63,20 @@ authRouter.post('/refresh-token',
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
-            await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
+            //await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
             //поменять в базе данных дату обновления
+            const deviceInfo: deviceInputValue = {
+                userId: currentUserId,
+                deviceId: currentDeviceId,
+                refreshToken: newRefreshToken.refreshToken,
+                deviceName: req.headers['user-agent'] ? req.headers['user-agent'].toString() : 'unknown',
+                ip: req.ip
+            }
+            try {
+                await authService.addDeviceInfoToDB(deviceInfo);
+            } catch (e) {
+                return false
+            }
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
                 .header('accessToken', newAccesstoken.accessToken)
@@ -84,7 +95,9 @@ authRouter.post('/logout',
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
         const currentUserId: string = currentUserInfo.userId;
         const currentDeviceId: string = currentUserInfo.deviceId;
+
         await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
+
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)

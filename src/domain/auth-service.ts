@@ -98,6 +98,7 @@ export const authService = {
         return await userRepository.findUserByEmail(email);
 
     },
+
     async addDeviceInfoToDB(deviceInfo: deviceInputValue): Promise<any> {
         let getInfoFromRefreshToken = await jwtService.getTokenInfoByRefreshToken(deviceInfo.refreshToken);
         let result: DeviceDBModel = {
@@ -109,6 +110,6 @@ export const authService = {
             deviceName: deviceInfo.deviceName,
         }
         await authRepository.createOrUpdateRefreshToken(result);
-
     }
+
 }
