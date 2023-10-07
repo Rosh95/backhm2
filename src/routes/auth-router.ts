@@ -117,7 +117,7 @@ authRouter.post('/registration',
         }
         const newUser: getUserViewModel | null = await authService.createUser(userPostInputData);
         if (newUser) {
-            res.sendStatus(204)
+            return res.sendStatus(204)
 
         }
         return res.sendStatus(400)

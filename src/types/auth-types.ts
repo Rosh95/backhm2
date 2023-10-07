@@ -1,3 +1,5 @@
+
+
 export type LoginSuccessViewModel = {
     accessToken: string
 }
@@ -8,7 +10,7 @@ export type LoginSuccessViewModelForRefresh = {
 export type DeviceViewModel = {
     ip: string,
     title: string,
-    lastActiveDate: number,
+    lastActiveDate: string,
     deviceId: string
 }
 

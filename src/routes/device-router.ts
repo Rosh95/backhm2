@@ -7,7 +7,6 @@ import {deviceRepository} from "../repositories/device/device-repository";
 
 export const deviceRouter = Router({});
 
-
 deviceRouter.get('/',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {

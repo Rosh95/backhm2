@@ -154,7 +154,7 @@ export function getSessionsMapping(device: DeviceDBModel): DeviceViewModel {
     return {
         ip: device.ip,
         title: device.deviceName,
-        lastActiveDate: device.issuedAt,
+        lastActiveDate: new Date(device.issuedAt * 1000).toISOString(),
         deviceId: device.deviceId
     }
 }
