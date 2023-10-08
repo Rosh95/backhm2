@@ -6,7 +6,7 @@ export const deviceQueryRepository = {
 
     async getAllDeviceSessions(userId: string): Promise<DeviceViewModelArray> {
 
-        const sessions = await devicesCollection.find({userId: userId}).toArray()
+        const sessions = await devicesCollection.find({userId: userId, issuedAt: {$ne: 0}}).toArray()
 
         const sessionsViewArray: DeviceViewModelArray = sessions.map(session => getSessionsMapping(session))
 
@@ -19,6 +19,16 @@ export const deviceQueryRepository = {
 
         if (foundDeviceInfo) {
             return foundDeviceInfo.userId
+        }
+        return null
+
+    },
+    async getDeviceIdByUserId(userId: string): Promise<string | null> {
+
+        const foundDeviceInfo = await devicesCollection.findOne({userId: userId})
+
+        if (foundDeviceInfo) {
+            return foundDeviceInfo.deviceId
         }
         return null
 

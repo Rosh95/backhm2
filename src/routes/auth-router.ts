@@ -14,9 +14,7 @@ import {errorsValidationMiddleware} from '../validation/error-validation-middlew
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
 import {userService} from "../domain/users-service";
-import {whiteList} from "../settings";
 import {deviceInputValue} from "../types/auth-types";
-import {deviceService} from "../domain/device-service";
 import {deviceRepository} from "../repositories/device/device-repository";
 
 
@@ -30,6 +28,8 @@ authRouter.post('/login',
 
         if (user) {
             const accessToken = await jwtService.createJWT(user)
+            //     const deviceIdByUserId = await deviceQueryRepository.getDeviceIdByUserId(user._id.toString())
+            //     const deviceId = deviceIdByUserId ? deviceIdByUserId : uuidv4();
             const deviceId = uuidv4();
             const refreshToken = await jwtService.createRefreshJWT(user, deviceId)
             const deviceInfo: deviceInputValue = {

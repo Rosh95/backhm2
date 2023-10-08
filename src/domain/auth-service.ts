@@ -110,6 +110,7 @@ export const authService = {
             deviceName: deviceInfo.deviceName,
         }
         await authRepository.createOrUpdateRefreshToken(result);
-    }
+    },
+
 
 }
