@@ -140,7 +140,7 @@ export const countNumberLoginAttempts = async (req: Request, res: Response, next
     const getCountOfAttemtsLogin = await deviceQueryRepository.getLoginAtemptsByUrlAndIp(req.ip, req.url, rateLimit)
     const addCountOfAttemptsLogin = await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
 
-    if (getCountOfAttemtsLogin > 5) {
+    if (getCountOfAttemtsLogin >= 5) {
         return res.sendStatus(429)
     }
     next()
