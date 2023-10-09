@@ -1,5 +1,4 @@
-import {devicesCollection, usersCollection} from '../../db/dbMongo';
-import {ObjectId} from "mongodb";
+import {devicesCollection, loginAttemptCollection} from '../../db/dbMongo';
 
 export const deviceRepository = {
 
@@ -24,6 +23,9 @@ export const deviceRepository = {
             }
         })
         return result.matchedCount === 1;
+    },
+    async createLoginAtempt(ip: string, url: string, date: Date) {
+        return loginAttemptCollection.insertOne({ip, url, date})
     }
 
 

@@ -1,5 +1,3 @@
-
-
 export type LoginSuccessViewModel = {
     accessToken: string
 }
@@ -38,4 +36,11 @@ export type deviceInputValue = {
     deviceName: string,
     ip: string
 }
+
+export type LoginAttemptDBModel = {
+    ip: string,
+    url: string,
+    date: Date
+}
+
 

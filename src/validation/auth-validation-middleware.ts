@@ -7,6 +7,8 @@ import {body} from "express-validator";
 import jwt from "jsonwebtoken";
 import {settings} from "../settings";
 import {devicesCollection} from "../db/dbMongo";
+import {deviceQueryRepository} from "../repositories/device/device-query-repository";
+import {deviceRepository} from "../repositories/device/device-repository";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -108,15 +110,6 @@ export const checkExistUserMiddleware = async (req: Request, res: Response, next
     return res.sendStatus(400);
 }
 
-// export const checkEmailConfirmationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-//     let foundUser = await deviceRepository.findUserByCode(req.body.code);
-//
-//     if (foundUser && foundUser.emailConfirmation.isConfirmed === false) {
-//         next();
-//         return;
-//     }
-//     return res.sendStatus(400);
-// }
 
 export const isEmailConfirmatedMiddlewareByCode = body('code').custom(async (value) => {
     let foundUser = await userRepository.findUserByCode(value);
@@ -140,3 +133,16 @@ export const isEmailConfirmatedMiddlewareByEmail = body('email').custom(async (v
     return true;
 
 }).withMessage('This email has confired or we couldn`t find user');
+
+
+export const countNumberLoginAttempts = async (req: Request, res: Response, next: NextFunction) => {
+    const rateLimit = new Date(Number(new Date()) - 10000)
+    const getCountOfAttemtsLogin = await deviceQueryRepository.getLoginAtemptsByUrlAndIp(req.ip, req.url, rateLimit)
+    const addCountOfAttemptsLogin = await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
+
+    if (getCountOfAttemtsLogin > 5) {
+        return res.sendStatus(429)
+    }
+    next()
+    return
+}

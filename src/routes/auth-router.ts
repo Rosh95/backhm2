@@ -5,7 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 import {
     authValidationINfoMiddleware,
     checkAccessTokenMiddleware,
-    checkRefreshTokenMiddleware,
+    checkRefreshTokenMiddleware, countNumberLoginAttempts,
     isEmailConfirmatedMiddlewareByCode,
     isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
@@ -22,10 +22,11 @@ export const authRouter = Router({})
 
 
 authRouter.post('/login',
+    countNumberLoginAttempts,
     async (req: Request, res: Response) => {
 
         let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
-
+        debugger
         if (user) {
             const accessToken = await jwtService.createJWT(user)
             //     const deviceIdByUserId = await deviceQueryRepository.getDeviceIdByUserId(user._id.toString())
@@ -127,7 +128,7 @@ authRouter.get('/me',
 )
 
 authRouter.post('/registration',
-    //  checkExistUserMiddleware,
+    countNumberLoginAttempts,
     userValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -148,6 +149,7 @@ authRouter.post('/registration',
 )
 
 authRouter.post('/registration-confirmation',
+    countNumberLoginAttempts,
     isEmailConfirmatedMiddlewareByCode,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -166,6 +168,7 @@ authRouter.post('/registration-confirmation',
 )
 
 authRouter.post('/registration-email-resending',
+    countNumberLoginAttempts,
     emailUserMiddleware,
     isEmailConfirmatedMiddlewareByEmail,
     errorsValidationMiddleware,

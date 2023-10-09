@@ -1,5 +1,5 @@
 import {getSessionsMapping} from '../../helpers/helpers';
-import {devicesCollection} from '../../db/dbMongo';
+import {devicesCollection, loginAttemptCollection} from '../../db/dbMongo';
 import {DeviceViewModelArray} from "../../types/auth-types";
 
 export const deviceQueryRepository = {
@@ -31,8 +31,10 @@ export const deviceQueryRepository = {
             return foundDeviceInfo.deviceId
         }
         return null
-
     },
 
-
+    async getLoginAtemptsByUrlAndIp(ip: string, url: string, date: Date) {
+        const resultCount = await loginAttemptCollection.find({ip, url, date: {$gt: date}}).toArray()
+        return resultCount.length
+    }
 }
