@@ -64,7 +64,6 @@ authRouter.post('/refresh-token',
         if (currentUser) {
             const newAccesstoken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
-            //await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
             //поменять в базе данных дату обновления
             const deviceInfo: deviceInputValue = {
                 userId: currentUserId,

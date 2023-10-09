@@ -71,10 +71,8 @@ export const authRepository = {
         if (findUserInRefreshCollection) {
             const newRefreshToken = await devicesCollection.updateOne(filter, {
                 $set: {
-                    userId: refreshTokenInfo.userId,
                     issuedAt: refreshTokenInfo.issuedAt,
                     expirationAt: refreshTokenInfo.expirationAt,
-                    deviceId: refreshTokenInfo.deviceId,
                     ip: refreshTokenInfo.ip,
                     deviceName: refreshTokenInfo.deviceName,
                 }
