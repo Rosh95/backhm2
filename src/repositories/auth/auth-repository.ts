@@ -64,10 +64,9 @@ export const authRepository = {
     async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<any> {
         const filter: Filter<DeviceDBModel> = {
             userId: refreshTokenInfo.userId,
-            deviceName: refreshTokenInfo.deviceName
+            deviceId: refreshTokenInfo.deviceId
         }
         const findUserInRefreshCollection = await devicesCollection.findOne(filter)
-
         if (findUserInRefreshCollection) {
             const newRefreshToken = await devicesCollection.updateOne(filter, {
                 $set: {

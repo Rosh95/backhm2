@@ -24,9 +24,7 @@ export const authRouter = Router({})
 authRouter.post('/login',
     countNumberLoginAttempts,
     async (req: Request, res: Response) => {
-
         let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
-        debugger
         if (user) {
             const accessToken = await jwtService.createJWT(user)
             //     const deviceIdByUserId = await deviceQueryRepository.getDeviceIdByUserId(user._id.toString())

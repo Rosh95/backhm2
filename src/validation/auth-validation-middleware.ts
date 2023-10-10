@@ -49,7 +49,6 @@ export const authValidationINfoMiddleware = async (req: Request, res: Response, 
 }
 
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
         res.sendStatus(401)

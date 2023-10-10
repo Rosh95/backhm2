@@ -50,7 +50,6 @@ export const authService = {
         return await userRepository.deleteUser(idInMongo);
     },
     async checkCredential(loginOrEmail: string, password: string) {
-        debugger
         const user = await userRepository.findLoginOrEmail(loginOrEmail);
         if (!user) return false;
         const passwordHash = await this._generateHash(password, user.accountData.passwordSalt)
