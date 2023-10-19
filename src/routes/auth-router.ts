@@ -4,10 +4,10 @@ import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/use
 import {v4 as uuidv4} from 'uuid';
 import {
     authValidationINfoMiddleware,
-    checkAccessTokenMiddleware,
+    checkAccessTokenMiddleware, checkNewPassword,
     checkRefreshTokenMiddleware, countNumberLoginAttempts,
     isEmailConfirmatedMiddlewareByCode,
-    isEmailConfirmatedMiddlewareByEmail,
+    isEmailConfirmatedMiddlewareByEmail, isEmailConfirmatedMiddlewareByRecoveryCode,
 } from '../validation/auth-validation-middleware';
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
@@ -193,7 +193,7 @@ authRouter.post('/password-recovery',
 )
 authRouter.post('/new-password',
     countNumberLoginAttempts,
-    isEmailConfirmatedMiddlewareByCode,
+    checkNewPassword,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const code = req.body.recoveryCode;

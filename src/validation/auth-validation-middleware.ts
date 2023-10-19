@@ -44,6 +44,11 @@ export const authValidationINfoMiddleware = async (req: Request, res: Response, 
     }
     return res.sendStatus(401);
 }
+export const checkNewPassword = body('newPassword').isString().trim().isLength({
+    min: 6,
+    max: 20
+}).withMessage('new password should be more than 6 and less then 20 symbols');
+
 
 export const checkRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -111,6 +116,14 @@ export const isEmailConfirmatedMiddlewareByCode = body('code').custom(async (val
     }
     return true;
 }).withMessage('This email has confirmed');
+export const isEmailConfirmatedMiddlewareByRecoveryCode = body('recoveryCode').custom(async (value) => {
+    let foundUser = await userRepository.findUserByCode(value);
+    if (foundUser!.emailConfirmation.isConfirmed) {
+        throw new Error('This email has confirmed.')
+    }
+    return true;
+}).withMessage('This email has confirmed');
+
 export const isEmailConfirmatedMiddlewareByEmail = body('email').custom(async (value) => {
     let foundUser = await userRepository.findUserByEmail(value);
     if (foundUser!.emailConfirmation.isConfirmed) {
@@ -124,7 +137,7 @@ export const isEmailConfirmatedMiddlewareByEmail = body('email').custom(async (v
 export const countNumberLoginAttempts = async (req: Request, res: Response, next: NextFunction) => {
     const rateLimit = new Date(Number(new Date()) - 10000)
     const getCountOfAttemtsLogin = await deviceQueryRepository.getLoginAtemptsByUrlAndIp(req.ip, req.url, rateLimit)
-     await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
+    await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
     if (getCountOfAttemtsLogin >= 5) {
         return res.sendStatus(429)
     }
