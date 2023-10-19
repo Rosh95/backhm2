@@ -99,8 +99,9 @@ export const authService = {
 
     },
 
-    async addDeviceInfoToDB(deviceInfo: deviceInputValue): Promise<any> {
+    async addDeviceInfoToDB(deviceInfo: deviceInputValue): Promise<Boolean> {
         let getInfoFromRefreshToken = await jwtService.getTokenInfoByRefreshToken(deviceInfo.refreshToken);
+        if (!getInfoFromRefreshToken) return false
         let result: DeviceDBModel = {
             userId: deviceInfo.userId,
             issuedAt: getInfoFromRefreshToken.iat,
@@ -109,7 +110,7 @@ export const authService = {
             ip: deviceInfo.ip,
             deviceName: deviceInfo.deviceName,
         }
-        await authRepository.createOrUpdateRefreshToken(result);
+        return await authRepository.createOrUpdateRefreshToken(result);
 
     },
 

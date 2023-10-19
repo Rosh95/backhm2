@@ -1,5 +1,5 @@
-import {blogsCollection, postsCollection} from '../../db/dbMongo';
-import {Filter, ObjectId} from 'mongodb';
+import {BlogModel, PostModel} from '../../db/dbMongo';
+import {ObjectId} from 'mongodb';
 import {
     blogMapping,
     countTotalBlogsAndPages,
@@ -13,14 +13,14 @@ import {BlogDbType, BlogViewType, PaginatorBlogViewType} from '../../types/blog-
 
 export const blogQueryRepository = {
     async getAllBlogs(queryData: queryDataType): Promise<PaginatorBlogViewType> {
-        const filter: Filter<BlogDbType> = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
+        const filter = {name: {$regex: queryData.searchNameTerm, $options: 'i'}}
 
-        const blogs = await blogsCollection.find(filter)
+        const blogs = await BlogModel.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
-            .limit(queryData.pageSize).toArray();
+            .limit(queryData.pageSize).lean();
 
-        let blogViewArray = blogs.map(blog => blogMapping(blog))
+        let blogViewArray = blogs.map((blog: BlogDbType) => blogMapping(blog))
         let pagesCount = await countTotalBlogsAndPages(queryData, filter);
 
 
@@ -36,17 +36,17 @@ export const blogQueryRepository = {
     },
 
     async findBlogById(id: string): Promise<BlogViewType | null> {
-        const foundBlog: BlogDbType | null = await blogsCollection.findOne({_id: new ObjectId(id)});
+        const foundBlog: BlogDbType | null = await BlogModel.findOne({_id: new ObjectId(id)});
         return foundBlog ? blogMapping(foundBlog) : null;
     },
 
-    async getAllPostOfBlog(blogId: any, queryData: queryDataType): Promise<PaginatorPostViewType> {
+    async getAllPostOfBlog(blogId: string, queryData: queryDataType): Promise<PaginatorPostViewType> {
 
-        let posts = await postsCollection.find({blogId})
+        let posts = await PostModel.find({blogId})
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize)
-            .toArray();
+            .lean();
 
         let postViewArray: PostViewModel[] = posts.map(post => postMapping(post))
         let pagesCount = await countTotalPostsAndPagesOfBlog(blogId, queryData);
@@ -63,17 +63,17 @@ export const blogQueryRepository = {
 
     },
 
-    async getAllPostCountOfBlog(blogId: any): Promise<number> {
+    async getAllPostCountOfBlog(blogId: string): Promise<number> {
 
-        return await postsCollection.countDocuments({blogId: blogId});
+        return PostModel.countDocuments({blogId: blogId});
     },
     async getAllBlogsCount(filter: any): Promise<number> {
 
-        return await blogsCollection.countDocuments(filter);
+        return BlogModel.countDocuments(filter);
     },
     async getAllPostsCount(): Promise<number> {
 
-        return await postsCollection.countDocuments();
+        return PostModel.countDocuments();
     },
 }
 

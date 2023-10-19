@@ -1,12 +1,12 @@
-import {countTotalUsersAndPages, getUsersMapping, queryDataType, usersMapping} from '../../helpers/helpers';
-import {usersCollection} from '../../db/dbMongo';
-import {getUserViewModel, NewUsersDBType, PaginatorUserViewType, UserViewModel} from '../../types/user-types';
-import {Filter} from 'mongodb';
+import {countTotalUsersAndPages, getUsersMapping, queryDataType} from '../../helpers/helpers';
+import {UserModel} from '../../db/dbMongo';
+import {getUserViewModel, NewUsersDBType, PaginatorUserViewType} from '../../types/user-types';
+import {FilterQuery} from "mongoose";
 
 export const usersQueryRepository = {
     async getAllUsers(queryData: queryDataType): Promise<PaginatorUserViewType> {
 
-        const filter: Filter<NewUsersDBType> = {
+        const filter: FilterQuery<NewUsersDBType> = {
             $or: [{
                 'accountData.email': {
                     $regex: queryData.searchEmailTerm ?? '',
@@ -20,11 +20,11 @@ export const usersQueryRepository = {
             }]
         }
 
-        const users = await usersCollection.find(filter)
+        const users = await UserModel.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize)
-            .toArray();
+            .lean();
 
         let usersViewArray: getUserViewModel[] = users.map(user => getUsersMapping(user))
         let pagesCount = await countTotalUsersAndPages(queryData, filter);
@@ -38,8 +38,7 @@ export const usersQueryRepository = {
         };
     },
 
-    async getAllUsersCount(filter?: Filter<any>): Promise<number> {
-
-        return await usersCollection.countDocuments(filter);
+    async getAllUsersCount(filter?: FilterQuery<any>): Promise<number> {
+        return filter ? UserModel.countDocuments(filter) : UserModel.countDocuments()
     },
 }

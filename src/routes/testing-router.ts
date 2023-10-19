@@ -1,14 +1,23 @@
 import {Request, Response, Router} from 'express';
-import {blogsCollection, commentsCollection, postsCollection, usersCollection} from '../db/dbMongo';
+import {
+    BlogModel,
+    CommentModel,
+    DeviceModel,
+    LoginAttemptModel,
+    PostModel,
+    UserModel
+} from '../db/dbMongo';
 
 export const testRouter = Router({})
 
 testRouter.delete('/', async (req: Request, res: Response) => {
 
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
-    await usersCollection.deleteMany({});
-    await commentsCollection.deleteMany({});
+    await BlogModel.deleteMany({});
+    await PostModel.deleteMany({});
+    await UserModel.deleteMany({});
+    await CommentModel.deleteMany({});
+    await DeviceModel.deleteMany({});
+    await LoginAttemptModel.deleteMany({});
     res.sendStatus(204)
 
 })

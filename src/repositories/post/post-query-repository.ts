@@ -1,14 +1,15 @@
 import {countTotalPostsAndPages, postMapping, queryDataType} from '../../helpers/helpers';
-import {postsCollection} from '../../db/dbMongo';
+import {PostModel} from '../../db/dbMongo';
 import {PaginatorPostViewType, PostDBModel, PostViewModel} from '../../types/post-types';
 import {ObjectId} from "mongodb";
 
 export const postQueryRepository = {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
-        const posts = await postsCollection.find()
+
+        const posts = await PostModel.find()
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
-            .limit(queryData.pageSize).toArray();
+            .limit(queryData.pageSize).lean();
 
         let postViewArray: PostViewModel[] = posts.map(post => postMapping(post))
         let pagesCount = await countTotalPostsAndPages(queryData);
@@ -21,8 +22,8 @@ export const postQueryRepository = {
             items: postViewArray
         };
     },
-    async findPostById(id: string): Promise<PostViewModel | null> {
-        const foundPost: PostDBModel | null = await postsCollection.findOne({_id: new ObjectId(id)});
+    async findPostById(id: string ): Promise<PostViewModel | null> {
+        const foundPost: PostDBModel = <PostDBModel>await PostModel.findOne({_id: new ObjectId(id)});
         return foundPost ? postMapping(foundPost) : null;
     },
 }

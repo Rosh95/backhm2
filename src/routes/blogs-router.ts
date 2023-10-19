@@ -10,6 +10,8 @@ import {queryValidation} from '../validation/query-validation';
 import {postService} from '../domain/post-service';
 import {BlogInputModel, BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModelForExistingBlog, PostViewModel} from '../types/post-types';
+import {ResultObject} from "../domain/device-service";
+import {postQueryRepository} from "../repositories/post/post-query-repository";
 
 export const blogsRouter = Router({})
 
@@ -45,7 +47,7 @@ blogsRouter.delete('/:id',
 
 blogsRouter.post('/',
     basicAuthMiddleware,
-    blogValidation,
+   blogValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         try {
@@ -104,7 +106,6 @@ blogsRouter.get('/:id/posts',
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
             let foundPosts: PaginatorPostViewType = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
-
             return res.send(foundPosts);
 
         } catch (e) {
@@ -129,9 +130,9 @@ blogsRouter.post('/:id/posts',
                 shortDescription: req.body.shortDescription,
                 content: req.body.content,
             }
-            const newPost: PostViewModel | boolean = await postService.createPostForExistingBlog(req.params.id, postInputData);
-
-            return res.status(201).send(newPost)
+            const newPost: ResultObject<string> = await postService.createPostForExistingBlog(req.params.id, postInputData);
+            const gotNewPost: PostViewModel | null = newPost.data ? await postQueryRepository.findPostById(newPost.data) : null;
+            return res.status(201).send(gotNewPost)
         } catch (e) {
             return res.status(500).json(e)
         }

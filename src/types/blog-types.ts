@@ -1,4 +1,5 @@
 import {ObjectId} from 'mongodb';
+import mongoose from "mongoose";
 
 export type BlogPostInputModel = {
     content: string,
@@ -12,8 +13,6 @@ export type BlogInputModel = {
     websiteUrl: string,
     // createdAt: string,
     // isMembership: boolean
-
-
 }
 
 export type BlogDbType = {
@@ -41,3 +40,11 @@ export type PaginatorBlogViewType = {
     totalCount: number,
     items: BlogViewType[]
 }
+
+export const BlogSchema = new mongoose.Schema<BlogDbType>({
+    name: {type: String, require: true},
+    description: {type: String, require: true},
+    websiteUrl: {type: String, require: true},
+    createdAt: {type: Date, default: Date.now()},
+    isMembership: {type: Boolean, default: false}
+})

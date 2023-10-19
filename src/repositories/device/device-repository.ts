@@ -1,9 +1,9 @@
-import {devicesCollection, loginAttemptCollection} from '../../db/dbMongo';
+import {DeviceModel, LoginAttemptModel} from '../../db/dbMongo';
 
 export const deviceRepository = {
 
     async deleteOtherUserDevice(userId: string, currentDeviceId: string): Promise<boolean> {
-        const result = await devicesCollection.deleteMany(
+        const result = await DeviceModel.deleteMany(
             {
                 $and: [{userId: userId}, {deviceId: {$ne: currentDeviceId}}]
             }
@@ -11,12 +11,12 @@ export const deviceRepository = {
         return result.deletedCount >= 1;
     },
     async deleteUserDeviceById(deviceId: string): Promise<boolean> {
-        const result = await devicesCollection.deleteOne({deviceId: deviceId});
+        const result = await DeviceModel.deleteOne({deviceId: deviceId});
         return result.deletedCount === 1;
     },
 
     async updateIssuedDate(userId: string, deviceId: string): Promise<boolean> {
-        const result = await devicesCollection.updateOne({userId: userId, deviceId: deviceId}, {
+        const result = await DeviceModel.updateOne({userId: userId, deviceId: deviceId}, {
             $set: {
                 issuedAt: 0,
                 expirationAt: 0
@@ -25,7 +25,7 @@ export const deviceRepository = {
         return result.matchedCount === 1;
     },
     async createLoginAtempt(ip: string, url: string, date: Date) {
-        return loginAttemptCollection.insertOne({ip, url, date})
+        return LoginAttemptModel.create({ip, url, date})
     }
 
 

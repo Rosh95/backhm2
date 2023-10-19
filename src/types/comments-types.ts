@@ -1,4 +1,5 @@
 import {ObjectId} from 'mongodb';
+import mongoose from "mongoose";
 
 export type CommentatorInfo = {
     userId: string
@@ -38,3 +39,11 @@ export type PaginatorCommentViewType = {
     totalCount: number,
     items: CommentsViewModel[]
 }
+
+export const CommentsSchema = new mongoose.Schema<CommentsDBType>({
+    content: {type: String, require: true},
+    userId: ObjectId,
+    postId: {type: String, require: true},
+    userLogin: {type: String, require: true, default: "Unknown user"},
+    createdAt: {type: Date, default: Date.now()},
+})

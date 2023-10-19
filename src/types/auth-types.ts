@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type LoginSuccessViewModel = {
     accessToken: string
 }
@@ -42,5 +44,18 @@ export type LoginAttemptDBModel = {
     url: string,
     date: Date
 }
+export const DeviceSchema = new mongoose.Schema<DeviceDBModel>({
+    userId: {type: String, require: true},
+    issuedAt: {type: Number, require: true},
+    expirationAt: {type: Number, require: true},
+    deviceId: {type: String, require: true},
+    ip: {type: String, require: true},
+    deviceName: {type: String, require: true},
+})
 
+export const LoginAttemptSchema = new mongoose.Schema<LoginAttemptDBModel>({
+    ip: {type: String, require: true},
+    url: {type: String, require: true},
+    date: {type: Date, default: Date.now()}
+})
 

@@ -1,4 +1,5 @@
 import {ObjectId} from 'mongodb';
+import mongoose from "mongoose";
 
 export type UserViewModel = {
     id: string,
@@ -49,9 +50,7 @@ export type NewUsersDBType = {
         emailExpiration: Date,
         isConfirmed: boolean,
     }
-    
 }
-
 
 export type PaginatorUserViewType = {
     pagesCount: number,
@@ -60,3 +59,19 @@ export type PaginatorUserViewType = {
     totalCount: number,
     items: getUserViewModel[]
 }
+
+
+export const UsersSchema = new mongoose.Schema<NewUsersDBType>({
+    accountData: {
+        login: String,
+        email: String,
+        passwordHash: String,
+        passwordSalt: String,
+        createdAt: {type: Date, default: Date.now()},
+    },
+    emailConfirmation: {
+        confirmationCode: String,
+        emailExpiration: Date,
+        isConfirmed: {type: Boolean, default: false},
+    }
+})

@@ -1,38 +1,44 @@
 import {MongoClient} from 'mongodb';
 import dotenv from 'dotenv'
-import {BlogDbType} from '../types/blog-types';
-import {PostDBModel} from '../types/post-types';
-import {NewUsersDBType} from '../types/user-types';
-import {CommentsDBType} from "../types/comments-types";
-import {DeviceDBModel, LoginAttemptDBModel} from "../types/auth-types";
+import {BlogDbType, BlogSchema} from '../types/blog-types';
+import {PostDBModel, PostSchema} from '../types/post-types';
+import {NewUsersDBType, UsersSchema} from '../types/user-types';
+import {CommentsDBType, CommentsSchema} from "../types/comments-types";
+import {DeviceDBModel, DeviceSchema, LoginAttemptDBModel, LoginAttemptSchema} from "../types/auth-types";
+import mongoose from 'mongoose'
+
 
 dotenv.config()
 
 
-const url = process.env.MONGO_URL;
-//const mongoURI = process.env.mongoURI || url;
-if (!url) {
+//const url = process.env.MONGO_URL;
+const dbName = 'home_works'
+const mongoURI = process.env.MONGO_URL || `mongodb://0.0.0.0:27017/${dbName}`;
+if (!mongoURI) {
     throw new Error('Url doesn`t found')
 }
-const client = new MongoClient(url);
+const client = new MongoClient(mongoURI);
 
 const db = client.db();
-export const blogsCollection = db.collection<BlogDbType>('blogs');
-export const postsCollection = db.collection<PostDBModel>('posts');
-export const usersCollection = db.collection<NewUsersDBType>('users');
-export const commentsCollection = db.collection<CommentsDBType>('comments');
+
+export const BlogModel = mongoose.model<BlogDbType>('blogs', BlogSchema)
+
+export const PostModel = mongoose.model<PostDBModel>('posts', PostSchema);
+export const UserModel = mongoose.model<NewUsersDBType>('users', UsersSchema);
+export const CommentModel = mongoose.model<CommentsDBType>('comments', CommentsSchema);
 //export const deviceCollection = db.collection<DeviceDBModel>('devices');
-export const devicesCollection = db.collection<DeviceDBModel>('devices');
-export const loginAttemptCollection = db.collection<LoginAttemptDBModel>('loginAttempt');
+export const DeviceModel = mongoose.model<DeviceDBModel>('devices', DeviceSchema);
+export const LoginAttemptModel = mongoose.model<LoginAttemptDBModel>('loginAttempt', LoginAttemptSchema);
 
 
 export async function runDb() {
     try {
-        await client.connect();
+        await mongoose.connect(mongoURI)
+        // await client.connect();
         console.log('Connected successfully to mongo server')
     } catch (e) {
         console.log('Can`t connect to mongo server');
-        await client.close();
+        await mongoose.disconnect()
     }
 
 }

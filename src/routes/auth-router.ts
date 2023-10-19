@@ -17,9 +17,7 @@ import {userService} from "../domain/users-service";
 import {deviceInputValue} from "../types/auth-types";
 import {deviceRepository} from "../repositories/device/device-repository";
 
-
 export const authRouter = Router({})
-
 
 authRouter.post('/login',
     countNumberLoginAttempts,
@@ -27,8 +25,6 @@ authRouter.post('/login',
         let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
         if (user) {
             const accessToken = await jwtService.createJWT(user)
-            //     const deviceIdByUserId = await deviceQueryRepository.getDeviceIdByUserId(user._id.toString())
-            //     const deviceId = deviceIdByUserId ? deviceIdByUserId : uuidv4();
             const deviceId = uuidv4();
             const refreshToken = await jwtService.createRefreshJWT(user, deviceId)
             const deviceInfo: deviceInputValue = {
@@ -56,13 +52,13 @@ authRouter.post('/refresh-token',
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        if (!currentUserInfo) return res.sendStatus(401)
         const currentUserId: string = currentUserInfo.userId;
         const currentDeviceId: string = currentUserInfo.deviceId;
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
-            const newAccesstoken = await jwtService.createJWT(currentUser)
+            const newAccessToken = await jwtService.createJWT(currentUser)
             const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
-            //поменять в базе данных дату обновления
             const deviceInfo: deviceInputValue = {
                 userId: currentUserId,
                 deviceId: currentDeviceId,
@@ -77,11 +73,10 @@ authRouter.post('/refresh-token',
             }
             return res
                 .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
-                .header('accessToken', newAccesstoken.accessToken)
-                .status(200).send(newAccesstoken)
+                .header('accessToken', newAccessToken.accessToken)
+                .status(200).send(newAccessToken)
         }
         return res.sendStatus(401)
-
     }
 )
 
@@ -91,11 +86,10 @@ authRouter.post('/logout',
         //убрать лишнюю инфу в базе данных ( обнулить дату создания )
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        if (!currentUserInfo) return res.sendStatus(401)
         const currentUserId: string = currentUserInfo.userId;
         const currentDeviceId: string = currentUserInfo.deviceId;
-
         await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
-
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)
@@ -111,7 +105,6 @@ authRouter.get('/me',
             res.sendStatus(401)
             return;
         }
-
         const currentUserInfo: CurrentUserInfoType = {
             login: req.user!.accountData.login,
             email: req.user!.accountData.email,

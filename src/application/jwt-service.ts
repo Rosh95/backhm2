@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import {settings} from '../settings';
 import {ObjectId} from 'mongodb';
 import {LoginSuccessViewModel, LoginSuccessViewModelForRefresh} from '../types/auth-types';
+import {UserAndDeviceTypeFromRefreshToken} from "../types/jwt-types";
 
 export const jwtService = {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
@@ -41,7 +42,7 @@ export const jwtService = {
         }
     },
 
-    async getTokenInfoByRefreshToken(token: string): Promise<any | null> {
+    async getTokenInfoByRefreshToken(token: string): Promise<UserAndDeviceTypeFromRefreshToken | null> {
         try {
             const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as {
                 userId: string,

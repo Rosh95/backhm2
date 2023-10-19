@@ -1,4 +1,5 @@
 import {ObjectId} from 'mongodb';
+import mongoose from "mongoose";
 
 export type PostViewModel = {
     id: string,
@@ -54,3 +55,12 @@ export type PaginatorPostViewType = {
     totalCount: number,
     items: PostViewModel[]
 }
+
+export const PostSchema = new mongoose.Schema<PostDBModel>({
+    title: {type: String, require: true},
+    shortDescription: {type: String, require: true},
+    content: {type: String, require: true},
+    blogId: {type: String, require: true},
+    blogName: {type: String, require: true},
+    createdAt: {type: Date, default: Date.now()},
+})

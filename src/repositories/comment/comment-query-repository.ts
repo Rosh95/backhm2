@@ -1,17 +1,17 @@
 import {CommentsDBType, CommentsViewModel, PaginatorCommentViewType} from '../../types/comments-types';
-import {commentsCollection} from '../../db/dbMongo';
-import {Filter, ObjectId} from 'mongodb';
+import {CommentModel} from '../../db/dbMongo';
 import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../helpers/helpers';
+import {FilterQuery} from "mongoose";
 
 
 export const commentQueryRepository = {
-    async getAllCommentsOfPost(postId: any, queryData: queryDataType): Promise<PaginatorCommentViewType> {
-        const filter: Filter<CommentsDBType> = {postId: postId}
+    async getAllCommentsOfPost(postId: string, queryData: queryDataType): Promise<PaginatorCommentViewType> {
+        const filter: FilterQuery<CommentsDBType> = {postId: postId}
 
-        const comments = await commentsCollection.find(filter)
+        const comments = await CommentModel.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
-            .limit(queryData.pageSize).toArray();
+            .limit(queryData.pageSize).lean();
 
 
         let commentViewArray = comments.map(comment => commentsMapping(comment))
@@ -28,17 +28,17 @@ export const commentQueryRepository = {
         };
     },
     async getCommentById(commentId: string): Promise<CommentsViewModel | null> {
-        const comment = await commentsCollection.findOne({_id: new ObjectId(commentId)});
+        const comment = await CommentModel.findById(commentId);
         if (comment) {
             return commentsMapping(comment);
         }
         return null
     },
     async getAllComments(): Promise<CommentsViewModel[]> {
-        let comments = await commentsCollection.find({}).toArray();
+        let comments = await CommentModel.find({}).lean();
         return comments.map(comment => commentsMapping(comment))
     },
     async getAllCommentsWithFilter(filter: any) {
-        return commentsCollection.countDocuments(filter);
+        return CommentModel.countDocuments(filter);
     }
 }

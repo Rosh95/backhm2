@@ -1,7 +1,6 @@
-import {getUserViewModel, NewUsersDBType, UserInputType, UserViewModel} from '../types/user-types';
+import {getUserViewModel, NewUsersDBType, UserInputType} from '../types/user-types';
 import {userRepository} from '../repositories/user/user-repository';
 import {ObjectId} from 'mongodb';
-import {emailAdapter} from '../adapters/email-adapter';
 import add from 'date-fns/add';
 import {v4 as uuidv4} from 'uuid';
 
@@ -32,12 +31,10 @@ export const userService = {
                 isConfirmed: true,
             }
         }
-        const createdUser = await userRepository.createUser(newUser);
+        return await userRepository.createUser(newUser);
 
-        return createdUser
     },
     async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
-
         const currentUser = await userService.findUserByEmail(email);
         const newConfirmationCode = uuidv4();
         if (currentUser) {
@@ -63,8 +60,6 @@ export const userService = {
         if (user.accountData.passwordHash === passwordHash) {
             return user;
         } else return false
-
-
     },
 
     async findUserById(userId: string): Promise<NewUsersDBType | null> {

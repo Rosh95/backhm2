@@ -2,8 +2,7 @@ import {Request, Response, Router} from 'express';
 import {deviceQueryRepository} from "../repositories/device/device-query-repository";
 import {jwtService} from "../application/jwt-service";
 import {checkRefreshTokenMiddleware} from "../validation/auth-validation-middleware";
-import {deviceRepository} from "../repositories/device/device-repository";
-
+import {deviceService, ResultCode} from "../domain/device-service";
 
 export const deviceRouter = Router({});
 
@@ -18,7 +17,6 @@ deviceRouter.get('/',
                 return res.status(200).send(currentSessions)
             } catch (e) {
                 return res.sendStatus(400)
-
             }
         }
         return res.sendStatus(400)
@@ -27,15 +25,13 @@ deviceRouter.get('/',
 deviceRouter.delete('/',
     checkRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
-
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
         if (currentUserInfo) {
             const currentDeviceId = currentUserInfo.deviceId;
             const currentUserId = currentUserInfo.userId;
-
             try {
-                const isDeleted: boolean = await deviceRepository.deleteOtherUserDevice(currentUserId, currentDeviceId);
+                const isDeleted: boolean = await deviceService.deleteOtherUserDevice(currentUserId, currentDeviceId);
                 if (isDeleted) {
                     return res.sendStatus(204)
                 }
@@ -44,7 +40,6 @@ deviceRouter.delete('/',
                 return res.sendStatus(400)
             }
         }
-
         return res.sendStatus(400)
     })
 deviceRouter.delete('/:deviceId',
@@ -52,33 +47,35 @@ deviceRouter.delete('/:deviceId',
     async (req: Request, res: Response) => {
         if (!req.params.deviceId) {
             return res.sendStatus(404)
-
         }
-
         const refreshToken = req.cookies.refreshToken;
         const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
-        const findUserIdByDeviceId = await deviceQueryRepository.findUserIdByDeviceId(req.params.deviceId)
-        if (!findUserIdByDeviceId) {
-            return res.sendStatus(404)
+        if (!currentUserInfo) {
+            return res.sendStatus(400)
         }
-        if (currentUserInfo) {
-            const currentDeviceId = currentUserInfo.deviceId;
-            const currentUserId = currentUserInfo.userId;
-            if (req.params.deviceId === currentUserInfo.deviceId) {
-                return res.status(400).send('couldn`t delete current session')
-            }
-            if (findUserIdByDeviceId !== currentUserId) {
-                return res.sendStatus(403)
-            }
-            try {
-                const isDeleted: boolean = await deviceRepository.deleteUserDeviceById(req.params.deviceId);
-                if (isDeleted) {
-                    return res.sendStatus(204)
-                }
-                return res.sendStatus(400)
-            } catch (e) {
-                return res.sendStatus(400)
-            }
+        const result = await deviceService.deleteUserDeviceById(currentUserInfo, req.params.deviceId)
+        if (result.resultCode !== ResultCode.Success) {
+            return res.status(mapStatus(result.resultCode)).send(result.errorMessage)
         }
-        return res.sendStatus(400)
+        return res.sendStatus(204)
     });
+
+const mapStatus = (resultCode: ResultCode) => {
+    switch (resultCode) {
+        case ResultCode.BadRequest:
+            return 400
+        case ResultCode.DeviceNotFound:
+            return 404
+        case ResultCode.Forbidden:
+            return 403
+        case ResultCode.Success:
+            return 200
+        case ResultCode.NotFound:
+            return 404
+        case ResultCode.ServerError:
+            return 500
+        default:
+            return 418
+    }
+
+}

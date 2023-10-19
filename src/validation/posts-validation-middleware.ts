@@ -1,5 +1,5 @@
 import {body, param} from 'express-validator';
-import {blogsCollection} from '../db/dbMongo';
+import {BlogModel} from '../db/dbMongo';
 import {ObjectId} from 'mongodb';
 
 export const titlePostMiddleware = body('title').isString().trim().isLength({
@@ -23,7 +23,7 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
     //  console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
     //  const isIncluded = await blogsCollection.find({id:value}).toArray();
-    const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
+    const isIncluded = await BlogModel.findOne({_id: new ObjectId(value.toString())});
     if (!isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist')
@@ -36,7 +36,7 @@ export const blogIdMiddlewareInParams = param('id').isString().custom(async (val
     //   console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
     //  const isIncluded = await blogsCollection.find({id:value}).toArray();
-    const isIncluded = await blogsCollection.findOne({_id: new ObjectId(value.toString())});
+    const isIncluded = await BlogModel.findOne({_id: new ObjectId(value.toString())});
     if (!isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist')

@@ -1,8 +1,5 @@
 import {Router} from 'express';
 
-const nodemailer = require('nodemailer');
-
-
 export const emailRouter = Router({});
 
 

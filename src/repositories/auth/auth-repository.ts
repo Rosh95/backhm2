@@ -1,25 +1,26 @@
 import {NewUsersDBType, UserViewModel} from '../../types/user-types';
-import {devicesCollection, usersCollection} from '../../db/dbMongo';
+import {DeviceModel, UserModel} from '../../db/dbMongo';
 import {usersMapping} from '../../helpers/helpers';
-import {Filter, ObjectId} from 'mongodb';
+import {ObjectId} from 'mongodb';
 import {DeviceDBModel} from "../../types/auth-types";
+import {FilterQuery} from "mongoose";
 
 export const authRepository = {
 
     async getAllUsers() {
-        return await usersCollection.find().sort({'createdAt': -1}).toArray();
+        return  UserModel.find().sort({'createdAt': -1}).lean();
     },
     async createUser(newUser: NewUsersDBType): Promise<UserViewModel> {
 
-        const result = await usersCollection.insertOne(newUser);
+        const result = await UserModel.create(newUser);
         return usersMapping(newUser);
     },
     async deleteUser(id: ObjectId): Promise<boolean> {
-        const result = await usersCollection.deleteOne({_id: id});
+        const result = await UserModel.deleteOne({_id: id});
         return result.deletedCount === 1;
     },
     async findUserById(userId: string): Promise<NewUsersDBType | null> {
-        let foundUser: NewUsersDBType | null = await usersCollection.findOne({_id: new ObjectId(userId)});
+        let foundUser: NewUsersDBType | null = await UserModel.findOne({_id: new ObjectId(userId)});
         if (foundUser) {
             return foundUser
         } else {
@@ -27,7 +28,7 @@ export const authRepository = {
         }
     },
     async findUserByLogin(login: string): Promise<NewUsersDBType | null> {
-        let foundUser = await usersCollection.findOne({"accountData.login": login});
+        let foundUser = await UserModel.findOne({"accountData.login": login});
         if (foundUser) {
             return foundUser
         } else {
@@ -35,7 +36,7 @@ export const authRepository = {
         }
     },
     async findUserByEmail(email: string): Promise<NewUsersDBType | null> {
-        let foundUser = await usersCollection.findOne({"accountData.email": email});
+        let foundUser = await UserModel.findOne({"accountData.email": email});
         if (foundUser) {
             return foundUser
         } else {
@@ -43,7 +44,7 @@ export const authRepository = {
         }
     },
     async findUserByCode(code: string): Promise<NewUsersDBType | null> {
-        let foundUser = await usersCollection.findOne({"emailConfirmation.confirmationCode": code});
+        let foundUser = await UserModel.findOne({"emailConfirmation.confirmationCode": code});
         if (foundUser) {
             return foundUser
         } else {
@@ -51,24 +52,24 @@ export const authRepository = {
         }
     },
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
-        return await usersCollection.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
+        return  UserModel.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
     },
     async updateEmailConfimation(userId: ObjectId): Promise<boolean> {
-        const result = await usersCollection.updateOne({_id: new ObjectId(userId)}, {
+        const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {
             $set: {
                 "emailConfirmation.isConfirmed": true
             }
         })
         return result.matchedCount === 1;
     },
-    async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<any> {
-        const filter: Filter<DeviceDBModel> = {
+    async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<Boolean> {
+        const filter: FilterQuery<DeviceDBModel> = {
             userId: refreshTokenInfo.userId,
             deviceId: refreshTokenInfo.deviceId
         }
-        const findUserInRefreshCollection = await devicesCollection.findOne(filter)
+        const findUserInRefreshCollection = await DeviceModel.findOne(filter)
         if (findUserInRefreshCollection) {
-            const newRefreshToken = await devicesCollection.updateOne(filter, {
+            const newRefreshToken = await DeviceModel.updateOne(filter, {
                 $set: {
                     issuedAt: refreshTokenInfo.issuedAt,
                     expirationAt: refreshTokenInfo.expirationAt,
@@ -79,7 +80,7 @@ export const authRepository = {
             return newRefreshToken.matchedCount === 1;
         } else {
             try {
-                const result = await devicesCollection.insertOne(refreshTokenInfo);
+                await DeviceModel.create(refreshTokenInfo);
                 return true;
             } catch (e) {
                 return false;

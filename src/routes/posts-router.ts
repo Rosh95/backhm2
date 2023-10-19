@@ -14,13 +14,13 @@ import {BlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, PostViewModel} from '../types/post-types';
 import {CommentsInputData, CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
 import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
+import {ResultObject} from "../domain/device-service";
 
 export const postsRouter = Router({})
 
 postsRouter.get('/',
     queryValidation,
     async (req: Request, res: Response): Promise<e.Response<PaginatorPostViewType>> => {
-
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
             const allPosts: PaginatorPostViewType = await postQueryRepository.getAllPosts(queryData);
@@ -59,8 +59,8 @@ postsRouter.post('/',
     postValidation,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        let foundBlogName: BlogViewType | null = await blogQueryRepository.findBlogById(req.body.blogId)
-        if (!foundBlogName) {
+        let foundBlog: BlogViewType | null = await blogQueryRepository.findBlogById(req.body.blogId)
+        if (!foundBlog) {
             return res.sendStatus(404);
         }
         try {
@@ -70,8 +70,9 @@ postsRouter.post('/',
                 content: req.body.content,
                 blogId: req.body.blogId,
             }
-            const newPost: PostViewModel = await postService.createPost(postInputData, foundBlogName);
-            return res.status(201).send(newPost)
+            const newPost: ResultObject<string> = await postService.createPost(postInputData, foundBlog);
+            const gotNewPost: PostViewModel | null = newPost.data ? await postQueryRepository.findPostById(newPost.data) : null;
+            return res.status(201).send(gotNewPost)
         } catch (e) {
             console.log(e)
             return res.sendStatus(500)
@@ -97,7 +98,6 @@ postsRouter.put('/:id',
                 return res.sendStatus(404)
             }
         } catch (e) {
-            console.log(e)
             return res.sendStatus(500)
         }
     }
@@ -112,12 +112,10 @@ postsRouter.post('/:postId/comments',
         if (!currentPost) {
             return res.sendStatus(404)
         }
-
         try {
             if (!req.user) {
                 throw new Error('user doesn`t exist');
             }
-
             const newCommentData: CommentsInputData = {
                 content: req.body.content,
                 userId: req.user._id,
@@ -125,18 +123,14 @@ postsRouter.post('/:postId/comments',
                 postId: req.params.postId
             }
             const newComment: CommentsViewModel = await commentsService.createCommentForPost(newCommentData);
-            console.log(newComment + ' new comment ')
-
             return res.status(201).send(newComment);
         } catch (e) {
-            console.log(e)
             return res.sendStatus(500)
         }
     }
 )
 
 postsRouter.get('/:postId/comments',
-
     async (req: Request, res: Response): Promise<e.Response | PaginatorCommentViewType> => {
         const currentPost = await postQueryRepository.findPostById(req.params.postId);
         if (!currentPost) {

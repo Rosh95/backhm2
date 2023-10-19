@@ -1,5 +1,5 @@
 import {countTotalUsersAndPages, queryDataType, usersMapping} from '../../helpers/helpers';
-import {usersCollection} from '../../db/dbMongo';
+import {UserModel} from '../../db/dbMongo';
 import {NewUsersDBType, PaginatorUserViewType, UserViewModel} from '../../types/user-types';
 import {Filter} from 'mongodb';
 
@@ -19,12 +19,12 @@ export const authQueryRepository = {
                 }
             }]
         }
-
-        const users = await usersCollection.find(filter)
+        // @ts-ignore
+        const users = await UserModel.find(filter)
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize)
-            .toArray();
+            .lean();
 
         let usersViewArray: UserViewModel[] = users.map(user => usersMapping(user))
         let pagesCount = await countTotalUsersAndPages(queryData, filter);
@@ -36,10 +36,5 @@ export const authQueryRepository = {
             totalCount: pagesCount.usersTotalCount,
             items: usersViewArray
         };
-    },
-
-    async getAllUsersCount(filter?: Filter<any>): Promise<number> {
-
-        return await usersCollection.countDocuments(filter);
-    },
+    }
 }
