@@ -143,17 +143,12 @@ authRouter.post('/registration-confirmation',
     isEmailConfirmatedMiddlewareByCode,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-
         const code = req.body.code;
-
         const result = await authService.confirmEmail(code);
-
-
         if (result) {
             return res.sendStatus(204)
         }
         return res.sendStatus(400)
-
     }
 )
 
@@ -173,6 +168,38 @@ authRouter.post('/registration-email-resending',
             } catch (e) {
                 return null
             }
+            return res.sendStatus(204)
+        }
+        return res.sendStatus(400)
+    }
+)
+authRouter.post('/password-recovery',
+    countNumberLoginAttempts,
+    emailUserMiddleware,
+    errorsValidationMiddleware,
+    async (req: Request, res: Response) => {
+        const email = req.body.email;
+        const currentUser = await authService.changeUserConfirmationcode(email);
+        if (currentUser) {
+            try {
+                await emailAdapter.sendRecoveryPasswordEmail(currentUser.emailConfirmation.confirmationCode, email)
+            } catch (e) {
+                return null
+            }
+            return res.sendStatus(204)
+        }
+        return res.sendStatus(400)
+    }
+)
+authRouter.post('/new-password',
+    countNumberLoginAttempts,
+    isEmailConfirmatedMiddlewareByCode,
+    errorsValidationMiddleware,
+    async (req: Request, res: Response) => {
+        const code = req.body.recoveryCode;
+        const newPassword = req.body.newPassword;
+        const result = await authService.сonfirmAndChangePassword(code, newPassword);
+        if (result) {
             return res.sendStatus(204)
         }
         return res.sendStatus(400)

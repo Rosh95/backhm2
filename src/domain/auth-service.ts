@@ -81,8 +81,15 @@ export const authService = {
         const findUser = await userRepository.findUserByCode(code)
         if (!findUser) return false;
         return await authRepository.updateEmailConfimation(findUser._id)
-
     },
+    async сonfirmAndChangePassword(code: string, password: string): Promise<boolean> {
+        const passwordSalt = await bcrypt.genSalt(10);
+        const passwordHash = await this._generateHash(password, passwordSalt);
+        const findUser = await userRepository.findUserByCode(code)
+        if (!findUser) return false;
+        return await authRepository.updateUserPassword(findUser._id, passwordHash, passwordSalt)
+    },
+
     async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
 
         const currentUser = await this.findUserByEmail(email);

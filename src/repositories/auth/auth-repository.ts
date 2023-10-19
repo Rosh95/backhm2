@@ -8,7 +8,7 @@ import {FilterQuery} from "mongoose";
 export const authRepository = {
 
     async getAllUsers() {
-        return  UserModel.find().sort({'createdAt': -1}).lean();
+        return UserModel.find().sort({'createdAt': -1}).lean();
     },
     async createUser(newUser: NewUsersDBType): Promise<UserViewModel> {
 
@@ -52,7 +52,7 @@ export const authRepository = {
         }
     },
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
-        return  UserModel.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
+        return UserModel.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
     },
     async updateEmailConfimation(userId: ObjectId): Promise<boolean> {
         const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {
@@ -62,6 +62,16 @@ export const authRepository = {
         })
         return result.matchedCount === 1;
     },
+    async updateUserPassword(userId: ObjectId, passwordHash: string, passwordSalt: string): Promise<boolean> {
+        const result = await UserModel.updateOne(userId, {
+            $set: {
+                "accountData.passwordHash": passwordHash,
+                "accountData.passwordSalt": passwordSalt
+            }
+        })
+        return result.matchedCount === 1;
+    },
+
     async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<Boolean> {
         const filter: FilterQuery<DeviceDBModel> = {
             userId: refreshTokenInfo.userId,
