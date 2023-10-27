@@ -4,12 +4,14 @@ import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/use
 import {v4 as uuidv4} from 'uuid';
 import {
     authValidationINfoMiddleware,
-    checkAccessTokenMiddleware, checkNewPassword,
-    checkRefreshTokenMiddleware, countNumberLoginAttempts,
+    checkAccessTokenMiddleware,
+    checkNewPassword,
+    checkRefreshTokenMiddleware,
+    countNumberLoginAttempts,
     isEmailConfirmatedMiddlewareByCode,
-    isEmailConfirmatedMiddlewareByEmail, isEmailConfirmatedMiddlewareByRecoveryCode,
+    isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
-import {emailUserMiddleware, userValidation} from '../validation/users-validation';
+import {checkRegistredUserByEmail, emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
@@ -176,19 +178,20 @@ authRouter.post('/registration-email-resending',
 authRouter.post('/password-recovery',
     countNumberLoginAttempts,
     emailUserMiddleware,
+    checkRegistredUserByEmail,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const email = req.body.email;
-        const currentUser = await authService.changeUserConfirmationcode(email);
-        if (currentUser) {
-            try {
-                await emailAdapter.sendRecoveryPasswordEmail(currentUser.emailConfirmation.confirmationCode, email)
-            } catch (e) {
-                return null
-            }
+        let foundUserByEmail = await userService.findUserByEmail(email)
+        if (!foundUserByEmail) return res.sendStatus(400)
+        const recoveryCode = uuidv4()
+        await authService.addRecoveryCodeAndEmail(email, recoveryCode);
+        try {
+            await emailAdapter.sendRecoveryPasswordEmail(recoveryCode, email)
             return res.sendStatus(204)
+        } catch (e) {
+            return null
         }
-        return res.sendStatus(400)
     }
 )
 authRouter.post('/new-password',
@@ -196,9 +199,10 @@ authRouter.post('/new-password',
     checkNewPassword,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
-        const code = req.body.recoveryCode;
+        const recoveryCode = req.body.recoveryCode;
         const newPassword = req.body.newPassword;
-        const result = await authService.сonfirmAndChangePassword(code, newPassword);
+
+        const result = await authService.сonfirmAndChangePassword(recoveryCode, newPassword);
         if (result) {
             return res.sendStatus(204)
         }

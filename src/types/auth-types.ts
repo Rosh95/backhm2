@@ -44,6 +44,11 @@ export type LoginAttemptDBModel = {
     url: string,
     date: Date
 }
+export type RecoveryCodeDBModel = {
+    email: string,
+    recoveryCode: string,
+}
+
 export const DeviceSchema = new mongoose.Schema<DeviceDBModel>({
     userId: {type: String, require: true},
     issuedAt: {type: Number, require: true},
@@ -57,5 +62,10 @@ export const LoginAttemptSchema = new mongoose.Schema<LoginAttemptDBModel>({
     ip: {type: String, require: true},
     url: {type: String, require: true},
     date: {type: Date, default: Date.now()}
+})
+
+export const RecoveryCodeSchema = new mongoose.Schema<RecoveryCodeDBModel>({
+    email: {type: String, require: true},
+    recoveryCode: {type: String, require: true},
 })
 

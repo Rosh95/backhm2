@@ -4,7 +4,13 @@ import {BlogDbType, BlogSchema} from '../types/blog-types';
 import {PostDBModel, PostSchema} from '../types/post-types';
 import {NewUsersDBType, UsersSchema} from '../types/user-types';
 import {CommentsDBType, CommentsSchema} from "../types/comments-types";
-import {DeviceDBModel, DeviceSchema, LoginAttemptDBModel, LoginAttemptSchema} from "../types/auth-types";
+import {
+    DeviceDBModel,
+    DeviceSchema,
+    LoginAttemptDBModel,
+    LoginAttemptSchema, RecoveryCodeDBModel,
+    RecoveryCodeSchema
+} from "../types/auth-types";
 import mongoose from 'mongoose'
 
 
@@ -29,6 +35,7 @@ export const CommentModel = mongoose.model<CommentsDBType>('comments', CommentsS
 //export const deviceCollection = db.collection<DeviceDBModel>('devices');
 export const DeviceModel = mongoose.model<DeviceDBModel>('devices', DeviceSchema);
 export const LoginAttemptModel = mongoose.model<LoginAttemptDBModel>('loginAttempt', LoginAttemptSchema);
+export const RecoveryCodeModel = mongoose.model<RecoveryCodeDBModel>('recoveryCodes', RecoveryCodeSchema);
 
 
 export async function runDb() {

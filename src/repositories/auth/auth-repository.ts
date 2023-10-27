@@ -1,5 +1,5 @@
 import {NewUsersDBType, UserViewModel} from '../../types/user-types';
-import {DeviceModel, UserModel} from '../../db/dbMongo';
+import {DeviceModel, RecoveryCodeModel, UserModel} from '../../db/dbMongo';
 import {usersMapping} from '../../helpers/helpers';
 import {ObjectId} from 'mongodb';
 import {DeviceDBModel} from "../../types/auth-types";
@@ -62,14 +62,30 @@ export const authRepository = {
         })
         return result.matchedCount === 1;
     },
-    async updateUserPassword(userId: ObjectId, passwordHash: string, passwordSalt: string): Promise<boolean> {
-        const result = await UserModel.updateOne(userId, {
+    async updateUserPassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
+        const result = await UserModel.findOneAndUpdate({email}, {
             $set: {
                 "accountData.passwordHash": passwordHash,
                 "accountData.passwordSalt": passwordSalt
             }
         })
-        return result.matchedCount === 1;
+        return true;
+    },
+    async updateRecoveryCode(email: string, recoveryCode: string): Promise<ObjectId | null> {
+        const result = await RecoveryCodeModel.findOneAndUpdate({email}, {
+            $set: {recoveryCode}
+        }, {returnDocument: 'after'})
+
+        return result ? result._id : null;
+    },
+    async addRecoveryCodeAndEmail(email: string, recoveryCode: string): Promise<ObjectId> {
+        const result = await RecoveryCodeModel.create({email, recoveryCode})
+        return result._id
+    },
+
+    async findEmailByRecoveryCode(recoveryCode: string): Promise<string | null> {
+        const result = await RecoveryCodeModel.findOne({recoveryCode})
+        return result ? result.email : null
     },
 
     async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<Boolean> {

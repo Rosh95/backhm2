@@ -1,7 +1,6 @@
 // @ts-ignore
 import request from 'supertest'
 import {app} from '../../src/app';
-// @ts-ignore
 import {blogsTestManager} from '../utils/blog.testManager';
 import {faker} from "@faker-js/faker";
 import {postsTestManager} from "../utils/post.testManager";
@@ -44,7 +43,7 @@ describe('Blogs router', () => {
                 .expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
         })
         it('should get blog by id', async () => {
-            let result = await blogsTestManager.createBlog(blogInputData)
+            let result = await blogsTestManager.createBlog({...blogInputData, name: 'John'})
             const getBlogResponse = await request(app).get(`/blogs/${result.createdEntity.id}`)
             expect(getBlogResponse.status).toBe(200)
             const blogFromAPi = getBlogResponse.body

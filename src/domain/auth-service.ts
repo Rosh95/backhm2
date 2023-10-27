@@ -8,8 +8,10 @@ import {authRepository} from "../repositories/auth/auth-repository";
 import {usersMapping} from "../helpers/helpers";
 import {DeviceDBModel, deviceInputValue} from "../types/auth-types";
 import {jwtService} from "../application/jwt-service";
+import {RecoveryCodeModel} from "../db/dbMongo";
 
 const bcrypt = require('bcrypt');
+
 
 export const authService = {
 
@@ -80,18 +82,31 @@ export const authService = {
     async confirmEmail(code: string): Promise<boolean> {
         const findUser = await userRepository.findUserByCode(code)
         if (!findUser) return false;
+
         return await authRepository.updateEmailConfimation(findUser._id)
     },
-    async сonfirmAndChangePassword(code: string, password: string): Promise<boolean> {
+    async сonfirmAndChangePassword(recoveryCode: string, password: string): Promise<Boolean> {
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt);
-        const findUser = await userRepository.findUserByCode(code)
-        if (!findUser) return false;
-        return await authRepository.updateUserPassword(findUser._id, passwordHash, passwordSalt)
+        const foundEmailByRecoveryCode = await authRepository.findEmailByRecoveryCode(recoveryCode)
+
+        if (!foundEmailByRecoveryCode) return false;
+        await authRepository.updateUserPassword(foundEmailByRecoveryCode, passwordHash, passwordSalt);
+        return true
+
+    },
+    async addRecoveryCodeAndEmail(email: string, recoveryCode: string): Promise<ObjectId | null> {
+        const isExistRecoveryCodeForCurrentEmail = await RecoveryCodeModel.findOne({email});
+        let result
+        if (isExistRecoveryCodeForCurrentEmail) {
+            result = await authRepository.updateRecoveryCode(email, recoveryCode)
+        } else {
+            result = await authRepository.addRecoveryCodeAndEmail(email, recoveryCode)
+        }
+        return result ? result._id : null;
     },
 
     async changeUserConfirmationcode(email: string): Promise<NewUsersDBType | null> {
-
         const currentUser = await this.findUserByEmail(email);
         const newConfirmationCode = uuidv4();
         if (currentUser) {

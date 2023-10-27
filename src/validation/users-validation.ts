@@ -10,7 +10,7 @@ export const passwordUserMiddleware = body('password').isString().trim().isLengt
     max: 20
 }).withMessage('password should be between 6 and 20 symbols string');
 
-export const emailUserMiddleware = body('email').isString().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
+export const emailUserMiddleware = body('email').isEmail().matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email should be correct:)');
 
 export const checkExistUserMiddlewareByLogin = body('login').isString().custom(async (value) => {
 
@@ -21,7 +21,7 @@ export const checkExistUserMiddlewareByLogin = body('login').isString().custom(a
     }
     return true;
 })
-export const checkExistUserMiddlewareByEmail = body('email').isString().custom(async (value) => {
+export const checkExistUserMiddlewareByEmail = body('email').isEmail().custom(async (value) => {
 
     let foundUserByEmail = await userService.findUserByEmail(value);
 
@@ -30,4 +30,13 @@ export const checkExistUserMiddlewareByEmail = body('email').isString().custom(a
     }
     return true;
 })
+export const checkRegistredUserByEmail = body('email').isString().custom(async (value) => {
+    let foundUserByEmail = await userService.findUserByEmail(value);
+
+    if (foundUserByEmail) {
+        return true
+    }
+    return false;
+}).withMessage('we couldn`t found this email')
+
 export const userValidation = [loginUserMiddleware, passwordUserMiddleware, emailUserMiddleware, checkExistUserMiddlewareByLogin, checkExistUserMiddlewareByEmail]

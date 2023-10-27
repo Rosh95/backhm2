@@ -22,7 +22,8 @@ export const emailAdapter = {
         return info
     },
 
-    async sendRecoveryPasswordEmail(confirmationCode: string, email: string) {
+    async sendRecoveryPasswordEmail(recoveryCode: string, email: string) {
+
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -34,10 +35,10 @@ export const emailAdapter = {
         let info = await transporter.sendMail({
             from: `Rosh <azi.rosh95@gmail.com>`, // sender address
             to: email, // list of receivers
-            subject: "Email Confirmation", // Subject line
+            subject: "Password recovery", // Subject line
             html: ` <h1>Password recovery</h1>
  <p>To finish password recovery please follow the link below:
-     <a href='https://somesite.com/confirm-email?recoveryCode=${confirmationCode}'>complete registration</a>
+     <a href='https://somesite.com/confirm-email?recoveryCode=${recoveryCode}'>complete registration</a>
  </p>`, // html body
         });
         return info
