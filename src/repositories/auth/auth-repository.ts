@@ -63,7 +63,7 @@ export const authRepository = {
         return result.matchedCount === 1;
     },
     async updateUserPassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
-        const result = await UserModel.findOneAndUpdate({email}, {
+        const result = await UserModel.findOneAndUpdate({"accountData.email": email}, {
             $set: {
                 "accountData.passwordHash": passwordHash,
                 "accountData.passwordSalt": passwordSalt

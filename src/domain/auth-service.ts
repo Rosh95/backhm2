@@ -86,11 +86,10 @@ export const authService = {
         return await authRepository.updateEmailConfimation(findUser._id)
     },
     async сonfirmAndChangePassword(recoveryCode: string, password: string): Promise<Boolean> {
+        const foundEmailByRecoveryCode = await authRepository.findEmailByRecoveryCode(recoveryCode)
+        if (!foundEmailByRecoveryCode) return false;
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt);
-        const foundEmailByRecoveryCode = await authRepository.findEmailByRecoveryCode(recoveryCode)
-
-        if (!foundEmailByRecoveryCode) return false;
         await authRepository.updateUserPassword(foundEmailByRecoveryCode, passwordHash, passwordSalt);
         return true
 

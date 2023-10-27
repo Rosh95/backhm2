@@ -11,7 +11,7 @@ import {
     isEmailConfirmatedMiddlewareByCode,
     isEmailConfirmatedMiddlewareByEmail,
 } from '../validation/auth-validation-middleware';
-import {checkRegistredUserByEmail, emailUserMiddleware, userValidation} from '../validation/users-validation';
+import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
 import {authService} from "../domain/auth-service";
@@ -178,12 +178,12 @@ authRouter.post('/registration-email-resending',
 authRouter.post('/password-recovery',
     countNumberLoginAttempts,
     emailUserMiddleware,
-    checkRegistredUserByEmail,
+    // checkRegistredUserByEmail,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const email = req.body.email;
-        let foundUserByEmail = await userService.findUserByEmail(email)
-        if (!foundUserByEmail) return res.sendStatus(400)
+        // let foundUserByEmail = await userService.findUserByEmail(email)
+        // if (!foundUserByEmail) return res.sendStatus(400)
         const recoveryCode = uuidv4()
         await authService.addRecoveryCodeAndEmail(email, recoveryCode);
         try {
