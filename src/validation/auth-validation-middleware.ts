@@ -9,6 +9,7 @@ import {settings} from "../settings";
 import {DeviceModel} from "../db/dbMongo";
 import {deviceQueryRepository} from "../repositories/device/device-query-repository";
 import {deviceRepository} from "../repositories/device/device-repository";
+import {authRepository} from "../repositories/auth/auth-repository";
 
 
 export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -116,6 +117,14 @@ export const isEmailConfirmatedMiddlewareByCode = body('code').custom(async (val
     }
     return true;
 }).withMessage('This email has confirmed');
+export const isValidRecoveryCode = body('recoveryCode').isUUID().custom(async (value) => {
+
+    const foundEmailByRecoveryCode = await authRepository.findEmailByRecoveryCode(value)
+    if(!foundEmailByRecoveryCode) throw new Error('inb')
+    return true
+
+}).withMessage('This recovery code is invalid');
+
 export const isEmailConfirmatedMiddlewareByRecoveryCode = body('recoveryCode').custom(async (value) => {
     let foundUser = await userRepository.findUserByCode(value);
     if (foundUser!.emailConfirmation.isConfirmed) {
@@ -137,10 +146,10 @@ export const isEmailConfirmatedMiddlewareByEmail = body('email').custom(async (v
 export const countNumberLoginAttempts = async (req: Request, res: Response, next: NextFunction) => {
     const rateLimit = new Date(Number(new Date()) - 10000)
     const getCountOfAttemtsLogin = await deviceQueryRepository.getLoginAtemptsByUrlAndIp(req.ip, req.url, rateLimit)
-    await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
-    if (getCountOfAttemtsLogin >= 5) {
+    if (getCountOfAttemtsLogin + 1 > 5) {
         return res.sendStatus(429)
     }
+    await deviceRepository.createLoginAtempt(req.ip, req.url, new Date())
     next()
     return
 }

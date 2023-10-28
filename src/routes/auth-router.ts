@@ -9,7 +9,7 @@ import {
     checkRefreshTokenMiddleware,
     countNumberLoginAttempts,
     isEmailConfirmatedMiddlewareByCode,
-    isEmailConfirmatedMiddlewareByEmail,
+    isEmailConfirmatedMiddlewareByEmail, isValidRecoveryCode,
 } from '../validation/auth-validation-middleware';
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
@@ -197,6 +197,7 @@ authRouter.post('/password-recovery',
 authRouter.post('/new-password',
     countNumberLoginAttempts,
     checkNewPassword,
+    isValidRecoveryCode,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
         const recoveryCode = req.body.recoveryCode;

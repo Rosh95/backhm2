@@ -17,7 +17,6 @@ export const deviceQueryRepository = {
         return null
     },
     async getLoginAtemptsByUrlAndIp(ip: string, url: string, date: Date) {
-        const resultCount = await LoginAttemptModel.find({ip, url, date: {$gt: date}}).lean()
-        return resultCount.length
+        return LoginAttemptModel.countDocuments({ip, url, date: {$gt: date}})
     }
 }
