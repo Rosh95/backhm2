@@ -53,13 +53,11 @@ commentsRouter.put('/:commentId',
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
     async (req, res) => {
-
         try {
             const commentInfo = await commentQueryRepository.getCommentById(req.params!.commentId);
             if (!commentInfo) {
                 return res.send(404);
             }
-
             const updatedComment = await commentsService.updateCommentById(req.params!.commentId, req.body.content);
             if (!updatedComment) {
                 return res.send(404);
