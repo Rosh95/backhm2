@@ -1,5 +1,5 @@
 import {ObjectId} from 'mongodb';
-import {CommentsDBType, CommentsInputData, CommentsViewModel} from '../types/comments-types';
+import {CommentsDBType, CommentsInputData, CommentsViewModel, LikeStatusOption} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {commentRepository} from '../repositories/comment/comment-repository';
 
@@ -24,13 +24,20 @@ export const commentsService = {
         const newComment: CommentsDBType = {
             _id: new ObjectId(),
             content: newCommentData.content,
-            userId: newCommentData.userId,
-            userLogin: newCommentData.userLogin,
+            commentatorInfo: {
+                userId: newCommentData.userId,
+                userLogin: newCommentData.userLogin,
+            },
             postId: newCommentData.postId,
-            createdAt: new Date()
+            createdAt: new Date(),
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatusOption.None
+            }
         }
         console.log(newComment + 'new comment in service')
-        return await commentRepository.createCommentForPost(newComment)
+        return commentRepository.createCommentForPost(newComment)
     },
 
     async updateCommentById(commentId: string, commentContent: string) {

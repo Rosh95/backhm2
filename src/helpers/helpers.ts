@@ -166,8 +166,8 @@ export function commentsMapping(comment: CommentsDBType): CommentsViewModel {
         id: commentMongoId,
         content: comment.content,
         commentatorInfo: {
-            userId: comment.userId.toString(),
-            userLogin: comment.userLogin
+            userId: comment.commentatorInfo.userId.toString(),
+            userLogin: comment.commentatorInfo.userLogin
         },
         createdAt: comment.createdAt.toISOString()
     }
