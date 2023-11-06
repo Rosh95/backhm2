@@ -2,6 +2,7 @@ import {CommentsDBType, CommentsViewModel, PaginatorCommentViewType} from '../..
 import {CommentModel} from '../../db/dbMongo';
 import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../helpers/helpers';
 import {FilterQuery} from "mongoose";
+import {ObjectId} from "mongodb";
 
 
 export const commentQueryRepository = {
@@ -27,10 +28,10 @@ export const commentQueryRepository = {
 
         };
     },
-    async getCommentById(commentId: string): Promise<CommentsViewModel | null> {
+    async getCommentById(commentId: string, userId?:ObjectId | null): Promise<CommentsViewModel | null> {
         const comment = await CommentModel.findById(commentId);
         if (comment) {
-            return await commentsMapping(comment);
+            return await commentsMapping(comment, userId);
         }
         return null
     },

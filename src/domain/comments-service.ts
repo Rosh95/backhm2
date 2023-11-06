@@ -4,6 +4,7 @@ import {commentQueryRepository} from '../repositories/comment/comment-query-repo
 import {commentRepository} from '../repositories/comment/comment-repository';
 import {LikeStatusModel} from "../db/dbMongo";
 import {NewUsersDBType} from "../types/user-types";
+import {LikeStatusDBType} from "../types/likeStatus-types";
 
 
 export const commentsService = {
@@ -44,13 +45,23 @@ export const commentsService = {
     async updateCommentById(commentId: string, commentContent: string) {
         return commentRepository.updatedCommentById(commentId, commentContent)
     },
-    async updateCommentLikeStatusById(commentInfo: CommentsDBType, newLikeStatusForComment: string, currentUser:NewUsersDBType) {
-        const currentLikeStatus = commentInfo.likesInfo.myStatus;
-        const findStatusInDB = LikeStatusModel.find({entityId: commentInfo._id, userId: currentUser._id})
+    async updateCommentLikeStatusById(commentInfo: CommentsDBType, newLikeStatusForComment: LikeStatusOption, currentUser: NewUsersDBType) {
+      //  const currentLikeStatus = commentInfo.likesInfo.myStatus;
+        const findLikeStatusInDB: LikeStatusDBType | null = await LikeStatusModel.findOne({
+            entityId: commentInfo._id,
+            userId: currentUser._id
+        })
 
+        if (!findLikeStatusInDB) {
+            await commentRepository.createLikeStatus(commentInfo._id, currentUser._id, currentUser.accountData.login, newLikeStatusForComment)
+            return true;
+        }
+        await commentRepository.updateLikeStatus(commentInfo._id, currentUser._id,  newLikeStatusForComment)
 
+        // findLikeStatusInDB.likeStatus = newLikeStatusForComment;
 
-        return commentRepository.updatedCommentById(commentInfo._id.toString(), newLikeStatusForComment)
+        return true
+        // return commentRepository.updatedCommentLikeStatusById(commentInfo._id.toString(), newLikeStatusForComment)
     },
 
 }

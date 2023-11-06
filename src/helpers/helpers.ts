@@ -7,7 +7,6 @@ import {CommentsDBType, CommentsViewModel, LikeStatusOption} from '../types/comm
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogDbType, BlogViewType} from '../types/blog-types';
 import {DeviceDBModel, DeviceViewModel} from "../types/auth-types";
-import {LikeStatusSchema} from "../types/likeStatus-types";
 import {LikeStatusModel} from "../db/dbMongo";
 
 export  type  queryDataType = {
@@ -161,7 +160,8 @@ export function getSessionsMapping(device: DeviceDBModel): DeviceViewModel {
     }
 }
 
-export async function commentsMapping(comment: CommentsDBType): Promise<CommentsViewModel> {
+export async function commentsMapping(comment: CommentsDBType, userId?: ObjectId | null): Promise<CommentsViewModel> {
+
     const commentMongoId = comment._id.toString();
     const likesCount: number = await LikeStatusModel.countDocuments({
         entityId: commentMongoId,
@@ -171,7 +171,12 @@ export async function commentsMapping(comment: CommentsDBType): Promise<Comments
         entityId: commentMongoId,
         likeStatus: "Dislike"
     })
-
+    const currentUserId = await LikeStatusModel.findOne({userId})
+    let currentStatus;
+    if (currentUserId) {
+        const result = await LikeStatusModel.findById(currentUserId)
+        currentStatus = result ? result.likeStatus : null
+    }
 
     return {
         id: commentMongoId,
@@ -184,7 +189,7 @@ export async function commentsMapping(comment: CommentsDBType): Promise<Comments
         likesInfo: {
             likesCount: likesCount,
             dislikesCount: dislikesCount,
-            myStatus: comment.likesInfo.myStatus
+            myStatus: currentStatus ? currentStatus : LikeStatusOption.None
         }
     }
 }

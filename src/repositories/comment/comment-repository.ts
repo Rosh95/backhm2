@@ -10,7 +10,7 @@ export const commentRepository = {
         const result = await CommentModel.create(newComment)
         return result._id
     },
-    async getCommentById(commentId: string): Promise< CommentsDBType| null> {
+    async getCommentById(commentId: string): Promise<CommentsDBType | null> {
         const comment = await CommentModel.findById(commentId);
         if (comment) {
             return comment;
@@ -31,9 +31,6 @@ export const commentRepository = {
                 }
             });
         return true;
-        const newComment:LikeStatusDBType | null = await LikeStatusModel.findById({commentId});
-
-
     },
     async updatedCommentLikeStatusById(commentId: string, likeStatus: string) {
         const commentInfo = await commentQueryRepository.getCommentById(commentId);
@@ -44,6 +41,32 @@ export const commentRepository = {
                     "likesInfo.myStatus": likeStatus,
                 }
             });
+        return true;
+    },
+    async createLikeStatus(entityId: ObjectId, userId: ObjectId, userLogin: string, likeStatus: LikeStatusOption) {
+        const newLikeStatus: LikeStatusDBType = {
+            entityId: entityId.toString(),
+            userId: userId.toString(),
+            userLogin,
+            likeStatus,
+            createdAt: new Date()
+        }
+        const result = await LikeStatusModel.create(newLikeStatus)
+        return true;
+    },
+    async updateLikeStatus(entityId: ObjectId, userId: ObjectId,  likeStatus: LikeStatusOption) {
+        // const newLikeStatus: LikeStatusDBType = {
+        //     entityId: entityId.toString(),
+        //     userId: userId.toString(),
+        //     userLogin,
+        //     likeStatus,
+        //     createdAt: new Date()
+        // }
+        const result = await LikeStatusModel.findOneAndUpdate({entityId, userId}, {
+            $set: {
+                likeStatus: likeStatus,
+            }
+        })
         return true;
     }
 

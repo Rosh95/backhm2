@@ -12,7 +12,7 @@ import {deviceRepository} from "../repositories/device/device-repository";
 import {authRepository} from "../repositories/auth/auth-repository";
 
 
-export const authValidationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authValidationCommentMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
         res.send(401)
         return;
@@ -31,6 +31,7 @@ export const authValidationMiddleware = async (req: Request, res: Response, next
     }
     return res.sendStatus(401);
 }
+
 export const authValidationINfoMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
         res.send(401)

@@ -6,13 +6,13 @@ import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {postQueryRepository} from '../repositories/post/post-query-repository';
 import {postService} from '../domain/post-service';
 import {queryValidation} from '../validation/query-validation';
-import {authValidationMiddleware} from '../validation/auth-validation-middleware';
+import {authValidationCommentMiddleware} from '../validation/auth-validation-middleware';
 import {CommentContentPostMiddleware} from '../validation/comments-validation-middleware';
 import {commentsService} from '../domain/comments-service';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, PostViewModel} from '../types/post-types';
-import {CommentsInputData, CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
+import {CommentsInputData, PaginatorCommentViewType} from '../types/comments-types';
 import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
 import {ResultObject} from "../domain/device-service";
 import {ObjectId} from "mongodb";
@@ -105,7 +105,7 @@ postsRouter.put('/:id',
 )
 
 postsRouter.post('/:postId/comments',
-    authValidationMiddleware,
+    authValidationCommentMiddleware,
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {

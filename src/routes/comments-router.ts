@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {commentsService} from '../domain/comments-service';
-import {authValidationMiddleware} from '../validation/auth-validation-middleware';
+import {authValidationCommentMiddleware} from '../validation/auth-validation-middleware';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {
     CommentContentPostMiddleware,
@@ -8,8 +8,8 @@ import {
 } from '../validation/comments-validation-middleware';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {CommentsViewModel} from '../types/comments-types';
-import {ObjectId} from "mongodb";
 import {commentRepository} from "../repositories/comment/comment-repository";
+import {jwtService} from "../application/jwt-service";
 
 
 export const commentsRouter = Router({});
@@ -23,7 +23,12 @@ export const commentsRouter = Router({});
 // )
 commentsRouter.get('/:commentId',
     async (req, res) => {
-        const commentInfo: CommentsViewModel | null = await commentQueryRepository.getCommentById(req.params.commentId);
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            userId = await jwtService.getUserIdByAccessToken(token.toString());
+        }
+        const commentInfo: CommentsViewModel | null = await commentQueryRepository.getCommentById(req.params.commentId, userId);
         if (!commentInfo) {
             return res.send(404);
         }
@@ -32,7 +37,7 @@ commentsRouter.get('/:commentId',
     }
 )
 commentsRouter.delete('/:commentId',
-    authValidationMiddleware,
+    authValidationCommentMiddleware,
     async (req: Request, res: Response) => {
         try {
             const commentInfo = await commentQueryRepository.getCommentById(req.params.commentId);
@@ -52,7 +57,7 @@ commentsRouter.delete('/:commentId',
 )
 
 commentsRouter.put('/:commentId',
-    authValidationMiddleware,
+    authValidationCommentMiddleware,
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
     async (req, res) => {
@@ -73,20 +78,18 @@ commentsRouter.put('/:commentId',
     }
 )
 commentsRouter.put('/:commentId/like-status',
-    authValidationMiddleware,
+    authValidationCommentMiddleware,
     CommentLikeStatusPutMiddleware,
     errorsValidationMiddleware,
     async (req, res) => {
-    let currentUser = req.user;
+        let currentUser = req.user;
+
         try {
             const commentInfo = await commentRepository.getCommentById(req.params.commentId);
             if (!commentInfo) {
                 return res.send(404);
             }
             const updatedCommentStatus = await commentsService.updateCommentLikeStatusById(commentInfo, req.body.likeStatus, currentUser!);
-            if (!updatedCommentStatus) {
-                return res.send(404);
-            }
             return res.send(204);
         } catch (e) {
             console.log(e)
