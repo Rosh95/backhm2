@@ -7,7 +7,7 @@ import {UserAndDeviceTypeFromRefreshToken} from "../types/jwt-types";
 
 export const jwtService = {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
-        const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '100s'})
+        const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '600s'})
         return {
             accessToken: token
         }
@@ -16,7 +16,7 @@ export const jwtService = {
         const token = jwt.sign({
             userId: user._id,
             deviceId: deviceId
-        }, settings.JWT_REFRESH_SECRET, {expiresIn: '200s'})
+        }, settings.JWT_REFRESH_SECRET, {expiresIn: '1200s'})
         return {
             refreshToken: token
         }

@@ -1,12 +1,14 @@
-import {SortDirection} from 'mongodb';
+import {ObjectId, SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
 import {PostDBModel, PostViewModel} from '../types/post-types';
 import {getUserViewModel, NewUsersDBType, UserViewModel} from '../types/user-types';
-import {CommentsDBType, CommentsViewModel} from '../types/comments-types';
+import {CommentsDBType, CommentsViewModel, LikeStatusOption} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogDbType, BlogViewType} from '../types/blog-types';
 import {DeviceDBModel, DeviceViewModel} from "../types/auth-types";
+import {LikeStatusSchema} from "../types/likeStatus-types";
+import {LikeStatusModel} from "../db/dbMongo";
 
 export  type  queryDataType = {
     pageNumber: number,
@@ -159,8 +161,17 @@ export function getSessionsMapping(device: DeviceDBModel): DeviceViewModel {
     }
 }
 
-export function commentsMapping(comment: CommentsDBType): CommentsViewModel {
+export async function commentsMapping(comment: CommentsDBType): Promise<CommentsViewModel> {
     const commentMongoId = comment._id.toString();
+    const likesCount: number = await LikeStatusModel.countDocuments({
+        entityId: commentMongoId,
+        likeStatus: "Like"
+    })
+    const dislikesCount: number = await LikeStatusModel.countDocuments({
+        entityId: commentMongoId,
+        likeStatus: "Dislike"
+    })
+
 
     return {
         id: commentMongoId,
@@ -169,6 +180,11 @@ export function commentsMapping(comment: CommentsDBType): CommentsViewModel {
             userId: comment.commentatorInfo.userId.toString(),
             userLogin: comment.commentatorInfo.userLogin
         },
-        createdAt: comment.createdAt.toISOString()
+        createdAt: comment.createdAt.toISOString(),
+        likesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: comment.likesInfo.myStatus
+        }
     }
 }

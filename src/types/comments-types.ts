@@ -10,14 +10,15 @@ export type CommentsViewModel = {
     id: string,
     content: string,
     commentatorInfo: CommentatorInfo
-    createdAt: string
+    createdAt: string,
+    likesInfo: LikesInfoViewModel
 
 }
 export type CommentsInputType = {
     content: string
 }
 
-export enum LikeStatusOption {"None", "Like", "Dislike"}
+export enum LikeStatusOption {None = "None", Like = "Like", Dislike = "Dislike"}
 
 type LikesInfoViewModel = {
     likesCount: number,
@@ -51,6 +52,8 @@ export type PaginatorCommentViewType = {
     items: CommentsViewModel[]
 }
 
+
+
 export const CommentsSchema = new mongoose.Schema<CommentsDBType>({
     content: {type: String, require: true},
     postId: {type: String, require: true},
@@ -64,5 +67,4 @@ export const CommentsSchema = new mongoose.Schema<CommentsDBType>({
         dislikesCount: {type: Number, require: true, default: 0},
         myStatus: {type: String, enum: LikeStatusOption, require: true, default: LikeStatusOption.None}
     }
-
 })

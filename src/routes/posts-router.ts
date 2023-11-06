@@ -15,6 +15,7 @@ import {PaginatorPostViewType, postInputDataModel, postInputUpdatedDataModel, Po
 import {CommentsInputData, CommentsViewModel, PaginatorCommentViewType} from '../types/comments-types';
 import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
 import {ResultObject} from "../domain/device-service";
+import {ObjectId} from "mongodb";
 
 export const postsRouter = Router({})
 
@@ -112,6 +113,7 @@ postsRouter.post('/:postId/comments',
         if (!currentPost) {
             return res.sendStatus(404)
         }
+
         try {
             if (!req.user) {
                 throw new Error('user doesn`t exist');
@@ -122,7 +124,9 @@ postsRouter.post('/:postId/comments',
                 userLogin: req.user.accountData.login,
                 postId: req.params.postId
             }
-            const newComment: CommentsViewModel = await commentsService.createCommentForPost(newCommentData);
+
+            const newCommentObjectId: ObjectId = await commentsService.createCommentForPost(newCommentData);
+            const newComment = await commentQueryRepository.getCommentById(newCommentObjectId.toString())
             return res.status(201).send(newComment);
         } catch (e) {
             return res.sendStatus(500)

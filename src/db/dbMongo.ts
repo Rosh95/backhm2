@@ -12,6 +12,7 @@ import {
     RecoveryCodeSchema
 } from "../types/auth-types";
 import mongoose from 'mongoose'
+import {LikeStatusDBType, LikeStatusSchema} from "../types/likeStatus-types";
 
 
 dotenv.config()
@@ -36,6 +37,7 @@ export const CommentModel = mongoose.model<CommentsDBType>('comments', CommentsS
 export const DeviceModel = mongoose.model<DeviceDBModel>('devices', DeviceSchema);
 export const LoginAttemptModel = mongoose.model<LoginAttemptDBModel>('loginAttempt', LoginAttemptSchema);
 export const RecoveryCodeModel = mongoose.model<RecoveryCodeDBModel>('recoveryCodes', RecoveryCodeSchema);
+export const LikeStatusModel = mongoose.model<LikeStatusDBType>('likeStatuses', LikeStatusSchema);
 
 
 export async function runDb() {

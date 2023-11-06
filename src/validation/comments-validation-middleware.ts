@@ -6,6 +6,11 @@ export const CommentContentPostMiddleware = body('content').isString().trim().is
     max: 300
 }).withMessage('content should be between 20 and 300 symbols');
 
-export const CommentLikeStatusPutMiddleware = body('likeStatus').trim().custom((value) => {
-    return !(value !== LikeStatusOption.None || value !== LikeStatusOption.Like || value !== LikeStatusOption.Dislike);
-}).withMessage('LikeStatus Should be one of this values: Like, Dislike or None');
+// export const CommentLikeStatusPutMiddleware = body('likeStatus').trim().custom((value) => {
+//     if (value !== "None" || value !== LikeStatusOption.Like || value !== LikeStatusOption.Dislike) {
+//         return false
+//     }
+//     return true
+// }).withMessage('LikeStatus Should be one of this values: Like, Dislike or None');
+export const CommentLikeStatusPutMiddleware = body('likeStatus')
+    .trim().isIn(["None", "Like", "Dislike"]).withMessage('LikeStatus Should be one of this values: Like, Dislike or None');

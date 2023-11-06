@@ -2,6 +2,7 @@ import {CommentsDBType, CommentsViewModel, PaginatorCommentViewType} from '../..
 import {CommentModel} from '../../db/dbMongo';
 import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../helpers/helpers';
 import {FilterQuery} from "mongoose";
+import {ObjectId} from "mongodb";
 
 
 export const commentQueryRepository = {
@@ -14,7 +15,7 @@ export const commentQueryRepository = {
             .limit(queryData.pageSize).lean();
 
 
-        let commentViewArray = comments.map(comment => commentsMapping(comment))
+        let commentViewArray: CommentsViewModel[] = await Promise.all(comments.map(async comment => await commentsMapping(comment)))
         let pagesCount = await countTotalCommentsAndPages(queryData, filter);
 
 
@@ -36,7 +37,7 @@ export const commentQueryRepository = {
     },
     async getAllComments(): Promise<CommentsViewModel[]> {
         let comments = await CommentModel.find({}).lean();
-        return comments.map(comment => commentsMapping(comment))
+        return Promise.all(comments.map(comment => commentsMapping(comment)))
     },
     async getAllCommentsWithFilter(filter: any) {
         return CommentModel.countDocuments(filter);

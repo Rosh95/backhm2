@@ -77,5 +77,4 @@ const mapStatus = (resultCode: ResultCode) => {
         default:
             return 418
     }
-
 }
