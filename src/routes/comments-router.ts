@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {commentsService} from '../domain/comments-service';
-import {authValidationCommentMiddleware} from '../validation/auth-validation-middleware';
+import {authValidationCommentMiddleware, authValidationINfoMiddleware} from '../validation/auth-validation-middleware';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {
     CommentContentPostMiddleware,
@@ -78,7 +78,7 @@ commentsRouter.put('/:commentId',
     }
 )
 commentsRouter.put('/:commentId/like-status',
-    authValidationCommentMiddleware,
+    authValidationINfoMiddleware,
     CommentLikeStatusPutMiddleware,
     errorsValidationMiddleware,
     async (req, res) => {
