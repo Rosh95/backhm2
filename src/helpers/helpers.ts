@@ -171,7 +171,7 @@ export async function commentsMapping(comment: CommentsDBType, userId?: ObjectId
         entityId: commentMongoId,
         likeStatus: "Dislike"
     })
-    const currentUserId = await LikeStatusModel.findOne({userId})
+    const currentUserId = await LikeStatusModel.findOne({entityId: commentMongoId,userId})
     let currentStatus;
     if (currentUserId) {
         const result = await LikeStatusModel.findById(currentUserId)

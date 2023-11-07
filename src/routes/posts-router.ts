@@ -16,6 +16,7 @@ import {CommentsInputData, PaginatorCommentViewType} from '../types/comments-typ
 import {blogQueryRepository} from "../repositories/blog/blog-query-repository";
 import {ResultObject} from "../domain/device-service";
 import {ObjectId} from "mongodb";
+import {jwtService} from "../application/jwt-service";
 
 export const postsRouter = Router({})
 
@@ -109,6 +110,8 @@ postsRouter.post('/:postId/comments',
     CommentContentPostMiddleware,
     errorsValidationMiddleware,
     async (req: Request, res: Response) => {
+
+
         const currentPost: PostViewModel | null = await postQueryRepository.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
@@ -126,7 +129,7 @@ postsRouter.post('/:postId/comments',
             }
 
             const newCommentObjectId: ObjectId = await commentsService.createCommentForPost(newCommentData);
-            const newComment = await commentQueryRepository.getCommentById(newCommentObjectId.toString())
+            const newComment = await commentQueryRepository.getCommentById(newCommentObjectId.toString(), req.user._id)
             return res.status(201).send(newComment);
         } catch (e) {
             return res.sendStatus(500)
@@ -136,13 +139,19 @@ postsRouter.post('/:postId/comments',
 
 postsRouter.get('/:postId/comments',
     async (req: Request, res: Response): Promise<e.Response | PaginatorCommentViewType> => {
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            userId = await jwtService.getUserIdByAccessToken(token.toString());
+        }
+
         const currentPost = await postQueryRepository.findPostById(req.params.postId);
         if (!currentPost) {
             return res.sendStatus(404)
         }
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            const comments: PaginatorCommentViewType = await commentQueryRepository.getAllCommentsOfPost(req.params.postId, queryData)
+            const comments: PaginatorCommentViewType = await commentQueryRepository.getAllCommentsOfPost(req.params.postId, queryData, userId)
             return res.send(comments);
         } catch (e) {
             return res.status(500).json(e)

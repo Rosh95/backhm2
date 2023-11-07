@@ -6,7 +6,7 @@ import {ObjectId} from "mongodb";
 
 
 export const commentQueryRepository = {
-    async getAllCommentsOfPost(postId: string, queryData: queryDataType): Promise<PaginatorCommentViewType> {
+    async getAllCommentsOfPost(postId: string, queryData: queryDataType, userId?: ObjectId | null): Promise<PaginatorCommentViewType> {
         const filter: FilterQuery<CommentsDBType> = {postId: postId}
 
         const comments = await CommentModel.find(filter)
@@ -15,7 +15,7 @@ export const commentQueryRepository = {
             .limit(queryData.pageSize).lean();
 
 
-        let commentViewArray: CommentsViewModel[] = await Promise.all(comments.map(async comment => await commentsMapping(comment)))
+        let commentViewArray: CommentsViewModel[] = await Promise.all(comments.map(async comment => await commentsMapping(comment, userId)))
         let pagesCount = await countTotalCommentsAndPages(queryData, filter);
 
 
@@ -28,7 +28,7 @@ export const commentQueryRepository = {
 
         };
     },
-    async getCommentById(commentId: string, userId?:ObjectId | null): Promise<CommentsViewModel | null> {
+    async getCommentById(commentId: string, userId?: ObjectId | null): Promise<CommentsViewModel | null> {
         const comment = await CommentModel.findById(commentId);
         if (comment) {
             return await commentsMapping(comment, userId);
