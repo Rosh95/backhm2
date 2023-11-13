@@ -46,4 +46,5 @@ export const blogIdMiddlewareInParams = param('id').isString().custom(async (val
 }).withMessage('Please, write exist blogId');
 
 
-export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware, blogIdMiddleware ]
+//export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware, blogIdMiddleware ]
+export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware ]
