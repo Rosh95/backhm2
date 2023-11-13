@@ -122,13 +122,17 @@ export async function postMapping(post: PostDBModel, userId?: ObjectId | null): 
         entityId: postMongoId,
         likeStatus: "Dislike"
     })
+
     const currentUserId = await LikeStatusModel.findOne({entityId: postMongoId, userId})
     let currentStatus;
     if (currentUserId) {
-        const result = await LikeStatusModel.findById(currentUserId)
+        const result = await LikeStatusModel.findOne({entityId: postMongoId, userId})
         currentStatus = result ? result.likeStatus : null
     }
-    const newestLikesFromDb = await LikeStatusModel.find({entityId: postMongoId}).sort({createdAt: 1}).limit(3).lean()
+    const newestLikesFromDb = await LikeStatusModel.find({
+        entityId: postMongoId,
+        likeStatus: LikeStatusOption.Like
+    }).sort({createdAt: 1}).limit(3).lean()
 
     const newestLikes = newestLikesFromDb.map((value) => {
         return {
