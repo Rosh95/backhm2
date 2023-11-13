@@ -4,8 +4,7 @@ import {commentsMapping, countTotalCommentsAndPages, queryDataType} from '../../
 import {FilterQuery} from "mongoose";
 import {ObjectId} from "mongodb";
 
-
-export const commentQueryRepository = {
+export class CommentQueryRepository {
     async getAllCommentsOfPost(postId: string, queryData: queryDataType, userId?: ObjectId | null): Promise<PaginatorCommentViewType> {
         const filter: FilterQuery<CommentsDBType> = {postId: postId}
 
@@ -27,19 +26,24 @@ export const commentQueryRepository = {
             items: commentViewArray
 
         };
-    },
+    }
+
     async getCommentById(commentId: string, userId?: ObjectId | null): Promise<CommentsViewModel | null> {
         const comment = await CommentModel.findById(commentId);
         if (comment) {
             return await commentsMapping(comment, userId);
         }
         return null
-    },
+    }
+
     async getAllComments(): Promise<CommentsViewModel[]> {
         let comments = await CommentModel.find({}).lean();
         return Promise.all(comments.map(comment => commentsMapping(comment)))
-    },
+    }
+
     async getAllCommentsWithFilter(filter: any) {
         return CommentModel.countDocuments(filter);
     }
 }
+
+export const commentQueryRepository = new CommentQueryRepository();

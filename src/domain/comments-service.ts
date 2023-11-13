@@ -1,27 +1,34 @@
 import {ObjectId} from 'mongodb';
 import {CommentsDBType, CommentsInputData, LikeStatusOption} from '../types/comments-types';
-import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
-import {commentRepository} from '../repositories/comment/comment-repository';
+import {commentQueryRepository, CommentQueryRepository} from '../repositories/comment/comment-query-repository';
+import {CommentRepository, commentRepository} from '../repositories/comment/comment-repository';
 import {LikeStatusModel} from "../db/dbMongo";
 import {NewUsersDBType} from "../types/user-types";
 import {LikeStatusDBType} from "../types/likeStatus-types";
 
 
-export const commentsService = {
+export class CommentsService {
+    constructor(
+        public commentRepository: CommentRepository,
+        public commentQueryRepository: CommentQueryRepository
+    ) {
+    }
+
     async sendComment(comment: string, id: ObjectId | string) {
         return null;
-    },
+    }
+
     async allFeedback(comment: string, userId: ObjectId) {
-        return commentQueryRepository.getAllComments();
-    },
+        return this.commentQueryRepository.getAllComments();
+    }
 
     async getCommentById(commentId: string) {
-        return commentRepository.getCommentById(commentId);
-    },
+        return this.commentRepository.getCommentById(commentId);
+    }
 
     async deleteCommentById(commentId: string) {
-        return await commentRepository.deleteCommentById(commentId);
-    },
+        return await this.commentRepository.deleteCommentById(commentId);
+    }
 
     async createCommentForPost(newCommentData: CommentsInputData): Promise<ObjectId> {
         const newComment: CommentsDBType = {
@@ -39,29 +46,32 @@ export const commentsService = {
                 myStatus: LikeStatusOption.None
             }
         }
-        return commentRepository.createCommentForPost(newComment)
-    },
+        return this.commentRepository.createCommentForPost(newComment)
+    }
 
     async updateCommentById(commentId: string, commentContent: string) {
-        return commentRepository.updatedCommentById(commentId, commentContent)
-    },
+        return this.commentRepository.updatedCommentById(commentId, commentContent)
+    }
+
     async updateCommentLikeStatusById(commentInfo: CommentsDBType, newLikeStatusForComment: LikeStatusOption, currentUser: NewUsersDBType) {
-      //  const currentLikeStatus = commentInfo.likesInfo.myStatus;
         const findLikeStatusInDB: LikeStatusDBType | null = await LikeStatusModel.findOne({
             entityId: commentInfo._id,
             userId: currentUser._id
         })
 
         if (!findLikeStatusInDB) {
-            await commentRepository.createLikeStatus(commentInfo._id, currentUser._id, currentUser.accountData.login, newLikeStatusForComment)
+            await this.commentRepository.createLikeStatus(commentInfo._id, currentUser._id, currentUser.accountData.login, newLikeStatusForComment)
             return true;
         }
-        await commentRepository.updateLikeStatus(commentInfo._id, currentUser._id,  newLikeStatusForComment)
+        await this.commentRepository.updateLikeStatus(commentInfo._id, currentUser._id, newLikeStatusForComment)
 
-        // findLikeStatusInDB.likeStatus = newLikeStatusForComment;
+        //findLikeStatusInDB.likeStatus = newLikeStatusForComment;
+
 
         return true
         // return commentRepository.updatedCommentLikeStatusById(commentInfo._id.toString(), newLikeStatusForComment)
-    },
-
+    }
 }
+
+export const commentsService = new CommentsService(commentRepository, commentQueryRepository)
+

@@ -1,12 +1,18 @@
-import {blogRepository} from '../repositories/blog/blog-repository';
+import {BlogRepository, blogRepository} from '../repositories/blog/blog-repository';
 import {BlogDbType, BlogInputModel, BlogViewType} from '../types/blog-types';
 import {ObjectId} from 'mongodb';
+import {blogQueryRepository, BlogQueryRepository} from "../repositories/blog/blog-query-repository";
 
-export const blogService = {
+
+export class BlogService {
+    constructor(protected blogQueryRepository: BlogQueryRepository,
+                protected blogRepository: BlogRepository) {
+    }
+
     async deleteBlog(id: string): Promise<boolean> {
-        return await blogRepository.deleteBlog(id);
+        return await this.blogRepository.deleteBlog(id);
+    }
 
-    },
     async createBlog(blogData: BlogInputModel): Promise<BlogViewType> {
         let newBlog: BlogDbType = {
             _id: new ObjectId(),
@@ -16,11 +22,12 @@ export const blogService = {
             createdAt: new Date(),
             isMembership: false
         }
-        return await blogRepository.createBlog(newBlog);
-
-    },
+        return await this.blogRepository.createBlog(newBlog);
+    }
 
     async updateBlog(blogId: string, blogUpdateData: BlogInputModel): Promise<boolean> {
-        return await blogRepository.updateBlog(blogId, blogUpdateData)
+        return await this.blogRepository.updateBlog(blogId, blogUpdateData)
     }
 }
+
+export const blogService = new BlogService(blogQueryRepository, blogRepository)

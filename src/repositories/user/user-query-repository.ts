@@ -3,7 +3,7 @@ import {UserModel} from '../../db/dbMongo';
 import {getUserViewModel, NewUsersDBType, PaginatorUserViewType} from '../../types/user-types';
 import {FilterQuery} from "mongoose";
 
-export const usersQueryRepository = {
+export class  UsersQueryRepository {
     async getAllUsers(queryData: queryDataType): Promise<PaginatorUserViewType> {
 
         const filter: FilterQuery<NewUsersDBType> = {
@@ -36,9 +36,10 @@ export const usersQueryRepository = {
             totalCount: pagesCount.usersTotalCount,
             items: usersViewArray
         };
-    },
+    }
 
     async getAllUsersCount(filter?: FilterQuery<any>): Promise<number> {
         return filter ? UserModel.countDocuments(filter) : UserModel.countDocuments()
-    },
+    }
 }
+export const usersQueryRepository = new UsersQueryRepository()

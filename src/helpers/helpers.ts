@@ -1,7 +1,7 @@
 import {ObjectId, SortDirection} from 'mongodb';
 import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {usersQueryRepository} from '../repositories/user/user-query-repository';
-import {PostDBModel, PostViewModel} from '../types/post-types';
+import {PostDBModel, PostLikesUsersModel, PostViewModel} from '../types/post-types';
 import {getUserViewModel, NewUsersDBType, UserViewModel} from '../types/user-types';
 import {CommentsDBType, CommentsViewModel, LikeStatusOption} from '../types/comments-types';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
@@ -111,8 +111,33 @@ export const countTotalUsersAndPages = async (queryData: queryDataType, filter?:
     }
 }
 
-export function postMapping(post: PostDBModel): PostViewModel {
+export async function postMapping(post: PostDBModel, userId?: ObjectId | null): Promise<PostViewModel> {
     const postMongoId = post._id.toString();
+
+    const likesCount: number = await LikeStatusModel.countDocuments({
+        entityId: postMongoId,
+        likeStatus: "Like"
+    })
+    const dislikesCount: number = await LikeStatusModel.countDocuments({
+        entityId: postMongoId,
+        likeStatus: "Dislike"
+    })
+    const currentUserId = await LikeStatusModel.findOne({entityId: postMongoId, userId})
+    let currentStatus;
+    if (currentUserId) {
+        const result = await LikeStatusModel.findById(currentUserId)
+        currentStatus = result ? result.likeStatus : null
+    }
+    const newestLikesFromDb = await LikeStatusModel.find({entityId: postMongoId}).sort({createdAt: 1}).limit(3).lean()
+
+    const newestLikes = newestLikesFromDb.map((value) => {
+        return {
+            addedAt: value.createdAt.toISOString(),
+            userId: value.userId.toString(),
+            login: value.userLogin
+        }
+    })
+
 
     return {
         id: postMongoId,
@@ -121,7 +146,13 @@ export function postMapping(post: PostDBModel): PostViewModel {
         content: post.content,
         blogId: post.blogId,
         blogName: post.blogName,
-        createdAt: post.createdAt.toISOString()
+        createdAt: post.createdAt.toISOString(),
+        extendedLikesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: currentStatus ? currentStatus : LikeStatusOption.None,
+            newestLikes: newestLikes
+        }
     }
 }
 
@@ -171,7 +202,7 @@ export async function commentsMapping(comment: CommentsDBType, userId?: ObjectId
         entityId: commentMongoId,
         likeStatus: "Dislike"
     })
-    const currentUserId = await LikeStatusModel.findOne({entityId: commentMongoId,userId})
+    const currentUserId = await LikeStatusModel.findOne({entityId: commentMongoId, userId})
     let currentStatus;
     if (currentUserId) {
         const result = await LikeStatusModel.findById(currentUserId)

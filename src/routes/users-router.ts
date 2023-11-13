@@ -10,12 +10,8 @@ import {getUserViewModel, NewUsersDBType, PaginatorUserViewType, UserInputType} 
 
 export const usersRouter = Router({})
 
-
-usersRouter.get('/',
-    queryValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-
+export class UsersController {
+    async getUsers(req: Request, res: Response) {
         try {
             const queryData: queryDataType = await getDataFromQuery(req.query)
             const allUsers: PaginatorUserViewType = await usersQueryRepository.getAllUsers(queryData);
@@ -24,11 +20,9 @@ usersRouter.get('/',
             console.log(e)
             return res.sendStatus(500)
         }
-    })
-usersRouter.get('/:userId',
-    queryValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    }
+
+    async getUserById(req: Request, res: Response) {
         try {
             const user: NewUsersDBType | null = await userService.findUserById(req.params.userId)
             return res.send(user)
@@ -36,12 +30,9 @@ usersRouter.get('/:userId',
             console.log(e)
             return res.sendStatus(500)
         }
-    })
+    }
 
-usersRouter.delete('/:id',
-    basicAuthMiddleware,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    async deleteUserById(req: Request, res: Response) {
         try {
             const isDeleted: boolean = await userService.deleteUser(req.params.id)
             if (isDeleted) {
@@ -52,15 +43,8 @@ usersRouter.delete('/:id',
             return res.sendStatus(500)
         }
     }
-)
 
-
-usersRouter.post('/',
-    basicAuthMiddleware,
-    userValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-
+    async createUser(req: Request, res: Response) {
         let userPostInputData: UserInputType = {
             email: req.body.email,
             login: req.body.login,
@@ -70,4 +54,23 @@ usersRouter.post('/',
         // await userService.createUser(userPostInputData);
         return res.status(201).send(newUser)
     }
-)
+}
+
+export const usersController = new UsersController()
+
+usersRouter.get('/',
+    queryValidation,
+    errorsValidationMiddleware, usersController.getUsers.bind(usersController))
+usersRouter.get('/:userId',
+    queryValidation,
+    errorsValidationMiddleware, usersController.getUserById.bind(usersController))
+
+usersRouter.delete('/:id',
+    basicAuthMiddleware,
+    errorsValidationMiddleware, usersController.deleteUserById.bind(usersController))
+
+
+usersRouter.post('/',
+    basicAuthMiddleware,
+    userValidation,
+    errorsValidationMiddleware, usersController.createUser.bind(usersController))

@@ -2,61 +2,60 @@ import {Request, Response, Router} from 'express';
 import {blogValidation} from '../validation/blogs-validation-middleware';
 import {basicAuthMiddleware} from '../validation/authorization';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
-import {blogService} from '../domain/blog-service';
+import {blogService, BlogService} from '../domain/blog-service';
 import {postValidation} from '../validation/posts-validation-middleware';
-import {blogQueryRepository} from '../repositories/blog/blog-query-repository';
+import {blogQueryRepository, BlogQueryRepository} from '../repositories/blog/blog-query-repository';
 import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {queryValidation} from '../validation/query-validation';
-import {postService} from '../domain/post-service';
+import {PostService, postService} from '../domain/post-service';
 import {BlogInputModel, BlogViewType, PaginatorBlogViewType} from '../types/blog-types';
 import {PaginatorPostViewType, postInputDataModelForExistingBlog, PostViewModel} from '../types/post-types';
 import {ResultObject} from "../domain/device-service";
-import {postQueryRepository} from "../repositories/post/post-query-repository";
+import {PostQueryRepository, postQueryRepository} from "../repositories/post/post-query-repository";
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/',
-    queryValidation,
-    async (req: Request, res: Response) => {
+export class BlogsController {
+    constructor(public blogService: BlogService,
+                public blogQueryRepository: BlogQueryRepository,
+                public postService: PostService,
+                public postQueryRepository: PostQueryRepository) {
+    }
+
+    async getBlogs(req: Request, res: Response) {
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            const allBlogs: PaginatorBlogViewType = await blogQueryRepository.getAllBlogs(queryData);
+            const allBlogs: PaginatorBlogViewType = await this.blogQueryRepository.getAllBlogs(queryData);
             return res.send(allBlogs)
         } catch (e) {
             console.log(e)
             return res.sendStatus(500)
         }
-    })
-
-blogsRouter.get('/:id', async (req: Request, res: Response) => {
-    let foundBlog: BlogViewType | null = await blogQueryRepository.findBlogById(req.params.id)
-    if (foundBlog) {
-        return res.send(foundBlog)
     }
-    return res.sendStatus(404)
-})
 
-blogsRouter.delete('/:id',
-    basicAuthMiddleware,
-    async (req: Request, res: Response) => {
-        const isDeleted: boolean = await blogService.deleteBlog(req.params.id)
+    async getBlogById(req: Request, res: Response) {
+        let foundBlog: BlogViewType | null = await this.blogQueryRepository.findBlogById(req.params.id)
+        if (foundBlog) {
+            return res.send(foundBlog)
+        }
+        return res.sendStatus(404)
+    }
+
+    async deleteBlog(req: Request, res: Response) {
+        const isDeleted: boolean = await this.blogService.deleteBlog(req.params.id)
         if (isDeleted) {
             return res.sendStatus(204)
         } else return res.sendStatus(404)
-    })
+    }
 
-blogsRouter.post('/',
-    basicAuthMiddleware,
-   blogValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    async createBlog(req: Request, res: Response) {
         try {
             let BlogInputData: BlogInputModel = {
                 name: req.body.name,
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             }
-            const newBlog: BlogViewType = await blogService.createBlog(BlogInputData);
+            const newBlog: BlogViewType = await this.blogService.createBlog(BlogInputData);
 
             return res.status(201).send(newBlog)
         } catch (e) {
@@ -64,14 +63,10 @@ blogsRouter.post('/',
             return res.sendStatus(500)
         }
 
-    })
+    }
 
-blogsRouter.put('/:id',
-    basicAuthMiddleware,
-    blogValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
+    async updateBlog(req: Request, res: Response) {
+        let isExistBlog = await this.blogQueryRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             res.sendStatus(404)
             return;
@@ -82,7 +77,7 @@ blogsRouter.put('/:id',
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             }
-            const isBlogUpdate: boolean = await blogService.updateBlog(req.params.id, BlogUpdateData);
+            const isBlogUpdate: boolean = await this.blogService.updateBlog(req.params.id, BlogUpdateData);
             if (isBlogUpdate) {
                 return res.sendStatus(204)
             } else {
@@ -92,34 +87,26 @@ blogsRouter.put('/:id',
             console.log(e)
             return res.sendStatus(500)
         }
-    })
+    }
 
-
-blogsRouter.get('/:id/posts',
-    queryValidation,
-    async (req: Request, res: Response) => {
-        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
+    async getPostsFromBlogById(req: Request, res: Response) {
+        let isExistBlog = await this.blogQueryRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             res.sendStatus(404)
             return;
         }
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            let foundPosts: PaginatorPostViewType = await blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
+            let foundPosts: PaginatorPostViewType = await this.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
             return res.send(foundPosts);
 
         } catch (e) {
             return res.status(500).json(e)
         }
-    })
+    }
 
-blogsRouter.post('/:id/posts',
-    basicAuthMiddleware,
-    postValidation,
-    queryValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
-        let isExistBlog = await blogQueryRepository.findBlogById(req.params.id);
+    async createPostForBlogById(req: Request, res: Response) {
+        let isExistBlog = await this.blogQueryRepository.findBlogById(req.params.id);
         if (!isExistBlog) {
             res.sendStatus(404)
             return;
@@ -130,11 +117,34 @@ blogsRouter.post('/:id/posts',
                 shortDescription: req.body.shortDescription,
                 content: req.body.content,
             }
-            const newPost: ResultObject<string> = await postService.createPostForExistingBlog(req.params.id, postInputData);
-            const gotNewPost: PostViewModel | null = newPost.data ? await postQueryRepository.findPostById(newPost.data) : null;
+            const newPost: ResultObject<string> = await this.postService.createPostForExistingBlog(req.params.id, postInputData);
+            const gotNewPost: PostViewModel | null = newPost.data ? await this.postQueryRepository.findPostById(newPost.data) : null;
             return res.status(201).send(gotNewPost)
         } catch (e) {
             return res.status(500).json(e)
         }
 
-    })
+    }
+
+}
+
+
+export const blogController = new BlogsController(blogService, blogQueryRepository, postService, postQueryRepository);
+
+
+blogsRouter.get('/', queryValidation, blogController.getBlogs.bind(blogController))
+
+blogsRouter.get('/:id', blogController.getBlogById.bind(blogController))
+
+
+blogsRouter.delete('/:id', basicAuthMiddleware, blogController.deleteBlog.bind(blogController))
+
+blogsRouter.post('/', basicAuthMiddleware, blogValidation, errorsValidationMiddleware, blogController.createBlog.bind(blogController))
+
+blogsRouter.put('/:id', basicAuthMiddleware, blogValidation, errorsValidationMiddleware, blogController.updateBlog.bind(blogController))
+
+
+blogsRouter.get('/:id/posts', queryValidation, blogController.getPostsFromBlogById.bind(blogController))
+
+blogsRouter.post('/:id/posts', basicAuthMiddleware, postValidation,
+    queryValidation, errorsValidationMiddleware, blogController.createPostForBlogById.bind(blogController))

@@ -3,7 +3,7 @@ import {PostModel} from '../../db/dbMongo';
 import {PaginatorPostViewType, PostDBModel, PostViewModel} from '../../types/post-types';
 import {ObjectId} from "mongodb";
 
-export const postQueryRepository = {
+export class PostQueryRepository {
     async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
 
         const posts = await PostModel.find()
@@ -11,7 +11,7 @@ export const postQueryRepository = {
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).lean();
 
-        let postViewArray: PostViewModel[] = posts.map(post => postMapping(post))
+        let postViewArray: PostViewModel[] = await Promise.all(posts.map(post => postMapping(post)))
         let pagesCount = await countTotalPostsAndPages(queryData);
 
         return {
@@ -21,9 +21,13 @@ export const postQueryRepository = {
             totalCount: pagesCount.postsTotalCount,
             items: postViewArray
         };
-    },
-    async findPostById(id: string ): Promise<PostViewModel | null> {
+    }
+
+    async findPostById(id: string): Promise<PostViewModel | null> {
         const foundPost: PostDBModel = <PostDBModel>await PostModel.findOne({_id: new ObjectId(id)});
         return foundPost ? postMapping(foundPost) : null;
-    },
+    }
 }
+
+export const postQueryRepository = new PostQueryRepository();
+

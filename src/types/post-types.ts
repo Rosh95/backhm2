@@ -1,5 +1,13 @@
 import {ObjectId} from 'mongodb';
 import mongoose from "mongoose";
+import {LikeStatusOption} from "./comments-types";
+import Any = jasmine.Any;
+
+export type PostLikesUsersModel = {
+    addedAt: string,
+    userId: string,
+    login: string
+}
 
 export type PostViewModel = {
     id: string,
@@ -9,17 +17,24 @@ export type PostViewModel = {
     blogId: string,
     blogName: string | null,
     createdAt: string
+    extendedLikesInfo: {
+        likesCount: number,
+        dislikesCount: number,
+        myStatus: LikeStatusOption,
+        newestLikes: PostLikesUsersModel[]
+    }
 }
 
-export type PostDBModel = {
-    _id: ObjectId,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string | null,
-    createdAt: Date
-}
+export type PostDBModel =
+    {
+        _id: ObjectId,
+        title: string,
+        shortDescription: string,
+        content: string,
+        blogId: string,
+        blogName: string | null,
+        createdAt: Date
+    }
 export type postInputType = {
     id?: string
     title: string,

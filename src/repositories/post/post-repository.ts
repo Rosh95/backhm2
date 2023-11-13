@@ -2,15 +2,15 @@ import {PostModel} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
 import {PostDBModel, postInputUpdatedDataModel} from '../../types/post-types';
 import {ResultCode, ResultObject} from "../../domain/device-service";
+import exp from "constants";
 
-
-export const postRepository = {
+export class PostRepository {
     async deletePost(id: string): Promise<boolean> {
         const result = await PostModel.deleteOne({_id: new ObjectId(id)});
         return result.deletedCount === 1;
-    },
-    async createPost(newPost: PostDBModel): Promise<ResultObject<string>> {
+    }
 
+    async createPost(newPost: PostDBModel): Promise<ResultObject<string>> {
         const result = await PostModel.create(newPost);
         if (result) {
             return {
@@ -24,7 +24,6 @@ export const postRepository = {
             resultCode: ResultCode.BadRequest,
             errorMessage: 'couldn`t create a new post'
         }
-
         // return {
         //     id: result.insertedId.toString(),
         //     title: newPost.title,
@@ -35,8 +34,7 @@ export const postRepository = {
         //     createdAt: newPost.createdAt.toISOString()
         // };
 
-    },
-
+    }
 
     async updatePost(id: string, updatedPostData: postInputUpdatedDataModel): Promise<boolean> {
 
@@ -48,8 +46,8 @@ export const postRepository = {
                     content: updatedPostData.content
                 }
             });
-
         return result.matchedCount === 1;
-
     }
 }
+
+export const postRepository = new PostRepository();
