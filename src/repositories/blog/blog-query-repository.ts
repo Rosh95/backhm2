@@ -40,7 +40,7 @@ export class BlogQueryRepository {
         return foundBlog ? blogMapping(foundBlog) : null;
     }
 
-    async getAllPostOfBlog(blogId: string, queryData: queryDataType): Promise<PaginatorPostViewType> {
+    async getAllPostOfBlog(blogId: string, queryData: queryDataType, userId?: ObjectId | null): Promise<PaginatorPostViewType> {
 
         let posts = await PostModel.find({blogId})
             .sort({[queryData.sortBy]: queryData.sortDirection})
@@ -48,7 +48,7 @@ export class BlogQueryRepository {
             .limit(queryData.pageSize)
             .lean();
 
-        let postViewArray: PostViewModel[] = await Promise.all(posts.map(async post => postMapping(post)))
+        let postViewArray: PostViewModel[] = await Promise.all(posts.map(async post => postMapping(post, userId)))
         let pagesCount = await countTotalPostsAndPagesOfBlog(blogId, queryData);
 
         return {

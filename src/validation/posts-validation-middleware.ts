@@ -23,7 +23,7 @@ export const blogIdMiddleware = body('blogId').isString().custom(async (value) =
     //  console.log(`${blogsIdArray} exists blogID`)
     //   const isIncluded = db.blogs.map(b => b.id).includes(value);
     //  const isIncluded = await blogsCollection.find({id:value}).toArray();
-    const isIncluded = await BlogModel.findOne({_id: new ObjectId(value.toString())});
+    const isIncluded = await BlogModel.findById(value);
     if (!isIncluded) {
         // return false;
         throw new Error('This blogId doesn`t exist')
@@ -47,4 +47,4 @@ export const blogIdMiddlewareInParams = param('id').isString().custom(async (val
 
 
 //export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware, blogIdMiddleware ]
-export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware ]
+export const postValidation = [titlePostMiddleware, shortDescriptionPostMiddleware, contentPostMiddleware]

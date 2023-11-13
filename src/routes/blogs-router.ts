@@ -12,6 +12,7 @@ import {BlogInputModel, BlogViewType, PaginatorBlogViewType} from '../types/blog
 import {PaginatorPostViewType, postInputDataModelForExistingBlog, PostViewModel} from '../types/post-types';
 import {ResultObject} from "../domain/device-service";
 import {PostQueryRepository, postQueryRepository} from "../repositories/post/post-query-repository";
+import {jwtService} from "../application/jwt-service";
 
 export const blogsRouter = Router({})
 
@@ -95,9 +96,14 @@ export class BlogsController {
             res.sendStatus(404)
             return;
         }
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            userId = await jwtService.getUserIdByAccessToken(token.toString());
+        }
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            let foundPosts: PaginatorPostViewType = await this.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData);
+            let foundPosts: PaginatorPostViewType = await this.blogQueryRepository.getAllPostOfBlog(req.params.id, queryData, userId);
             return res.send(foundPosts);
 
         } catch (e) {
