@@ -4,14 +4,14 @@ import {PaginatorPostViewType, PostDBModel, PostViewModel} from '../../types/pos
 import {ObjectId} from "mongodb";
 
 export class PostQueryRepository {
-    async getAllPosts(queryData: queryDataType): Promise<PaginatorPostViewType> {
+    async getAllPosts(queryData: queryDataType, userId?: ObjectId | null): Promise<PaginatorPostViewType> {
 
         const posts = await PostModel.find()
             .sort({[queryData.sortBy]: queryData.sortDirection})
             .skip(queryData.skippedPages)
             .limit(queryData.pageSize).lean();
 
-        let postViewArray: PostViewModel[] = await Promise.all(posts.map(post => postMapping(post)))
+        let postViewArray: PostViewModel[] = await Promise.all(posts.map(async post => postMapping(post, userId)))
         let pagesCount = await countTotalPostsAndPages(queryData);
 
         return {
@@ -23,9 +23,9 @@ export class PostQueryRepository {
         };
     }
 
-    async findPostById(id: string): Promise<PostViewModel | null> {
+    async findPostById(id: string, userId?: ObjectId | null): Promise<PostViewModel | null> {
         const foundPost: PostDBModel = <PostDBModel>await PostModel.findOne({_id: new ObjectId(id)});
-        return foundPost ? postMapping(foundPost) : null;
+        return foundPost ? postMapping(foundPost, userId) : null;
     }
 }
 

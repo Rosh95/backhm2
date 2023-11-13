@@ -30,9 +30,15 @@ export class PostController {
     }
 
     async getPosts(req: Request, res: Response): Promise<e.Response<PaginatorPostViewType>> {
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            userId = await jwtService.getUserIdByAccessToken(token.toString());
+        }
+
         try {
             let queryData: queryDataType = await getDataFromQuery(req.query)
-            const allPosts: PaginatorPostViewType = await this.postQueryRepository.getAllPosts(queryData);
+            const allPosts: PaginatorPostViewType = await this.postQueryRepository.getAllPosts(queryData, userId);
             return res.send(allPosts)
         } catch (e) {
             console.log(e)
@@ -41,8 +47,13 @@ export class PostController {
     }
 
     async getPostById(req: Request, res: Response): Promise<e.Response<PostViewModel>> {
+        let userId = null;
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
+            userId = await jwtService.getUserIdByAccessToken(token.toString());
+        }
         try {
-            let foundPost: PostViewModel | null = await this.postQueryRepository.findPostById(req.params.id)
+            let foundPost: PostViewModel | null = await this.postQueryRepository.findPostById(req.params.id, userId)
             if (foundPost) {
                 return res.send(foundPost)
             }
