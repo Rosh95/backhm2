@@ -1,8 +1,9 @@
-import {PostModel} from '../../db/dbMongo';
+import {LikeStatusModel, PostModel} from '../../db/dbMongo';
 import {ObjectId} from 'mongodb';
 import {PostDBModel, postInputUpdatedDataModel} from '../../types/post-types';
 import {ResultCode, ResultObject} from "../../domain/device-service";
-import exp from "constants";
+import {LikeStatusOption} from "../../types/comments-types";
+import {LikeStatusDBType} from "../../types/likeStatus-types";
 
 export class PostRepository {
     async deletePost(id: string): Promise<boolean> {
@@ -36,6 +37,14 @@ export class PostRepository {
 
     }
 
+    async getPostById(postId: string): Promise<PostDBModel | null> {
+        const foundPost = await PostModel.findById(postId);
+        if (foundPost) {
+            return foundPost;
+        }
+        return null
+    }
+
     async updatePost(id: string, updatedPostData: postInputUpdatedDataModel): Promise<boolean> {
 
         const result = await PostModel.updateOne({_id: new ObjectId(id)},
@@ -48,6 +57,35 @@ export class PostRepository {
             });
         return result.matchedCount === 1;
     }
+
+    async createLikeStatusForPost(entityId: ObjectId, userId: ObjectId, userLogin: string, likeStatus: LikeStatusOption) {
+        const newLikeStatus: LikeStatusDBType = {
+            entityId: entityId.toString(),
+            userId: userId.toString(),
+            userLogin,
+            likeStatus,
+            createdAt: new Date()
+        }
+        const result = await LikeStatusModel.create(newLikeStatus)
+        return true;
+    }
+
+    async updatePostLikeStatus(entityId: ObjectId, userId: ObjectId, likeStatus: LikeStatusOption) {
+        // const newLikeStatus: LikeStatusDBType = {
+        //     entityId: entityId.toString(),
+        //     userId: userId.toString(),
+        //     userLogin,
+        //     likeStatus,
+        //     createdAt: new Date()
+        // }
+        const result = await LikeStatusModel.findOneAndUpdate({entityId, userId}, {
+            $set: {
+                likeStatus: likeStatus,
+            }
+        })
+        return true;
+    }
+
 }
 
 export const postRepository = new PostRepository();

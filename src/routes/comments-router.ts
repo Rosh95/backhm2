@@ -4,7 +4,7 @@ import {authValidationCommentMiddleware, authValidationINfoMiddleware} from '../
 import {CommentQueryRepository, commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {
     CommentContentPostMiddleware,
-    CommentLikeStatusPutMiddleware
+    LikeStatusPutMiddleware
 } from '../validation/comments-validation-middleware';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {CommentsViewModel} from '../types/comments-types';
@@ -98,5 +98,5 @@ commentsRouter.put('/:commentId',
     errorsValidationMiddleware, commentsController.updateComment.bind(commentsController))
 commentsRouter.put('/:commentId/like-status',
     authValidationINfoMiddleware,
-    CommentLikeStatusPutMiddleware,
+    LikeStatusPutMiddleware,
     errorsValidationMiddleware, commentsController.updateCommentLikeStatus.bind(commentsController))

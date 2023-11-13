@@ -6,8 +6,8 @@ import {getDataFromQuery, queryDataType} from '../helpers/helpers';
 import {PostQueryRepository, postQueryRepository} from '../repositories/post/post-query-repository';
 import {PostService, postService} from '../domain/post-service';
 import {queryValidation} from '../validation/query-validation';
-import {authValidationCommentMiddleware} from '../validation/auth-validation-middleware';
-import {CommentContentPostMiddleware} from '../validation/comments-validation-middleware';
+import {authValidationCommentMiddleware, authValidationINfoMiddleware} from '../validation/auth-validation-middleware';
+import {CommentContentPostMiddleware, LikeStatusPutMiddleware} from '../validation/comments-validation-middleware';
 import {commentsService} from '../domain/comments-service';
 import {commentQueryRepository} from '../repositories/comment/comment-query-repository';
 import {BlogViewType} from '../types/blog-types';
@@ -146,6 +146,21 @@ export class PostController {
         }
     }
 
+    async updatePostLikeStatus(req: Request, res: Response) {
+        let currentUser = req.user;
+
+        try {
+            const postInfo = await this.postRepository.getPostById(req.params.postId);
+            if (!postInfo) {
+                return res.send(404);
+            }
+            const updatedPostStatus = await this.postService.updatePostLikeStatusById(postInfo, req.body.likeStatus, currentUser!);
+            return res.send(204);
+        } catch (e) {
+            console.log(e)
+            return res.sendStatus(500)
+        }
+    }
 
 }
 
@@ -169,3 +184,7 @@ postsRouter.post('/:postId/comments', authValidationCommentMiddleware,
     errorsValidationMiddleware, postController.createCommentForPostById.bind(postController))
 
 postsRouter.get('/:postId/comments', postController.getCommentForPostById.bind(postController))
+postsRouter.put('/:postId/like-status',
+    authValidationINfoMiddleware,
+    LikeStatusPutMiddleware,
+    errorsValidationMiddleware, postController.updatePostLikeStatus.bind(postController))

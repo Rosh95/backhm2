@@ -10,6 +10,10 @@ import {ObjectId} from 'mongodb';
 import {BlogQueryRepository, blogQueryRepository} from "../repositories/blog/blog-query-repository";
 import {ResultObject} from "./device-service";
 import {postQueryRepository, PostQueryRepository} from "../repositories/post/post-query-repository";
+import {LikeStatusOption} from "../types/comments-types";
+import {NewUsersDBType} from "../types/user-types";
+import {LikeStatusDBType} from "../types/likeStatus-types";
+import {LikeStatusModel} from "../db/dbMongo";
 
 export class PostService {
 
@@ -54,6 +58,25 @@ export class PostService {
 
     async updatePost(id: string, updatedPostData: postInputUpdatedDataModel): Promise<boolean> {
         return await this.postRepository.updatePost(id, updatedPostData)
+    }
+
+    async updatePostLikeStatusById(postInfo: PostDBModel, newLikeStatusForComment: LikeStatusOption, currentUser: NewUsersDBType) {
+        const findPostLikeStatusInDB: LikeStatusDBType | null = await LikeStatusModel.findOne({
+            entityId: postInfo._id,
+            userId: currentUser._id
+        })
+
+        if (!findPostLikeStatusInDB) {
+            await this.postRepository.createLikeStatusForPost(postInfo._id, currentUser._id, currentUser.accountData.login, newLikeStatusForComment)
+            return true;
+        }
+        await this.postRepository.updatePostLikeStatus(postInfo._id, currentUser._id, newLikeStatusForComment)
+
+        //findLikeStatusInDB.likeStatus = newLikeStatusForComment;
+
+
+        return true
+        // return commentRepository.updatedCommentLikeStatusById(commentInfo._id.toString(), newLikeStatusForComment)
     }
 }
 

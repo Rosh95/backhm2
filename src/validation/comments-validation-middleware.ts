@@ -1,5 +1,4 @@
 import {body} from 'express-validator';
-import {LikeStatusOption} from "../types/comments-types";
 
 export const CommentContentPostMiddleware = body('content').isString().trim().isLength({
     min: 20,
@@ -12,5 +11,5 @@ export const CommentContentPostMiddleware = body('content').isString().trim().is
 //     }
 //     return true
 // }).withMessage('LikeStatus Should be one of this values: Like, Dislike or None');
-export const CommentLikeStatusPutMiddleware = body('likeStatus')
+export const LikeStatusPutMiddleware = body('likeStatus')
     .trim().isIn(["None", "Like", "Dislike"]).withMessage('LikeStatus Should be one of this values: Like, Dislike or None');
