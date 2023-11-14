@@ -1,5 +1,5 @@
 import {Request, Response, Router} from 'express';
-import {jwtService} from '../application/jwt-service';
+import {jwtService, JwtService} from '../application/jwt-service';
 import {CurrentUserInfoType, getUserViewModel, UserInputType} from '../types/user-types';
 import {v4 as uuidv4} from 'uuid';
 import {
@@ -14,21 +14,27 @@ import {
 import {emailUserMiddleware, userValidation} from '../validation/users-validation';
 import {errorsValidationMiddleware} from '../validation/error-validation-middleware';
 import {emailAdapter} from "../adapters/email-adapter";
-import {authService} from "../domain/auth-service";
+import {authService, AuthService} from "../domain/auth-service";
 import {userService} from "../domain/users-service";
 import {deviceInputValue} from "../types/auth-types";
-import {deviceRepository} from "../repositories/device/device-repository";
+import {deviceRepository, DeviceRepository} from "../repositories/device/device-repository";
 
 export const authRouter = Router({})
 
-authRouter.post('/login',
-    countNumberLoginAttempts,
-    async (req: Request, res: Response) => {
-        let user = await authService.checkCredential(req.body.loginOrEmail, req.body.password);
+export class AuthController {
+    constructor(
+        public authService: AuthService,
+        public jwtService: JwtService,
+        public deviceRepository: DeviceRepository,
+    ) {
+    }
+
+    async loginUser(req: Request, res: Response) {
+        let user = await this.authService.checkCredential(req.body.loginOrEmail, req.body.password);
         if (user) {
-            const accessToken = await jwtService.createJWT(user)
+            const accessToken = await this.jwtService.createJWT(user)
             const deviceId = uuidv4();
-            const refreshToken = await jwtService.createRefreshJWT(user, deviceId)
+            const refreshToken = await this.jwtService.createRefreshJWT(user, deviceId)
             const deviceInfo: deviceInputValue = {
                 userId: user._id.toString(),
                 deviceId: deviceId,
@@ -37,7 +43,7 @@ authRouter.post('/login',
                 ip: req.ip
             }
             try {
-                await authService.addDeviceInfoToDB(deviceInfo);
+                await this.authService.addDeviceInfoToDB(deviceInfo);
             } catch (e) {
                 return false
             }
@@ -48,19 +54,17 @@ authRouter.post('/login',
             return res.sendStatus(401)
         }
     }
-)
-authRouter.post('/refresh-token',
-    checkRefreshTokenMiddleware,
-    async (req: Request, res: Response) => {
+
+    async refreshToken(req: Request, res: Response) {
         const refreshToken = req.cookies.refreshToken;
-        const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        const currentUserInfo = await this.jwtService.getTokenInfoByRefreshToken(refreshToken);
         if (!currentUserInfo) return res.sendStatus(401)
         const currentUserId: string = currentUserInfo.userId;
         const currentDeviceId: string = currentUserInfo.deviceId;
         const currentUser = currentUserId ? await userService.findUserById(currentUserId.toString()) : null;
         if (currentUser) {
-            const newAccessToken = await jwtService.createJWT(currentUser)
-            const newRefreshToken = await jwtService.createRefreshJWT(currentUser, currentDeviceId)
+            const newAccessToken = await this.jwtService.createJWT(currentUser)
+            const newRefreshToken = await this.jwtService.createRefreshJWT(currentUser, currentDeviceId)
             const deviceInfo: deviceInputValue = {
                 userId: currentUserId,
                 deviceId: currentDeviceId,
@@ -69,7 +73,7 @@ authRouter.post('/refresh-token',
                 ip: req.ip
             }
             try {
-                await authService.addDeviceInfoToDB(deviceInfo);
+                await this.authService.addDeviceInfoToDB(deviceInfo);
             } catch (e) {
                 return false
             }
@@ -80,29 +84,21 @@ authRouter.post('/refresh-token',
         }
         return res.sendStatus(401)
     }
-)
 
-authRouter.post('/logout',
-    checkRefreshTokenMiddleware,
-    async (req: Request, res: Response) => {
+    async logoutUser(req: Request, res: Response) {
         //убрать лишнюю инфу в базе данных ( обнулить дату создания )
         const refreshToken = req.cookies.refreshToken;
-        const currentUserInfo = await jwtService.getTokenInfoByRefreshToken(refreshToken);
+        const currentUserInfo = await this.jwtService.getTokenInfoByRefreshToken(refreshToken);
         if (!currentUserInfo) return res.sendStatus(401)
         const currentUserId: string = currentUserInfo.userId;
         const currentDeviceId: string = currentUserInfo.deviceId;
-        await deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
+        await this.deviceRepository.updateIssuedDate(currentUserId, currentDeviceId);
         return res
             .clearCookie('refreshToken')
             .sendStatus(204)
     }
-)
 
-
-authRouter.get('/me',
-    authValidationINfoMiddleware,
-    checkAccessTokenMiddleware,
-    async (req, res) => {
+    async getInfoOfCurrentUser(req: Request, res: Response) {
         if (!req.headers.authorization) {
             res.sendStatus(401)
             return;
@@ -117,20 +113,15 @@ authRouter.get('/me',
         }
         return res.sendStatus(404)
     }
-)
 
-authRouter.post('/registration',
-    countNumberLoginAttempts,
-    userValidation,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    async registrationUser(req: Request, res: Response) {
 
         let userPostInputData: UserInputType = {
             email: req.body.email,
             login: req.body.login,
             password: req.body.password
         }
-        const newUser: getUserViewModel | null = await authService.createUser(userPostInputData);
+        const newUser: getUserViewModel | null = await this.authService.createUser(userPostInputData);
         if (newUser) {
             return res.sendStatus(204)
 
@@ -138,32 +129,21 @@ authRouter.post('/registration',
         return res.sendStatus(400)
 
     }
-)
 
-authRouter.post('/registration-confirmation',
-    countNumberLoginAttempts,
-    isEmailConfirmatedMiddlewareByCode,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    async registrationConfirmation(req: Request, res: Response) {
         const code = req.body.code;
-        const result = await authService.confirmEmail(code);
+        const result = await this.authService.confirmEmail(code);
         if (result) {
             return res.sendStatus(204)
         }
         return res.sendStatus(400)
     }
-)
 
-authRouter.post('/registration-email-resending',
-    countNumberLoginAttempts,
-    emailUserMiddleware,
-    isEmailConfirmatedMiddlewareByEmail,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+    async registrationEmailResending(req: Request, res: Response) {
 
         const email = req.body.email;
 
-        const currentUser = await authService.changeUserConfirmationcode(email);
+        const currentUser = await this.authService.changeUserConfirmationcode(email);
         if (currentUser) {
             try {
                 await emailAdapter.sendConfirmationEmail(currentUser.emailConfirmation.confirmationCode, email)
@@ -174,18 +154,13 @@ authRouter.post('/registration-email-resending',
         }
         return res.sendStatus(400)
     }
-)
-authRouter.post('/password-recovery',
-    countNumberLoginAttempts,
-    emailUserMiddleware,
-    // checkRegistredUserByEmail,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+
+    async passwordRecovery(req: Request, res: Response) {
         const email = req.body.email;
         // let foundUserByEmail = await userService.findUserByEmail(email)
         // if (!foundUserByEmail) return res.sendStatus(400)
         const recoveryCode = uuidv4()
-        await authService.addRecoveryCodeAndEmail(email, recoveryCode);
+        await this.authService.addRecoveryCodeAndEmail(email, recoveryCode);
         try {
             await emailAdapter.sendRecoveryPasswordEmail(recoveryCode, email)
             return res.sendStatus(204)
@@ -193,20 +168,59 @@ authRouter.post('/password-recovery',
             return null
         }
     }
-)
-authRouter.post('/new-password',
-    countNumberLoginAttempts,
-    checkNewPassword,
-    isValidRecoveryCode,
-    errorsValidationMiddleware,
-    async (req: Request, res: Response) => {
+
+    async getNewPassword(req: Request, res: Response) {
         const recoveryCode = req.body.recoveryCode;
         const newPassword = req.body.newPassword;
 
-        const result = await authService.сonfirmAndChangePassword(recoveryCode, newPassword);
+        const result = await this.authService.сonfirmAndChangePassword(recoveryCode, newPassword);
         if (result) {
             return res.sendStatus(204)
         }
         return res.sendStatus(400)
     }
-)
+
+
+}
+
+export const authController = new AuthController(authService, jwtService, deviceRepository)
+
+
+authRouter.post('/login',
+    countNumberLoginAttempts, authController.loginUser.bind(authController))
+authRouter.post('/refresh-token',
+    checkRefreshTokenMiddleware, authController.refreshToken.bind(authController))
+
+authRouter.post('/logout',
+    checkRefreshTokenMiddleware, authController.logoutUser.bind(authController))
+
+
+authRouter.get('/me',
+    authValidationINfoMiddleware,
+    checkAccessTokenMiddleware, authController.getInfoOfCurrentUser.bind(authController))
+
+authRouter.post('/registration',
+    countNumberLoginAttempts,
+    userValidation,
+    errorsValidationMiddleware, authController.registrationUser.bind(authController))
+
+authRouter.post('/registration-confirmation',
+    countNumberLoginAttempts,
+    isEmailConfirmatedMiddlewareByCode,
+    errorsValidationMiddleware, authController.registrationConfirmation.bind(authController))
+
+authRouter.post('/registration-email-resending',
+    countNumberLoginAttempts,
+    emailUserMiddleware,
+    isEmailConfirmatedMiddlewareByEmail,
+    errorsValidationMiddleware, authController.registrationEmailResending.bind(authController))
+authRouter.post('/password-recovery',
+    countNumberLoginAttempts,
+    emailUserMiddleware,
+    // checkRegistredUserByEmail,
+    errorsValidationMiddleware, authController.passwordRecovery.bind(authController))
+authRouter.post('/new-password',
+    countNumberLoginAttempts,
+    checkNewPassword,
+    isValidRecoveryCode,
+    errorsValidationMiddleware, authController.getNewPassword.bind(authController))

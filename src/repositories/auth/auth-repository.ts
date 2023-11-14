@@ -5,20 +5,23 @@ import {ObjectId} from 'mongodb';
 import {DeviceDBModel} from "../../types/auth-types";
 import {FilterQuery} from "mongoose";
 
-export const authRepository = {
-
+export class AuthRepository {
     async getAllUsers() {
         return UserModel.find().sort({'createdAt': -1}).lean();
-    },
+    }
+
+
     async createUser(newUser: NewUsersDBType): Promise<UserViewModel> {
 
         const result = await UserModel.create(newUser);
         return usersMapping(newUser);
-    },
+    }
+
     async deleteUser(id: ObjectId): Promise<boolean> {
         const result = await UserModel.deleteOne({_id: id});
         return result.deletedCount === 1;
-    },
+    }
+
     async findUserById(userId: string): Promise<NewUsersDBType | null> {
         let foundUser: NewUsersDBType | null = await UserModel.findOne({_id: new ObjectId(userId)});
         if (foundUser) {
@@ -26,7 +29,8 @@ export const authRepository = {
         } else {
             return null;
         }
-    },
+    }
+
     async findUserByLogin(login: string): Promise<NewUsersDBType | null> {
         let foundUser = await UserModel.findOne({"accountData.login": login});
         if (foundUser) {
@@ -34,7 +38,8 @@ export const authRepository = {
         } else {
             return null;
         }
-    },
+    }
+
     async findUserByEmail(email: string): Promise<NewUsersDBType | null> {
         let foundUser = await UserModel.findOne({"accountData.email": email});
         if (foundUser) {
@@ -42,7 +47,8 @@ export const authRepository = {
         } else {
             return null;
         }
-    },
+    }
+
     async findUserByCode(code: string): Promise<NewUsersDBType | null> {
         let foundUser = await UserModel.findOne({"emailConfirmation.confirmationCode": code});
         if (foundUser) {
@@ -50,10 +56,12 @@ export const authRepository = {
         } else {
             return null;
         }
-    },
+    }
+
     async findLoginOrEmail(loginOrEmail: string): Promise<NewUsersDBType | null> {
         return UserModel.findOne({$or: [{"accountData.email": loginOrEmail}, {"accountData.login": loginOrEmail}]});
-    },
+    }
+
     async updateEmailConfimation(userId: ObjectId): Promise<boolean> {
         const result = await UserModel.updateOne({_id: new ObjectId(userId)}, {
             $set: {
@@ -61,7 +69,8 @@ export const authRepository = {
             }
         })
         return result.matchedCount === 1;
-    },
+    }
+
     async updateUserPassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
         const result = await UserModel.findOneAndUpdate({"accountData.email": email}, {
             $set: {
@@ -70,23 +79,25 @@ export const authRepository = {
             }
         })
         return true;
-    },
+    }
+
     async updateRecoveryCode(email: string, recoveryCode: string): Promise<ObjectId | null> {
         const result = await RecoveryCodeModel.findOneAndUpdate({email}, {
             $set: {recoveryCode}
         }, {returnDocument: 'after'})
 
         return result ? result._id : null;
-    },
+    }
+
     async addRecoveryCodeAndEmail(email: string, recoveryCode: string): Promise<ObjectId> {
         const result = await RecoveryCodeModel.create({email, recoveryCode})
         return result._id
-    },
+    }
 
     async findEmailByRecoveryCode(recoveryCode: string): Promise<string | null> {
         const result = await RecoveryCodeModel.findOne({recoveryCode})
         return result ? result.email : null
-    },
+    }
 
     async createOrUpdateRefreshToken(refreshTokenInfo: DeviceDBModel): Promise<Boolean> {
         const filter: FilterQuery<DeviceDBModel> = {
@@ -114,5 +125,6 @@ export const authRepository = {
         }
     }
 
-
 }
+
+export const authRepository = new AuthRepository()

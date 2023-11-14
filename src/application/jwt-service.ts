@@ -5,13 +5,15 @@ import {ObjectId} from 'mongodb';
 import {LoginSuccessViewModel, LoginSuccessViewModelForRefresh} from '../types/auth-types';
 import {UserAndDeviceTypeFromRefreshToken} from "../types/jwt-types";
 
-export const jwtService = {
+
+export class JwtService {
     async createJWT(user: NewUsersDBType): Promise<LoginSuccessViewModel> {
         const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '600s'})
         return {
             accessToken: token
         }
-    },
+    }
+
     async createRefreshJWT(user: NewUsersDBType, deviceId: string): Promise<LoginSuccessViewModelForRefresh> {
         const token = jwt.sign({
             userId: user._id,
@@ -20,7 +22,7 @@ export const jwtService = {
         return {
             refreshToken: token
         }
-    },
+    }
 
 
     async getUserIdByAccessToken(token: string): Promise<ObjectId | null> {
@@ -31,7 +33,8 @@ export const jwtService = {
         } catch (error) {
             return null
         }
-    },
+    }
+
     async getUserIdByRefreshToken(token: string): Promise<ObjectId | null> {
         try {
             const result = jwt.verify(token, settings.JWT_REFRESH_SECRET) as { userId: string };
@@ -40,7 +43,7 @@ export const jwtService = {
         } catch (error) {
             return null
         }
-    },
+    }
 
     async getTokenInfoByRefreshToken(token: string): Promise<UserAndDeviceTypeFromRefreshToken | null> {
         try {
@@ -57,3 +60,5 @@ export const jwtService = {
     }
 
 }
+
+export const jwtService = new JwtService()

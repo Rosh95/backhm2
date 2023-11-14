@@ -1,6 +1,6 @@
-import {deviceRepository} from "../repositories/device/device-repository";
-import {deviceQueryRepository} from "../repositories/device/device-query-repository";
 import {UserAndDeviceTypeFromRefreshToken} from "../types/jwt-types";
+import {deviceRepository, DeviceRepository} from "../repositories/device/device-repository";
+import {deviceQueryRepository, DeviceQueryRepository} from "../repositories/device/device-query-repository";
 
 export enum ResultCode {
     Success = 0,
@@ -18,13 +18,21 @@ export type ResultObject<T> = {
     errorMessage?: string
 }
 
-export const deviceService = {
+export class DeviceService {
+    constructor(
+        public deviceRepository: DeviceRepository,
+        public deviceQueryRepository: DeviceQueryRepository,
+    ) {
+
+    }
+
+
     async deleteOtherUserDevice(userId: string, deviceId: string): Promise<boolean> {
-        return await deviceRepository.deleteOtherUserDevice(userId, deviceId);
-    },
+        return await this.deviceRepository.deleteOtherUserDevice(userId, deviceId);
+    }
 
     async deleteUserDeviceById(currentUserInfo: UserAndDeviceTypeFromRefreshToken, currentDeviceId: string): Promise<ResultObject<boolean>> {
-        const findUserIdByDeviceId = await deviceQueryRepository.findUserIdByDeviceId(currentDeviceId);
+        const findUserIdByDeviceId = await this.deviceQueryRepository.findUserIdByDeviceId(currentDeviceId);
         if (!findUserIdByDeviceId) {
             return {
                 data: null,
@@ -48,7 +56,7 @@ export const deviceService = {
             }
         }
 
-        const isDeleted: boolean = await deviceRepository.deleteUserDeviceById(currentDeviceId);
+        const isDeleted: boolean = await this.deviceRepository.deleteUserDeviceById(currentDeviceId);
         if (isDeleted) {
             return {
                 data: true,
@@ -62,5 +70,7 @@ export const deviceService = {
             resultCode: ResultCode.ServerError,
             errorMessage: 'server error'
         }
-    },
+    }
 }
+
+export const deviceService = new DeviceService(deviceRepository, deviceQueryRepository)
